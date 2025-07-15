@@ -5,6 +5,8 @@ import {
   updateData,
   cleanAll,
 } from "./databaseLogic.js";
-function Record() {}
+function Record() {
+  console.log("");
+}
 
 export default Record;
