@@ -22,7 +22,7 @@ const firebaseConfig = {
   storageBucket: "temprecording.firebasestorage.app",
   messagingSenderId: "433465160677",
   appId: "1:433465160677:web:075bbef2733a3af388f50c",
-  measurementId: "G-GBRJYH26QY"
+  measurementId: "G-GBRJYH26QY",
 };
 
 // Initialize Firebase

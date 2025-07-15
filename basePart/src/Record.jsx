@@ -1,7 +1,3 @@
- 
-
-function Record(){
-    
-}
+function Record() {}
 
 export default Record;
