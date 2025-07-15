@@ -1,0 +1,4 @@
+virtualenv==20.30.0
+virtualenvwrapper-win==1.2.7  # Optional, for easier Windows management
+pip==25.1.1
+pipreqs==0.4.13

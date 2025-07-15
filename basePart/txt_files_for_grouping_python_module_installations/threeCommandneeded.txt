@@ -1,0 +1,3 @@
+pip install -r [nameoffile].txt - { requires the package == versionNumber format}
+python -m pip uninstall -r [nameoffile].txt { requires just the package name}
+pip freeze > [.textToUpdate].txt

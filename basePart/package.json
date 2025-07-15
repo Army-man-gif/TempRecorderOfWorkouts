@@ -1,0 +1,45 @@
+{
+  "name": "moz-todo-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "clean-buildfiles": "rimraf ..//docs",
+    "make-buildfiles": "md ..\\docs",
+    "deploy": "gh-pages -d dist",
+    "copy-build": "cp -r dist/* ../docs/",
+    "clean-dist": "rimraf dist",
+    "move-build": "npm run clean-buildfiles && npm run make-buildfiles && npm run copy-build && npm run clean-dist",
+    "build-and-move": "npm run build && npm run move-build",
+    "build-and-move-and-push": "npm run build && npm run move-build && npm run format && npm run git",
+    "pushToGit": "npm run git",
+    "git": "cd ../../TempRecorderOfWorkouts && git add . && git commit -m '.' && git push"
+  },
+  "dependencies": {
+    "firebase": "^11.10.0",
+    "prettier": "^3.6.2",
+    "react": "^19.1.0",
+    "react-confetti": "^6.4.0",
+    "react-dom": "^19.1.0",
+    "react-use": "^17.6.0",
+    "rimraf": "^6.0.1",
+    "three": "^0.178.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "vite": "^6.3.5"
+  }
+}

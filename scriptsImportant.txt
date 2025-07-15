@@ -1,0 +1,18 @@
+"scripts": {
+    "test": "vitest",
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "clean-buildfiles": "rimraf ..//docs",
+    "make-buildfiles": "md ..\\docs",
+    "deploy": "gh-pages -d dist",
+    "copy-build": "cp -r dist/* ../docs/",
+    "clean-dist": "rimraf dist",
+    "move-build": "npm run clean-buildfiles && npm run make-buildfiles && npm run copy-build && npm run clean-dist",
+    "build-and-move": "npm run build && npm run move-build",
+    "build-and-move-and-push": "npm run build && npm run move-build && npm run format && npm run git",
+    "pushToGit": "npm run git",
+    "git": "cd ../../fancy-toDoListForpersonaluse && git add . && git commit -m '.' && git push"
+  },
