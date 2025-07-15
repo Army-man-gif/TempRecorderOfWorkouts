@@ -5,8 +5,9 @@ import {
   updateData,
   cleanAll,
 } from "./databaseLogic.js";
+import { useState } from "react";
 function Record() {
-  console.log("");
+  const [user, setUser] = useState(() => prompt("Enter your name"));
 }
 
 export default Record;
