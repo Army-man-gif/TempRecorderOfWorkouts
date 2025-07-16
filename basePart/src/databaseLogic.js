@@ -37,39 +37,75 @@ export async function Users() {
 }
 
 // Make function to dynamically make user parent document
-export async function SpecificUser(Username, id) {
-  const docRef = doc(db, "Users", id);
-  await setDoc(docRef, {
-    name: { Username },
-  });
+export async function addUser(Username) {
+  const docRef = doc(db, "Users", Username);
+  await setDoc(docRef, {});
 }
 
-/*
- Make function to dynamically make workouts' child 
- subcollection of the user parent document
- to represent history of workouts
- This needs to use date to ID it, partially
-*/
-export async function getData(name) {
+async function getUser(name) {
   const fetch = await getDocs(collection(db, name));
   const data = [];
   fetch.forEach((doc) => {
-    data.push({ id: doc.id, name: doc.data().name });
+    data.push(doc.id);
   });
   return data;
 }
-export async function MakeSubcollection(Username) {
-  const fetch = await getData("Users");
+// const today = new Date().toISOString().split("T")[0];
+export async function WorkoutDateSubcollection(Username, subcollectionName) {
+  const fetch = await getUser("Users");
   let id = "";
   fetch.forEach((doc) => {
-    if (doc.name === Username) {
+    if (doc.id === Username) {
       id = doc.id;
     }
   });
-  const SpecificUserDocument = collection(db, "Users", id, "workouts");
+  const workoutDatesubcollection = collection(
+    db,
+    "Users",
+    id,
+    subcollectionName,
+  );
+  return workoutDatesubcollection;
+}
+export async function numberOfWorkoutsOnThatDate(Username, workoutDate) {
+  const fetch = await WorkoutDateSubcollection(Username, workoutDate);
+  if (fetch) {
+    const fetch2 = await getDocs(fetch);
+    return fetch2.size;
+  }
+  return 0;
+}
+// Make function to make each workout a subcollection
+export async function setNewWorkoutPage(Username, workoutDate) {
+  const fetch = await WorkoutDateSubcollection(Username, workoutDate);
+  if (fetch) {
+    const existing = await numberOfWorkoutsOnThatDate(Username, workoutDate);
+    if (existing) {
+      const newID = "workout" + (existing + 1);
+      const docRef = doc(fetch, newID);
+      await setDoc(docRef, {});
+    }
+  }
 }
 
-// Make function to make each workout
+export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
+  const workoutDateWorkouts = await WorkoutDateSubcollection(
+    Username,
+    workoutDate,
+  );
+  const data = [];
+  if (workoutDateWorkouts) {
+    const listOfWorkoutsThatDay = await getDocs(workoutDateWorkouts);
+    if (listOfWorkoutsThatDay) {
+      listOfWorkoutsThatDay.forEach((workout) => {
+        if (workout.id == "workout" + workoutNumber) {
+          data.push(workout.id);
+        }
+      });
+    }
+  }
+  return data;
+}
 
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
