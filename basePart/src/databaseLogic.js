@@ -75,9 +75,9 @@ export async function numberOfWorkoutsOnThatDate(Username, workoutDate) {
 export async function setNewWorkoutPage(Username, workoutDate) {
   const fetch = await WorkoutDateSubcollection(Username, workoutDate);
   if (fetch) {
-    const existing = await numberOfWorkoutsOnThatDate(Username, workoutDate);
-    if (existing) {
-      const newID = "workout" + (existing + 1);
+    const count = await numberOfWorkoutsOnThatDate(Username, workoutDate);
+    if (count) {
+      const newID = "workout" + (count + 1);
       const docRef = doc(fetch, newID);
       await setDoc(docRef, {});
     }
@@ -132,6 +132,31 @@ export async function numberOfExercisessInThatWorkout(
   if (fetch) {
     const fetch2 = await getDocs(fetch);
     return fetch2.size;
+  }
+}
+
+export async function setNewExercise(
+  Username,
+  workoutDate,
+  workoutNumber,
+  data,
+) {
+  const fetch = await exercisesSubcollection(
+    Username,
+    workoutDate,
+    workoutNumber,
+  );
+  if (fetch) {
+    const count = await numberOfExercisessInThatWorkout(
+      Username,
+      workoutDate,
+      workoutNumber,
+    );
+    if (count) {
+      const newID = "exercises" + (count + 1);
+      const docRef = doc(fetch, newID);
+      await setDoc(docRef, data, { merge: true });
+    }
   }
 }
 /*
