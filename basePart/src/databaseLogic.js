@@ -180,20 +180,28 @@ export async function getExercise(
     }
   }
 }
+
+export async function deleteExercise(
+  Username,
+  workoutDate,
+  workoutNumber,
+  exerciseNumber,
+) {
+  const userID = await getUser(Username);
+  const workoutID = await getWorkoutPage(Username, workoutDate, workoutNumber);
+  const exerciseID = await getExercise(
+    Username,
+    workoutDate,
+    workoutNumber,
+    exerciseNumber,
+  );
+}
 /*
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
   await updateDoc(docRef, newData);
 }
-export async function cleanAll(name) {
-  try {
-    const fetch = await getDocs(collection(db, name));
-    await Promise.all(fetch.docs.map((doc) => deleteDoc(doc.ref)));
-  } catch (error) {
-    console.error("Error cleaning all documents:", error);
-    throw error;
-  }
-}
+
 export async function clean(name, id) {
   await deleteDoc(doc(db, name, id));
 }
