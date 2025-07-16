@@ -50,7 +50,6 @@ async function getUser(Username) {
     }
   });
 }
-// const today = new Date().toISOString().split("T")[0];
 export async function WorkoutDateSubcollection(Username, subcollectionName) {
   const fetch = await getUser(Username);
   if (fetch) {

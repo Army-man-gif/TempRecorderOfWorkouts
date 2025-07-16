@@ -10,6 +10,7 @@ import {
  */
 import { useEffect, useState } from "react";
 function Record() {
+  // const today = new Date().toISOString().split("T")[0];
   const [user, setUser] = useState(() => prompt("Enter your username"));
   useEffect(() => {
     alert(
