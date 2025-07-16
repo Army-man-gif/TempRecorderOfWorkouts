@@ -101,6 +101,7 @@ export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
   }
 }
 
+/*
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
   await updateDoc(docRef, newData);
@@ -122,3 +123,4 @@ export async function addData(name, id, data) {
   const docRef = doc(db, name, id);
   await setDoc(docRef, data);
 }
+*/
