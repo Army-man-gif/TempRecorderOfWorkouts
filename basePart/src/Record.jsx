@@ -23,6 +23,15 @@ function Record() {
     }
     load(user);
   }, [user]);
+  return (
+    <>
+      <form>
+        <label for="workoutPick">Pick workout date: </label>
+        <input type="date" id="workoutPick" name="workoutPick"></input>
+        <button type="submit"></button>
+      </form>
+    </>
+  );
 }
 
 export default Record;
