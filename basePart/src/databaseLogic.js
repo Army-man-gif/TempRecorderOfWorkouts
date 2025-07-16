@@ -4,9 +4,8 @@ import {
   getDocs,
   setDoc,
   deleteDoc,
-  updateDoc,
+  getDoc,
   doc,
-  addDoc,
 } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -43,12 +42,9 @@ export async function addUser(Username) {
 }
 
 export async function getUser(Username) {
-  const fetch = await getDocs(collection(db, "Users"));
-  fetch.forEach((doc) => {
-    if (doc.id === Username) {
-      return doc.id;
-    }
-  });
+  const docRef = doc(db, "Users", Username);
+  const getDocRef = await getDoc(docRef);
+  return getDocRef.exists() ? Username : null;
 }
 export async function WorkoutDateSubcollection(Username, subcollectionName) {
   const fetch = await getUser(Username);
@@ -75,7 +71,7 @@ export async function setNewWorkoutPage(Username, workoutDate) {
   const fetch = await WorkoutDateSubcollection(Username, workoutDate);
   if (fetch) {
     const count = await numberOfWorkoutsOnThatDate(Username, workoutDate);
-    if (count) {
+    if (count || count === 0) {
       const newID = "workout" + (count + 1);
       const docRef = doc(fetch, newID);
       await setDoc(docRef, {});
@@ -84,20 +80,10 @@ export async function setNewWorkoutPage(Username, workoutDate) {
 }
 
 export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
-  const workoutDateWorkouts = await WorkoutDateSubcollection(
-    Username,
-    workoutDate,
-  );
-  if (workoutDateWorkouts) {
-    const listOfWorkoutsThatDay = await getDocs(workoutDateWorkouts);
-    if (listOfWorkoutsThatDay) {
-      listOfWorkoutsThatDay.forEach((workout) => {
-        if (workout.id == "workout" + workoutNumber) {
-          return workout.id;
-        }
-      });
-    }
-  }
+  const subcollection = await WorkoutDateSubcollection(Username, workoutDate);
+  const docRef = doc(subcollection, "workout" + workoutNumber);
+  const getDocRef = await getDoc(docRef);
+  return getDocRef.exists() ? docRef.id : null;
 }
 
 export async function exercisesSubcollection(
@@ -151,7 +137,7 @@ export async function setNewExercise(
       workoutDate,
       workoutNumber,
     );
-    if (count) {
+    if (count || count === 0) {
       const newID = "exercise" + (count + 1);
       const docRef = doc(fetch, newID);
       await setDoc(docRef, data, { merge: true });
@@ -164,21 +150,14 @@ export async function getExercise(
   workoutNumber,
   exerciseNumber,
 ) {
-  const exercises = await exercisesSubcollection(
+  const subcollection = await exercisesSubcollection(
     Username,
     workoutDate,
     workoutNumber,
   );
-  if (exercises) {
-    const listOfexercisesThatDay = await getDocs(exercises);
-    if (listOfexercisesThatDay) {
-      listOfexercisesThatDay.forEach((workout) => {
-        if (workout.id == "exercise" + exerciseNumber) {
-          return workout.id;
-        }
-      });
-    }
-  }
+  const docRef = doc(subcollection, "exercise" + exerciseNumber);
+  const getDocRef = await getDoc(docRef);
+  return getDocRef.exists() ? docRef.id : null;
 }
 
 export async function deleteExercise(
