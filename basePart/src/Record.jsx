@@ -1,10 +1,9 @@
 import { useDrop } from "react-use";
 
-import { Users, addUser, getUser } from "./databaseLogic.js";
+import { Users, addUser, getUser, setNewWorkoutPage } from "./databaseLogic.js";
 
 import { useEffect, useState } from "react";
 function Record() {
-  const today = new Date().toISOString().split("T")[0];
   const [user, setUser] = useState(() => prompt("Enter your username"));
   useEffect(() => {
     async function load() {
@@ -26,14 +25,17 @@ function Record() {
     }
     load(user);
   }, [user]);
-  async function createNewWorkout() {}
+  async function createNewWorkout() {
+    const today = new Date().toISOString().split("T")[0];
+    const makeNewWorkoutPage = await setNewWorkoutPage(user, today);
+  }
   return (
     <>
-      <button type="button" onClick={add}>
+      <button type="button" onClick={createNewWorkout}>
         Click to add a new workout
       </button>
       <form>
-        <label for="workoutPick">Pick workout date: </label>
+        <label htmlFor="workoutPick">Pick workout date: </label>
         <input type="date" id="workoutPick" name="workoutPick"></input>
         <button type="submit"></button>
       </form>
