@@ -42,30 +42,26 @@ export async function addUser(Username) {
   await setDoc(docRef, {});
 }
 
-async function getUser(name) {
-  const fetch = await getDocs(collection(db, name));
-  const data = [];
+async function getUser(Username) {
+  const fetch = await getDocs(collection(db, "Users"));
   fetch.forEach((doc) => {
-    data.push(doc.id);
+    if (doc.id === Username) {
+      return doc.id;
+    }
   });
-  return data;
 }
 // const today = new Date().toISOString().split("T")[0];
 export async function WorkoutDateSubcollection(Username, subcollectionName) {
-  const fetch = await getUser("Users");
-  let id = "";
-  fetch.forEach((doc) => {
-    if (doc.id === Username) {
-      id = doc.id;
-    }
-  });
-  const workoutDatesubcollection = collection(
-    db,
-    "Users",
-    id,
-    subcollectionName,
-  );
-  return workoutDatesubcollection;
+  const fetch = await getUser(Username);
+  if (fetch) {
+    const workoutDatesubcollection = collection(
+      db,
+      "Users",
+      fetch,
+      subcollectionName,
+    );
+    return workoutDatesubcollection;
+  }
 }
 export async function numberOfWorkoutsOnThatDate(Username, workoutDate) {
   const fetch = await WorkoutDateSubcollection(Username, workoutDate);
@@ -93,18 +89,16 @@ export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
     Username,
     workoutDate,
   );
-  const data = [];
   if (workoutDateWorkouts) {
     const listOfWorkoutsThatDay = await getDocs(workoutDateWorkouts);
     if (listOfWorkoutsThatDay) {
       listOfWorkoutsThatDay.forEach((workout) => {
         if (workout.id == "workout" + workoutNumber) {
-          data.push(workout.id);
+          return workout.id;
         }
       });
     }
   }
-  return data;
 }
 
 export async function updateData(id, newData, name) {
