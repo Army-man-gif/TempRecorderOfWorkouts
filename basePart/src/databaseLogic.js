@@ -101,6 +101,22 @@ export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
   }
 }
 
+export async function exercisesSubcollection(
+  Username,
+  workoutDate,
+  workoutNumber,
+) {
+  const fetch = await getUser(Username);
+  if (fetch) {
+    const workoutDatesubcollection = collection(
+      db,
+      "Users",
+      fetch,
+      getWorkoutPage(Username, workoutDate, workoutNumber),
+      "exercises",
+    );
+  }
+}
 /*
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
