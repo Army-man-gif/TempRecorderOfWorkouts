@@ -108,13 +108,14 @@ export async function exercisesSubcollection(
 ) {
   const fetch = await getUser(Username);
   if (fetch) {
-    const workoutDatesubcollection = collection(
+    const exercisesSubcollection = collection(
       db,
       "Users",
       fetch,
       getWorkoutPage(Username, workoutDate, workoutNumber),
       "exercises",
     );
+    return exercisesSubcollection;
   }
 }
 /*
