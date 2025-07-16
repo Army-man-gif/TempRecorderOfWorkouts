@@ -42,7 +42,7 @@ export async function addUser(Username) {
   await setDoc(docRef, {});
 }
 
-async function getUser(Username) {
+export async function getUser(Username) {
   const fetch = await getDocs(collection(db, "Users"));
   fetch.forEach((doc) => {
     if (doc.id === Username) {
