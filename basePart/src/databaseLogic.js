@@ -58,3 +58,7 @@ export async function addData(name, id, data) {
   const docRef = doc(db, name, id);
   await setDoc(docRef, data);
 }
+export async function addDataToSpecificCollection(name, id, data, specific) {
+  const collRef = collection(db, name, id, specific);
+  await addData(collRef, id, data);
+}
