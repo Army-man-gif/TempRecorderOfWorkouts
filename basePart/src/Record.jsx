@@ -12,7 +12,10 @@ function Record() {
       await addUser(user);
     }
     alert(
-      "This username is to be kept private. If you reveal this to others, they can access and alter your data. If you need to see ur username again for remembering type Yes in the following prompt",
+      `This username is to be kept private. If you reveal this to others,
+      they can access and alter your data. 
+      If you need to see ur username again for remembering type 
+      Yes in the following prompt`,
     );
     const confirm = prompt("Yes or No?");
     if (confirm == "Yes") {
