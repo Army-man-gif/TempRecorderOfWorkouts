@@ -118,6 +118,22 @@ export async function exercisesSubcollection(
     return exercisesSubcollection;
   }
 }
+
+export async function numberOfExercisessInThatWorkout(
+  Username,
+  workoutDate,
+  workoutNumber,
+) {
+  const fetch = await exercisesSubcollection(
+    Username,
+    workoutDate,
+    workoutNumber,
+  );
+  if (fetch) {
+    const fetch2 = await getDocs(fetch);
+    return fetch2.size;
+  }
+}
 /*
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
