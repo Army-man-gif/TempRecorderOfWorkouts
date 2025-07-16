@@ -101,7 +101,6 @@ export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
   }
 }
 
-console.log("Hello");
 /*
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
