@@ -1,4 +1,5 @@
 import { useDrop } from "react-use";
+/*
 import {
   getData,
   addData,
@@ -6,6 +7,7 @@ import {
   updateData,
   cleanAll,
 } from "./databaseLogic.js";
+ */
 import { useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
