@@ -6,6 +6,7 @@ import {
   deleteDoc,
   updateDoc,
   doc,
+  addDoc,
 } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -29,6 +30,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+
+// Make function to statically make the absolute parent collection
+export async function Users() {
+  const TopMostContainer = collection(db, "Users");
+}
+
+// Make function to dynamically make user parent document
+export async function SpecificUser(Username) {
+  const TopMostContainer = collection(db, "Users");
+  const docRef = addDoc(db, Username);
+}
+
+/*
+ Make function to dynamically make workouts' child 
+ subcollection of the user parent document
+ to represent history of workouts
+ This needs to use date to ID it, partially
+*/
+
+// Make function to make each workout
 
 export async function updateData(id, newData, name) {
   const docRef = doc(db, name, id);
@@ -57,8 +78,4 @@ export async function getData(name) {
 export async function addData(name, id, data) {
   const docRef = doc(db, name, id);
   await setDoc(docRef, data);
-}
-export async function addDataToSpecificCollection(name, id, data, specific) {
-  const collRef = collection(db, name, id, specific);
-  await addData(collRef, id, data);
 }
