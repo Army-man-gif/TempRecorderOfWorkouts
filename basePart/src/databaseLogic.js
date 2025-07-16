@@ -195,6 +195,18 @@ export async function deleteExercise(
     workoutNumber,
     exerciseNumber,
   );
+  if (userID && workoutID && exerciseID) {
+    const docRef = doc(
+      db,
+      "Users",
+      userID,
+      workoutDate,
+      workoutID,
+      "exercises",
+      exerciseID,
+    );
+    await deleteDoc(docRef);
+  }
 }
 /*
 export async function updateData(id, newData, name) {
