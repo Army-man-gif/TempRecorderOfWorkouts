@@ -153,9 +153,31 @@ export async function setNewExercise(
       workoutNumber,
     );
     if (count) {
-      const newID = "exercises" + (count + 1);
+      const newID = "exercise" + (count + 1);
       const docRef = doc(fetch, newID);
       await setDoc(docRef, data, { merge: true });
+    }
+  }
+}
+export async function getExercise(
+  Username,
+  workoutDate,
+  workoutNumber,
+  exerciseNumber,
+) {
+  const exercises = await exercisesSubcollection(
+    Username,
+    workoutDate,
+    workoutNumber,
+  );
+  if (exercises) {
+    const listOfexercisesThatDay = await getDocs(exercises);
+    if (listOfexercisesThatDay) {
+      listOfexercisesThatDay.forEach((workout) => {
+        if (workout.id == "exercise" + exerciseNumber) {
+          return workout.id;
+        }
+      });
     }
   }
 }
