@@ -37,9 +37,9 @@ export async function Users() {
 }
 
 // Make function to dynamically make user parent document
-export async function SpecificUser(Username) {
-  const TopMostContainer = collection(db, "Users");
-  const docRef = addDoc(TopMostContainer, {
+export async function SpecificUser(Username, id) {
+  const docRef = doc(db, "Users", id);
+  await setDoc(docRef, {
     name: { Username },
   });
 }
@@ -50,6 +50,24 @@ export async function SpecificUser(Username) {
  to represent history of workouts
  This needs to use date to ID it, partially
 */
+export async function getData(name) {
+  const fetch = await getDocs(collection(db, name));
+  const data = [];
+  fetch.forEach((doc) => {
+    data.push({ id: doc.id, name: doc.data().name });
+  });
+  return data;
+}
+export async function MakeSubcollection(Username) {
+  const fetch = await getData("Users");
+  let id = "";
+  fetch.forEach((doc) => {
+    if (doc.name === Username) {
+      id = doc.id;
+    }
+  });
+  const SpecificUserDocument = collection(db, "Users", id, "workouts");
+}
 
 // Make function to make each workout
 
@@ -69,14 +87,7 @@ export async function cleanAll(name) {
 export async function clean(name, id) {
   await deleteDoc(doc(db, name, id));
 }
-export async function getData(name) {
-  const fetch = await getDocs(collection(db, name));
-  const data = [];
-  fetch.forEach((doc) => {
-    data.push({ id: doc.id, ...doc.data() });
-  });
-  return data;
-}
+
 export async function addData(name, id, data) {
   const docRef = doc(db, name, id);
   await setDoc(docRef, data);
