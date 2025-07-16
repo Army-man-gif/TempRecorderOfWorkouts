@@ -208,18 +208,3 @@ export async function deleteExercise(
     await deleteDoc(docRef);
   }
 }
-/*
-export async function updateData(id, newData, name) {
-  const docRef = doc(db, name, id);
-  await updateDoc(docRef, newData);
-}
-
-export async function clean(name, id) {
-  await deleteDoc(doc(db, name, id));
-}
-
-export async function addData(name, id, data) {
-  const docRef = doc(db, name, id);
-  await setDoc(docRef, data);
-}
-*/
