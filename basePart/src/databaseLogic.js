@@ -39,7 +39,9 @@ export async function Users() {
 // Make function to dynamically make user parent document
 export async function SpecificUser(Username) {
   const TopMostContainer = collection(db, "Users");
-  const docRef = addDoc(db, Username);
+  const docRef = addDoc(TopMostContainer, {
+    name: { Username },
+  });
 }
 
 /*
