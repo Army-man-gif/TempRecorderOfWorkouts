@@ -14,13 +14,11 @@ import {
   getExerciseData,
 } from "./databaseLogic.js";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
   const [curDate, setCurDate] = useState("");
   const [workoutStarted, setworkoutStarted] = useState(false);
-  const [selectDate, setSelectDate] = useState(false);
-  const [displaying, setdiplsaying] = useState(false);
   const [workoutList, setWorkoutList] = useState([]);
 
   useEffect(() => {
@@ -80,53 +78,6 @@ function Record() {
     setworkoutStarted(false);
   }
 
-  function displayExercises() {
-    const body = document.getElementsByTagName("tbody")[0];
-    body.innerHTML = "";
-    //const table = document.getElementsByTagName("table");
-    let exerciseCount = 0;
-    let workoutCount = 0;
-    for (const workout of workoutList) {
-      exerciseCount = 0;
-      const workoutSeperationRow = document.createElement("tr");
-      const fillerCell = document.createElement("td");
-      fillerCell.textContent = "";
-      const workoutSeperationRowData = document.createElement("td");
-      workoutSeperationRowData.colSpan = 4;
-      workoutSeperationRowData.textContent = "Workout " + (workoutCount + 1);
-      workoutSeperationRow.appendChild(fillerCell);
-      workoutSeperationRow.appendChild(workoutSeperationRowData);
-      body.appendChild(workoutSeperationRow);
-      for (const exercise of workout) {
-        const newRow = document.createElement("tr");
-        const exerciseNumber = "Exercise " + (exerciseCount + 1);
-        const exerciseName = exercise.name;
-        const exerciseReps = exercise.reps;
-        const exerciseSets = exercise.sets;
-        const exerciseWeight = exercise.weight;
-
-        const exerciseNumberCell = document.createElement("td");
-        exerciseNumberCell.textContent = exerciseNumber;
-        const exerciseNameCell = document.createElement("td");
-        exerciseNameCell.textContent = exerciseName;
-        const exerciseRepsCell = document.createElement("td");
-        exerciseRepsCell.textContent = exerciseReps;
-        const exerciseSetsCell = document.createElement("td");
-        exerciseSetsCell.textContent = exerciseSets;
-        const exerciseWeightCell = document.createElement("td");
-        exerciseWeightCell.textContent = exerciseWeight;
-        newRow.appendChild(exerciseNumberCell);
-        newRow.appendChild(exerciseNameCell);
-        newRow.appendChild(exerciseRepsCell);
-        newRow.appendChild(exerciseSetsCell);
-        newRow.appendChild(exerciseWeightCell);
-        body.append(newRow);
-
-        exerciseCount++;
-      }
-      workoutCount++;
-    }
-  }
   async function viewWorkoutDate(e) {
     const dateFormatted = e.target.value;
     console.log("Date: " + dateFormatted);
@@ -167,14 +118,55 @@ function Record() {
       setWorkoutList([]);
     }
   }
-  function WorkoutButtonClicked() {
-    setSelectDate(true);
-  }
-  function WorkoutViewClosed() {
-    setSelectDate(false);
-  }
+
   return (
     <>
+      <form>
+        <label htmlFor="workoutPick">
+          Pick workout date to view workouts of:{" "}
+        </label>
+        <input
+          type="date"
+          id="workoutPick"
+          name="workoutPick"
+          onChange={(e) => viewWorkoutDate(e)}
+        ></input>
+      </form>
+      {workoutList.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="5">{curDate}</th>
+            </tr>
+            <tr>
+              <th>Exercise number</th>
+              <th>Exercise Name</th>
+              <th>Reps</th>
+              <th>Sets</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            {workoutList.map((workout, workoutIndex) => (
+              <React.Fragment key={workoutIndex}>
+                <tr>
+                  <td></td>
+                  <td colSpan="4">Workout {workoutIndex + 1}</td>
+                </tr>
+                {workout.map((exercise, exerciseIndex) => (
+                  <tr key={exerciseIndex}>
+                    <td>Exercise {exerciseIndex + 1}</td>
+                    <td>{exercise.name}</td>
+                    <td>{exercise.reps}</td>
+                    <td>{exercise.sets}</td>
+                    <td>{exercise.weight}</td>
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      )}
       <button
         type="button"
         onClick={createNewWorkout}
@@ -182,44 +174,6 @@ function Record() {
       >
         Click to add a new workout
       </button>
-
-      <button type="button" onClick={WorkoutButtonClicked}>
-        Click to view workouts on a specific date
-      </button>
-      {selectDate && (
-        <>
-          <form>
-            <label htmlFor="workoutPick">Pick workout date: </label>
-            <input
-              type="date"
-              id="workoutPick"
-              name="workoutPick"
-              onChange={(e) => viewWorkoutDate(e)}
-            ></input>
-            <button type="button" onClick={displayExercises}>
-              Click to view
-            </button>
-            <table>
-              <thead>
-                <tr>
-                  <th colSpan="5">{curDate}</th>
-                </tr>
-                <tr>
-                  <th>Exercise number</th>
-                  <th>Exercise Name</th>
-                  <th>Reps</th>
-                  <th>Sets</th>
-                  <th>Weight</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </form>
-          <button type="button" onClick={WorkoutViewClosed}>
-            Click to close view
-          </button>
-        </>
-      )}
       {workoutStarted && (
         <>
           <div className="flex-container">
