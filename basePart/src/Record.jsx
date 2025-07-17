@@ -9,6 +9,9 @@ import {
   deleteExercise,
   numberOfWorkoutsOnThatDate,
   getMostRecentWorkoutPage,
+  getWorkoutPage,
+  numberOfExercisessInThatWorkout,
+  getExercise,
 } from "./databaseLogic.js";
 
 import { useEffect, useState } from "react";
@@ -76,9 +79,22 @@ function Record() {
   async function viewWorkoutDate(e) {
     const dateUnformatted = e.target.value;
     const dateFormatted = dateUnformatted.toISOString().split("T")[0];
-    const number = numberOfWorkoutsOnThatDate(user, dateFormatted);
-    for (let i = 0; i < number; i++) {
-      const workout = await getWorkoutPage(user, dateFormatted, i);
+    const numberOfWorkouts = numberOfWorkoutsOnThatDate(user, dateFormatted);
+    const workoutList = [];
+    for (let i = 0; i < numberOfWorkouts; i++) {
+      const exerciseList = [];
+      const numberOfExercises = await numberOfExercisessInThatWorkout(
+        user,
+        dateFormatted,
+        i,
+      );
+      for (let j = 0; j < numberOfExercises; j++) {
+        const exercise = await getExercise(user, dateFormatted, i, j);
+        if (exercise) {
+          exerciseList.push(exercise);
+        }
+        workoutList.push(exerciseList);
+      }
     }
   }
   function WorkoutButtonClicked() {
