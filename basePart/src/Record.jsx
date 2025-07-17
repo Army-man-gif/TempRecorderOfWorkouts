@@ -89,7 +89,7 @@ function Record() {
         Click to add a new workout
       </button>
 
-      <button type="button" onClick={viewWorkoutDate}>
+      <button type="button" onClick={WorkoutButtonClicked}>
         Click to view workouts on a specific date
       </button>
       {selectDate && (
