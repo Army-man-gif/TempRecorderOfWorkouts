@@ -54,16 +54,20 @@ function Record() {
 
     const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
     if (workoutNumber || workoutNumber == 0) {
-      const Newexercise = await setNewExercise(user, curDate, workoutNumber, {
+      const today = new Date().toISOString().split("T")[0];
+      const Newexercise = await setNewExercise(user, today, workoutNumber, {
         exercise: exercise,
         reps: repsParsed,
         sets: setsParsed,
         weight: weightParsed,
       });
-      document.getElementById("addEx").value = "";
-      document.getElementById("addReps").value = "";
-      document.getElementById("addSets").value = "";
-      document.getElementById("addWeight").value = "";
+      if (Newexercise) {
+        document.getElementById("addEx").value = "";
+        document.getElementById("addReps").value = "";
+        document.getElementById("addSets").value = "";
+        document.getElementById("addWeight").value = "";
+        setCurDate(today);
+      }
     }
   }
   async function createNewWorkout() {
@@ -71,7 +75,11 @@ function Record() {
     const today = new Date().toISOString().split("T")[0];
     if (curDate != today) {
       const workout = await setNewWorkoutPage(user, today);
-      setCurDate(today);
+      if (workout) {
+        setCurDate(today);
+      } else {
+        console.log("error setting workout page");
+      }
     }
   }
   function finished() {
