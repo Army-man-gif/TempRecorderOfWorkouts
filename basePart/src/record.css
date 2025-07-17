@@ -1,0 +1,11 @@
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 20%;
+  gap: 20px;
+}
+#addEx,
+#addReps,
+#addSets {
+  height: 20px;
+}
