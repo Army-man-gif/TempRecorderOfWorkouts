@@ -20,6 +20,7 @@ function Record() {
   const [curDate, setCurDate] = useState("");
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [selectDate, setSelectDate] = useState(false);
+  const [displaying, setdiplsaying] = useState(false);
   useEffect(() => {
     async function load() {
       await Users();
@@ -76,6 +77,14 @@ function Record() {
   function finished() {
     setworkoutStarted(false);
   }
+
+  function displayExercises(workoutList) {
+    for (const workout of workoutList) {
+      for (const exercise of workout) {
+        console.log(exercise.name);
+      }
+    }
+  }
   async function viewWorkoutDate(e) {
     const dateFormatted = e.target.value;
     const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
@@ -99,6 +108,7 @@ function Record() {
         }
         workoutList.push(exerciseList);
       }
+      // call display stuff here
     }
   }
   function WorkoutButtonClicked() {
