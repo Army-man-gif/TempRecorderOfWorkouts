@@ -5,7 +5,4 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "/TempRecorderOfWorkouts/docs",
   plugins: [react()],
-  server: {
-    open: true,
-  },
 });

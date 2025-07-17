@@ -1,6 +1,14 @@
 import { useDrop } from "react-use";
 
-import { Users, addUser, getUser, setNewWorkoutPage } from "./databaseLogic.js";
+import {
+  Users,
+  addUser,
+  getUser,
+  setNewWorkoutPage,
+  setNewExercise,
+  deleteWorkoutPage,
+  deleteExercise,
+} from "./databaseLogic.js";
 
 import { useEffect, useState } from "react";
 function Record() {
@@ -27,7 +35,12 @@ function Record() {
   }, [user]);
   async function createNewWorkout() {
     const today = new Date().toISOString().split("T")[0];
-    const makeNewWorkoutPage = await setNewWorkoutPage(user, today);
+    const workout1 = await setNewWorkoutPage(user, today);
+    const workout2 = await setNewWorkoutPage(user, today);
+    const exercise1 = await setNewExercise(user, today, 2, {
+      reps: 5,
+    });
+    const deleteW = await deleteWorkoutPage(user, today, 1);
   }
   return (
     <>

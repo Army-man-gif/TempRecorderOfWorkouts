@@ -85,7 +85,6 @@ export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
   const getDocRef = await getDoc(docRef);
   return getDocRef.exists() ? docRef.id : null;
 }
-
 export async function exercisesSubcollection(
   Username,
   workoutDate,
@@ -93,14 +92,53 @@ export async function exercisesSubcollection(
 ) {
   const fetch = await getUser(Username);
   if (fetch) {
-    const exercisesSubcollection = collection(
-      db,
-      "Users",
-      fetch,
-      getWorkoutPage(Username, workoutDate, workoutNumber),
-      "exercises",
+    const workoutPageID = await getWorkoutPage(
+      Username,
+      workoutDate,
+      workoutNumber,
     );
-    return exercisesSubcollection;
+    const workoutDatesubcollection = await WorkoutDateSubcollection(
+      Username,
+      workoutDate,
+    );
+    if (workoutPageID && workoutDatesubcollection) {
+      const exercisesSubcollection = collection(
+        db,
+        "Users",
+        fetch,
+        workoutDate,
+        workoutPageID,
+        "exercises",
+      );
+      return exercisesSubcollection;
+    }
+  }
+}
+export async function deleteWorkoutPage(Username, workoutDate, workoutNumber) {
+  const subcollection = await WorkoutDateSubcollection(Username, workoutDate);
+  if (subcollection) {
+    const docRef = doc(subcollection, "workout" + workoutNumber);
+    const exerciseSub = await exercisesSubcollection(
+      Username,
+      workoutDate,
+      workoutNumber,
+    );
+    if (exerciseSub) {
+      const getsubcollection = await getDocs(exerciseSub);
+      if (getsubcollection) {
+        for (const snap of getsubcollection.docs) {
+          await deleteDoc(snap.ref);
+        }
+        const workoutRef = doc(
+          db,
+          "Users",
+          Username,
+          workoutDate,
+          "workout" + workoutNumber,
+        );
+        await deleteDoc(workoutRef);
+      }
+    }
   }
 }
 
