@@ -11,7 +11,7 @@ import {
   getMostRecentWorkoutPage,
   getWorkoutPage,
   numberOfExercisessInThatWorkout,
-  getExercise,
+  getExerciseData,
 } from "./databaseLogic.js";
 
 import { useEffect, useState } from "react";
@@ -129,6 +129,7 @@ function Record() {
   }
   async function viewWorkoutDate(e) {
     const dateFormatted = e.target.value;
+    console.log("Date: " + dateFormatted);
     const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
       user,
       dateFormatted,
@@ -143,15 +144,19 @@ function Record() {
           dateFormatted,
           i,
         );
-        for (let j = 0; j < numberOfExercises; j++) {
-          const exercise = await getExercise(user, dateFormatted, i, j);
-          if (exercise) {
-            exerciseList.push({
-              name: exercise.exercise,
-              sets: exercise.sets,
-              reps: exercise.reps,
-              weight: exercise.weight,
-            });
+        if (numberOfExercises) {
+          console.log("Number of exericses: " + numberOfExercises);
+          for (let j = 0; j < numberOfExercises; j++) {
+            const exercise = await getExerciseData(user, dateFormatted, i, j);
+            if (exercise) {
+              console.log("exercise data: " + exercise.reps);
+              exerciseList.push({
+                name: exercise.exercise,
+                sets: exercise.sets,
+                reps: exercise.reps,
+                weight: exercise.weight,
+              });
+            }
           }
         }
         WorkoutList.push(exerciseList);

@@ -203,7 +203,21 @@ export async function getExercise(
   const getDocRef = await getDoc(docRef);
   return getDocRef.exists() ? docRef.id : null;
 }
-
+export async function getExerciseData(
+  Username,
+  workoutDate,
+  workoutNumber,
+  exerciseNumber,
+) {
+  const subcollection = await exercisesSubcollection(
+    Username,
+    workoutDate,
+    workoutNumber,
+  );
+  const docRef = doc(subcollection, "exercise" + exerciseNumber);
+  const getDocRef = await getDoc(docRef);
+  return getDocRef.exists() ? getDocRef.data() : null;
+}
 export async function deleteExercise(
   Username,
   workoutDate,
