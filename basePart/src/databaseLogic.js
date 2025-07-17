@@ -79,6 +79,12 @@ export async function setNewWorkoutPage(Username, workoutDate) {
   }
 }
 
+export async function getMostRecentWorkoutPage(Username, workoutDate) {
+  const number = await numberOfWorkoutsOnThatDate(Username, workoutDate);
+  if (number) {
+    return number;
+  }
+}
 export async function getWorkoutPage(Username, workoutDate, workoutNumber) {
   const subcollection = await WorkoutDateSubcollection(Username, workoutDate);
   const docRef = doc(subcollection, "workout" + workoutNumber);

@@ -8,12 +8,15 @@ import {
   setNewExercise,
   deleteWorkoutPage,
   deleteExercise,
+  getMostRecentWorkoutPage,
 } from "./databaseLogic.js";
 
 import { useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
-  const [curDate, setCurDate] = "";
+  const [curDate, setCurDate] = useState("");
+  const [workoutStarted, setworkoutStarted] = useState(false);
+
   useEffect(() => {
     async function load() {
       await Users();
@@ -34,21 +37,38 @@ function Record() {
     }
     load(user);
   }, [user]);
-  async function createNewWorkout() {
-    const today = new Date().toISOString().split("T")[0];
-    if (curDate != "" && curDate != today) {
-      setCurDate(today);
+
+  async function addExercise() {
+    const exercise = document.getElementById("addEx").value;
+    const reps = document.getElementById("addReps").value;
+    const sets = document.getElementById("addSets").value;
+    const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
+    if (workoutNumber || workoutNumber == 0) {
+      const Newexercise = await setNewExercise(user, curDate, workoutNumber, {
+        exercise: exercise,
+        reps: reps,
+        sets: sets,
+      });
     }
-    const workout1 = await setNewWorkoutPage(user, curDate);
-    const workout2 = await setNewWorkoutPage(user, curDate);
-    const exercise1 = await setNewExercise(user, curDate, 2, {
-      reps: 5,
-    });
-    const deleteW = await deleteWorkoutPage(user, curDate, 1);
+  }
+  async function createNewWorkout() {
+    setworkoutStarted(true);
+    const today = new Date().toISOString().split("T")[0];
+    if (curDate != today) {
+      setCurDate(today);
+      const workout = await setNewWorkoutPage(user, curDate);
+    }
+  }
+  function finished() {
+    setworkoutStarted(false);
   }
   return (
     <>
-      <button type="button" onClick={createNewWorkout}>
+      <button
+        type="button"
+        onClick={createNewWorkout}
+        disabled={workoutStarted}
+      >
         Click to add a new workout
       </button>
       <form>
@@ -56,6 +76,23 @@ function Record() {
         <input type="date" id="workoutPick" name="workoutPick"></input>
         <button type="submit"></button>
       </form>
+
+      {workoutStarted && (
+        <>
+          <label htmlFor="addEx">Exercise: </label>
+          <input id="addEx" type="text"></input>
+          <label htmlFor="addReps">Reps: </label>
+          <input id="addReps" type="text"></input>
+          <label htmlFor="addSets">Sets: </label>
+          <input id="addSets" type="text"></input>
+          <button type="button" onClick={addExercise}>
+            Click to add exercise
+          </button>
+          <button type="button" onClick={finished}>
+            Click to finish workout
+          </button>
+        </>
+      )}
     </>
   );
 }
