@@ -72,6 +72,13 @@ function Record() {
   function finished() {
     setworkoutStarted(false);
   }
+  async function viewWorkoutDate(e) {
+    const dateUnformatted = e.target.value;
+    const dateFormatted = dateUnformatted.toISOString().split("T")[0];
+  }
+  function WorkoutButtonClicked() {
+    setSelectDate(true);
+  }
   return (
     <>
       <button
@@ -81,11 +88,19 @@ function Record() {
       >
         Click to add a new workout
       </button>
+
+      <button type="button" onClick={viewWorkoutDate}>
+        Click to view workouts on a specific date
+      </button>
       {selectDate && (
         <form>
           <label htmlFor="workoutPick">Pick workout date: </label>
-          <input type="date" id="workoutPick" name="workoutPick"></input>
-          <button type="button"></button>
+          <input
+            type="date"
+            id="workoutPick"
+            name="workoutPick"
+            onChange={(e) => viewWorkoutDate(e)}
+          ></input>
         </form>
       )}
       {workoutStarted && (
