@@ -41,16 +41,24 @@ function Record() {
     let exercise = document.getElementById("addEx").value;
     let reps = document.getElementById("addReps").value;
     let sets = document.getElementById("addSets").value;
+    let weight = document.getElementById("addWeight").value;
+
+    const repsParsed = parseInt(reps);
+    const setsParsed = parseInt(sets);
+    const weightParsed = parseFloat(weight);
+
     const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
     if (workoutNumber || workoutNumber == 0) {
       const Newexercise = await setNewExercise(user, curDate, workoutNumber, {
         exercise: exercise,
-        reps: reps,
-        sets: sets,
+        reps: repsParsed,
+        sets: setsParsed,
+        weight: weightParsed,
       });
       document.getElementById("addEx").value = "";
       document.getElementById("addReps").value = "";
       document.getElementById("addSets").value = "";
+      document.getElementById("addWeight").value = "";
     }
   }
   async function createNewWorkout() {
@@ -89,6 +97,8 @@ function Record() {
             <input id="addReps" type="text"></input>
             <label htmlFor="addSets">Sets: </label>
             <input id="addSets" type="text"></input>
+            <label htmlFor="addWeight">Weight (in kg): </label>
+            <input id="addWeight" type="text"></input>
             <br></br>
             <button type="button" onClick={addExercise}>
               Click to add exercise
