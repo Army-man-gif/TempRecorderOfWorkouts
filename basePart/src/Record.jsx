@@ -21,6 +21,8 @@ function Record() {
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [selectDate, setSelectDate] = useState(false);
   const [displaying, setdiplsaying] = useState(false);
+  const [workoutList, setWorkoutList] = useState([]);
+
   useEffect(() => {
     async function load() {
       await Users();
@@ -78,11 +80,51 @@ function Record() {
     setworkoutStarted(false);
   }
 
-  function displayExercises(workoutList) {
+  function displayExercises() {
+    const body = document.getElementsByTagName("tbody")[0];
+    body.innerHTML = "";
+    //const table = document.getElementsByTagName("table");
+    let exerciseCount = 0;
+    let workoutCount = 0;
     for (const workout of workoutList) {
+      const workoutSeperationRow = document.createElement("tr");
+      const fillerCell = document.createElement("td");
+      fillerCell.textContent = "";
+      const workoutSeperationRowData = document.createElement("td");
+      workoutSeperationRowData.colSpan = 4;
+      workoutSeperationRowData.textContent = "Workout " + workoutCount;
+      workoutSeperationRow.appendChild(fillerCell);
+      workoutSeperationRow.appendChild(workoutSeperationRowData);
+      body.appendChild(workoutSeperationRow);
+      body.appendChild(workoutSeperationRow);
       for (const exercise of workout) {
-        console.log(exercise.name);
+        const newRow = document.createElement("tr");
+        const exerciseNumber = "Exercise " + (exerciseCount + 1);
+        const exerciseName = exercise.name;
+        const exerciseReps = exercise.reps;
+        const exerciseSets = exercise.sets;
+        const exerciseWeight = exercise.weight;
+
+        const exerciseNumberCell = document.createElement("td");
+        exerciseNumberCell.textContent = exerciseNumber;
+        const exerciseNameCell = document.createElement("td");
+        exerciseNameCell.textContent = exerciseName;
+        const exerciseRepsCell = document.createElement("td");
+        exerciseRepsCell.textContent = exerciseReps;
+        const exerciseSetsCell = document.createElement("td");
+        exerciseSetsCell.textContent = exerciseSets;
+        const exerciseWeightCell = document.createElement("td");
+        exerciseWeightCell.textContent = exerciseWeight;
+        newRow.appendChild(exerciseNumberCell);
+        newRow.appendChild(exerciseNameCell);
+        newRow.appendChild(exerciseRepsCell);
+        newRow.appendChild(exerciseSetsCell);
+        newRow.appendChild(exerciseWeightCell);
+        body.append(newRow);
+
+        exerciseCount++;
       }
+      workoutCount++;
     }
   }
   async function viewWorkoutDate(e) {
@@ -92,7 +134,8 @@ function Record() {
       dateFormatted,
     );
     if (numberOfWorkouts) {
-      const workoutList = [];
+      console.log("Number of workouts: " + numberOfWorkouts);
+      const WorkoutList = [];
       for (let i = 0; i < numberOfWorkouts; i++) {
         const exerciseList = [];
         const numberOfExercises = await numberOfExercisessInThatWorkout(
@@ -103,12 +146,20 @@ function Record() {
         for (let j = 0; j < numberOfExercises; j++) {
           const exercise = await getExercise(user, dateFormatted, i, j);
           if (exercise) {
-            exerciseList.push(exercise);
+            exerciseList.push({
+              name: exercise.exercise,
+              sets: exercise.sets,
+              reps: exercise.reps,
+              weight: exercise.weight,
+            });
           }
         }
-        workoutList.push(exerciseList);
+        WorkoutList.push(exerciseList);
       }
-      // call display stuff here
+      setCurDate(dateFormatted);
+      setWorkoutList(WorkoutList);
+    } else {
+      setWorkoutList([]);
     }
   }
   function WorkoutButtonClicked() {
@@ -140,6 +191,24 @@ function Record() {
               name="workoutPick"
               onChange={(e) => viewWorkoutDate(e)}
             ></input>
+            <button type="button" onClick={displayExercises}>
+              Click to view
+            </button>
+            <table>
+              <thead>
+                <tr>
+                  <th colSpan="5">{curDate}</th>
+                </tr>
+                <tr>
+                  <th>Exercise number</th>
+                  <th>Exercise Name</th>
+                  <th>Reps</th>
+                  <th>Sets</th>
+                  <th>Weight</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </form>
           <button type="button" onClick={WorkoutViewClosed}>
             Click to close view
