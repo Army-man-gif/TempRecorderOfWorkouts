@@ -72,7 +72,7 @@ export async function setNewWorkoutPage(Username, workoutDate) {
   if (fetch) {
     const count = await numberOfWorkoutsOnThatDate(Username, workoutDate);
     if (count || count === 0) {
-      const newID = "workout" + (count + 1);
+      const newID = "workout" + count;
       const docRef = doc(fetch, newID);
       await setDoc(docRef, {});
     }
@@ -160,7 +160,7 @@ export async function numberOfExercisessInThatWorkout(
   );
   if (fetch) {
     const fetch2 = await getDocs(fetch);
-    return fetch2.size;
+    return fetch2 ? fetch2.size : 0;
   }
 }
 
@@ -182,7 +182,7 @@ export async function setNewExercise(
       workoutNumber,
     );
     if (count || count === 0) {
-      const newID = "exercise" + (count + 1);
+      const newID = "exercise" + count;
       const docRef = doc(fetch, newID);
       await setDoc(docRef, data, { merge: true });
     }

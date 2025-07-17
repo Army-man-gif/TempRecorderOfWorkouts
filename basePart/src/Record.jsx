@@ -87,15 +87,15 @@ function Record() {
     let exerciseCount = 0;
     let workoutCount = 0;
     for (const workout of workoutList) {
+      exerciseCount = 0;
       const workoutSeperationRow = document.createElement("tr");
       const fillerCell = document.createElement("td");
       fillerCell.textContent = "";
       const workoutSeperationRowData = document.createElement("td");
       workoutSeperationRowData.colSpan = 4;
-      workoutSeperationRowData.textContent = "Workout " + workoutCount;
+      workoutSeperationRowData.textContent = "Workout " + (workoutCount + 1);
       workoutSeperationRow.appendChild(fillerCell);
       workoutSeperationRow.appendChild(workoutSeperationRowData);
-      body.appendChild(workoutSeperationRow);
       body.appendChild(workoutSeperationRow);
       for (const exercise of workout) {
         const newRow = document.createElement("tr");
@@ -134,8 +134,8 @@ function Record() {
       user,
       dateFormatted,
     );
-    if (numberOfWorkouts) {
-      console.log("Number of workouts: " + numberOfWorkouts);
+    console.log(numberOfWorkouts);
+    if (numberOfWorkouts > 0) {
       const WorkoutList = [];
       for (let i = 0; i < numberOfWorkouts; i++) {
         const exerciseList = [];
@@ -144,8 +144,8 @@ function Record() {
           dateFormatted,
           i,
         );
-        if (numberOfExercises) {
-          console.log("Number of exericses: " + numberOfExercises);
+        console.log(numberOfExercises);
+        if (numberOfExercises > 0) {
           for (let j = 0; j < numberOfExercises; j++) {
             const exercise = await getExerciseData(user, dateFormatted, i, j);
             if (exercise) {
