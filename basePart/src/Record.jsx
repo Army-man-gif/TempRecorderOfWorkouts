@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
+  const [curDate, setCurDate] = "";
   useEffect(() => {
     async function load() {
       await Users();
@@ -35,12 +36,15 @@ function Record() {
   }, [user]);
   async function createNewWorkout() {
     const today = new Date().toISOString().split("T")[0];
-    const workout1 = await setNewWorkoutPage(user, today);
-    const workout2 = await setNewWorkoutPage(user, today);
-    const exercise1 = await setNewExercise(user, today, 2, {
+    if (curDate != "" && curDate != today) {
+      setCurDate(today);
+    }
+    const workout1 = await setNewWorkoutPage(user, curDate);
+    const workout2 = await setNewWorkoutPage(user, curDate);
+    const exercise1 = await setNewExercise(user, curDate, 2, {
       reps: 5,
     });
-    const deleteW = await deleteWorkoutPage(user, today, 1);
+    const deleteW = await deleteWorkoutPage(user, curDate, 1);
   }
   return (
     <>
