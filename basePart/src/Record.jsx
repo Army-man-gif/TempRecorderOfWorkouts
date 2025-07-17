@@ -7,6 +7,7 @@ import {
   setNewExercise,
   deleteWorkoutPage,
   deleteExercise,
+  numberOfWorkoutsOnThatDate,
   getMostRecentWorkoutPage,
 } from "./databaseLogic.js";
 
@@ -75,6 +76,10 @@ function Record() {
   async function viewWorkoutDate(e) {
     const dateUnformatted = e.target.value;
     const dateFormatted = dateUnformatted.toISOString().split("T")[0];
+    const number = numberOfWorkoutsOnThatDate(user, dateFormatted);
+    for (let i = 0; i < number; i++) {
+      const workout = await getWorkoutPage(user, dateFormatted, i);
+    }
   }
   function WorkoutButtonClicked() {
     setSelectDate(true);
