@@ -77,21 +77,25 @@ function Record() {
     setworkoutStarted(false);
   }
   async function viewWorkoutDate(e) {
-    const dateUnformatted = e.target.value;
-    const dateFormatted = dateUnformatted.toISOString().split("T")[0];
-    const numberOfWorkouts = numberOfWorkoutsOnThatDate(user, dateFormatted);
-    const workoutList = [];
-    for (let i = 0; i < numberOfWorkouts; i++) {
-      const exerciseList = [];
-      const numberOfExercises = await numberOfExercisessInThatWorkout(
-        user,
-        dateFormatted,
-        i,
-      );
-      for (let j = 0; j < numberOfExercises; j++) {
-        const exercise = await getExercise(user, dateFormatted, i, j);
-        if (exercise) {
-          exerciseList.push(exercise);
+    const dateFormatted = e.target.value;
+    const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
+      user,
+      dateFormatted,
+    );
+    if (numberOfWorkouts) {
+      const workoutList = [];
+      for (let i = 0; i < numberOfWorkouts; i++) {
+        const exerciseList = [];
+        const numberOfExercises = await numberOfExercisessInThatWorkout(
+          user,
+          dateFormatted,
+          i,
+        );
+        for (let j = 0; j < numberOfExercises; j++) {
+          const exercise = await getExercise(user, dateFormatted, i, j);
+          if (exercise) {
+            exerciseList.push(exercise);
+          }
         }
         workoutList.push(exerciseList);
       }
@@ -99,6 +103,9 @@ function Record() {
   }
   function WorkoutButtonClicked() {
     setSelectDate(true);
+  }
+  function WorkoutViewClosed() {
+    setSelectDate(false);
   }
   return (
     <>
@@ -114,15 +121,20 @@ function Record() {
         Click to view workouts on a specific date
       </button>
       {selectDate && (
-        <form>
-          <label htmlFor="workoutPick">Pick workout date: </label>
-          <input
-            type="date"
-            id="workoutPick"
-            name="workoutPick"
-            onChange={(e) => viewWorkoutDate(e)}
-          ></input>
-        </form>
+        <>
+          <form>
+            <label htmlFor="workoutPick">Pick workout date: </label>
+            <input
+              type="date"
+              id="workoutPick"
+              name="workoutPick"
+              onChange={(e) => viewWorkoutDate(e)}
+            ></input>
+          </form>
+          <button type="button" onClick={WorkoutViewClosed}>
+            Click to close view
+          </button>
+        </>
       )}
       {workoutStarted && (
         <>
