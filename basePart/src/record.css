@@ -14,3 +14,9 @@
 .table {
   border: 1px solid black;
 }
+
+#workout_block_line,
+#dateHeading {
+  background-color: black;
+  color: white;
+}

@@ -155,7 +155,9 @@ function Record() {
         <table>
           <thead>
             <tr>
-              <th colSpan="5">{curDate}</th>
+              <th id="dateHeading" colSpan="5">
+                Date: {curDate}
+              </th>
             </tr>
             <tr>
               <th>Exercise number</th>
@@ -170,7 +172,9 @@ function Record() {
               <React.Fragment key={workoutIndex}>
                 <tr>
                   <td></td>
-                  <td colSpan="4">Workout {workoutIndex + 1}</td>
+                  <td id="workout_block_line" colSpan="4">
+                    Workout {workoutIndex + 1}
+                  </td>
                 </tr>
                 {workout.map((exercise, exerciseIndex) => (
                   <tr key={exerciseIndex}>
