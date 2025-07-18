@@ -77,6 +77,7 @@ function Record() {
         document.getElementById("addSets").value = "";
         document.getElementById("addWeight").value = "";
         setCurDate(today);
+        changeWorkoutList(today);
       }
     }
   }
@@ -97,8 +98,7 @@ function Record() {
     setworkoutStarted(false);
   }
 
-  async function viewWorkoutDate(e) {
-    const dateFormatted = e.target.value;
+  async function changeWorkoutList(dateFormatted) {
     console.log("Date: " + dateFormatted);
     const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
       user,
@@ -136,6 +136,10 @@ function Record() {
     } else {
       setWorkoutList([]);
     }
+  }
+  async function viewWorkoutDate(e) {
+    const dateFormatted = e.target.value;
+    await changeWorkoutList(dateFormatted);
   }
 
   return (
