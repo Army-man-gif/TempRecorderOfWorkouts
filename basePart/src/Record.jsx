@@ -193,23 +193,42 @@ function Record() {
       </button>
       {workoutStarted && (
         <>
-          <div className="flex-container">
-            <label htmlFor="addEx">Exercise: </label>
+          <br></br>
+          <br></br>
+          <label htmlFor="addEx">Exercise: </label>
+          <div className="flexContainer">
             <input id="addEx" type="text"></input>
-            <label htmlFor="addReps">Reps: </label>
-            <input id="addReps" type="text"></input>
-            <label htmlFor="addSets">Sets: </label>
-            <input id="addSets" type="text"></input>
-            <label htmlFor="addWeight">Weight (in kg): </label>
-            <input id="addWeight" type="text"></input>
-            <br></br>
-            <button type="button" onClick={addExercise}>
-              Click to add exercise
-            </button>
-            <button type="button" onClick={finished}>
-              Click to finish workout
-            </button>
+            <button type="button">Click to restore previous value</button>
           </div>
+          <br></br>
+          <label htmlFor="addReps">Reps: </label>
+          <div className="flexContainer">
+            <input id="addReps" type="text"></input>
+            <button type="button">Click to restore previous value</button>
+          </div>
+          <br></br>
+
+          <label htmlFor="addSets">Sets: </label>
+          <div className="flexContainer">
+            <input id="addSets" type="text"></input>
+            <button type="button">Click to restore previous value</button>
+          </div>
+          <br></br>
+
+          <label htmlFor="addWeight">Weight (in kg): </label>
+          <div className="flexContainer">
+            <input id="addWeight" type="text"></input>
+            <button type="button">Click to restore previous value</button>
+          </div>
+
+          <br></br>
+
+          <button type="button" onClick={addExercise}>
+            Click to add exercise
+          </button>
+          <button type="button" onClick={finished}>
+            Click to finish workout
+          </button>
         </>
       )}
     </>

@@ -10,7 +10,11 @@
 #addWeight {
   height: 20px;
 }
-
+.flexContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
 .table {
   border: 1px solid black;
 }
