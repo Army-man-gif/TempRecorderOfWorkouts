@@ -14,13 +14,20 @@ import {
   getExerciseData,
 } from "./databaseLogic.js";
 
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
   const [curDate, setCurDate] = useState("");
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [workoutList, setWorkoutList] = useState([]);
-
+  const exercise = useRef(null);
+  const reps = useRef(null);
+  const sets = useRef(null);
+  const weight = useRef(null);
+  let pExercise = "";
+  let pReps = "";
+  let pSets = "";
+  let pWeight = "0";
   useEffect(() => {
     async function load() {
       await Users();
@@ -42,29 +49,32 @@ function Record() {
     load(user);
   }, [user]);
 
+  function restore() {
+    exercise.current.value = pExercise;
+    reps.current.value = pReps;
+    sets.current.value = pSets;
+    weight.current.value = pWeight;
+  }
   async function addExercise() {
-    let exercise = document.getElementById("addEx").value;
-    let reps = document.getElementById("addReps").value;
-    let sets = document.getElementById("addSets").value;
-    let weight = document.getElementById("addWeight").value;
     if (exercise != "" && reps != "" && sets != "" && weight != "") {
-      const repsParsed = parseInt(reps);
-      const setsParsed = parseInt(sets);
-      const weightParsed = parseFloat(weight);
       const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
       if (workoutNumber || workoutNumber == 0) {
         const today = new Date().toISOString().split("T")[0];
         const Newexercise = await setNewExercise(user, today, workoutNumber, {
-          exercise: exercise,
-          reps: repsParsed,
-          sets: setsParsed,
-          weight: weightParsed,
+          exercise: exercise.current.value,
+          reps: reps.current.value,
+          sets: sets.current.value,
+          weight: weight.current.value,
         });
         if (Newexercise) {
-          document.getElementById("addEx").value = "";
-          document.getElementById("addReps").value = "";
-          document.getElementById("addSets").value = "";
-          document.getElementById("addWeight").value = "";
+          pExercise = exercise.current.value;
+          pReps = reps.current.value;
+          pSets = sets.current.value;
+          pWeight = weight.current.value;
+          exercise.current.value = "";
+          reps.current.value = "";
+          sets.current.value = "";
+          weight.current.value = "";
           setCurDate(today);
           changeWorkoutList(today);
         }
@@ -197,28 +207,36 @@ function Record() {
           <br></br>
           <label htmlFor="addEx">Exercise: </label>
           <div className="flexContainer">
-            <input id="addEx" type="text"></input>
-            <button type="button">Click to restore previous value</button>
+            <input ref={exercise} id="addEx" type="text"></input>
+            <button onClick={restore} type="button">
+              Click to restore previous value
+            </button>
           </div>
           <br></br>
           <label htmlFor="addReps">Reps: </label>
           <div className="flexContainer">
-            <input id="addReps" type="text"></input>
-            <button type="button">Click to restore previous value</button>
+            <input ref={reps} id="addReps" type="text"></input>
+            <button onClick={restore} type="button">
+              Click to restore previous value
+            </button>
           </div>
           <br></br>
 
           <label htmlFor="addSets">Sets: </label>
           <div className="flexContainer">
-            <input id="addSets" type="text"></input>
-            <button type="button">Click to restore previous value</button>
+            <input ref={sets} id="addSets" type="text"></input>
+            <button onClick={restore} type="button">
+              Click to restore previous value
+            </button>
           </div>
           <br></br>
 
           <label htmlFor="addWeight">Weight (in kg): </label>
           <div className="flexContainer">
-            <input id="addWeight" type="text"></input>
-            <button type="button">Click to restore previous value</button>
+            <input ref={weight} id="addWeight" type="text"></input>
+            <button onClick={restore} type="button">
+              Click to restore previous value
+            </button>
           </div>
 
           <br></br>
