@@ -89,6 +89,7 @@ function Record() {
       console.log(workout);
       if (workout) {
         setCurDate(today);
+        changeWorkoutList(today);
       } else {
         console.log("error setting workout page");
       }
