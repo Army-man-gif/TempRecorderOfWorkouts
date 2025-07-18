@@ -84,15 +84,13 @@ function Record() {
   async function createNewWorkout() {
     setworkoutStarted(true);
     const today = new Date().toISOString().split("T")[0];
-    if (curDate != today) {
-      const workout = await setNewWorkoutPage(user, today);
-      console.log(workout);
-      if (workout) {
-        setCurDate(today);
-        changeWorkoutList(today);
-      } else {
-        console.log("error setting workout page");
-      }
+    const workout = await setNewWorkoutPage(user, today);
+    console.log(workout);
+    if (workout) {
+      setCurDate(today);
+      changeWorkoutList(today);
+    } else {
+      console.log("error setting workout page");
     }
   }
   function finished() {
