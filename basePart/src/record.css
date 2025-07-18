@@ -1,3 +1,17 @@
+.center {
+  position: fixed;
+  top: 10%;
+  left: 40%;
+  transform: translateX(-60%);
+}
+.move {
+  float: right;
+}
+.move2 {
+  position: fixed;
+  top: 10%;
+  left: 68%;
+}
 .flex-container {
   display: flex;
   flex-direction: column;

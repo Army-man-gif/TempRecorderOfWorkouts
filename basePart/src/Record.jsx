@@ -9,7 +9,6 @@ import {
   deleteExercise,
   numberOfWorkoutsOnThatDate,
   getMostRecentWorkoutPage,
-  getWorkoutPage,
   numberOfExercisessInThatWorkout,
   getExerciseData,
 } from "./databaseLogic.js";
@@ -20,14 +19,15 @@ function Record() {
   const [curDate, setCurDate] = useState("");
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [workoutList, setWorkoutList] = useState([]);
+  const [SpecificworkoutList, setSpecificWorkoutList] = useState([]);
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
   const weight = useRef(null);
-  let pExercise = "";
-  let pReps = "";
-  let pSets = "";
-  let pWeight = "0";
+  let pExercise = useRef(null);
+  let pReps = useRef(null);
+  let pSets = useRef(null);
+  let pWeight = useRef(null);
   useEffect(() => {
     async function load() {
       await Users();
@@ -35,6 +35,8 @@ function Record() {
       if (!lookFor) {
         await addUser(user);
       }
+      const today = new Date().toLocaleDateString("en-CA");
+      await changeWorkoutList(today);
     }
     alert(
       `This username is to be kept private. If you reveal this to others,
@@ -49,17 +51,25 @@ function Record() {
     load(user);
   }, [user]);
 
-  function restore() {
-    exercise.current.value = pExercise;
-    reps.current.value = pReps;
-    sets.current.value = pSets;
-    weight.current.value = pWeight;
+  function restore(field) {
+    if (field == "exercise") {
+      exercise.current.value = pExercise.current;
+    }
+    if (field == "sets") {
+      reps.current.value = pSets.current;
+    }
+    if (field == "reps") {
+      sets.current.value = pReps.current;
+    }
+    if (field == "weight") {
+      weight.current.value = pWeight.current;
+    }
   }
   async function addExercise() {
     if (exercise != "" && reps != "" && sets != "" && weight != "") {
       const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
       if (workoutNumber || workoutNumber == 0) {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA");
         const Newexercise = await setNewExercise(user, today, workoutNumber, {
           exercise: exercise.current.value,
           reps: reps.current.value,
@@ -67,27 +77,25 @@ function Record() {
           weight: weight.current.value,
         });
         if (Newexercise) {
-          pExercise = exercise.current.value;
-          pReps = reps.current.value;
-          pSets = sets.current.value;
-          pWeight = weight.current.value;
+          pExercise.current = exercise.current.value;
+          pReps.current = reps.current.value;
+          pSets.current = sets.current.value;
+          pWeight.current = weight.current.value;
           exercise.current.value = "";
           reps.current.value = "";
           sets.current.value = "";
           weight.current.value = "";
-          setCurDate(today);
-          changeWorkoutList(today);
+          await changeWorkoutList(today);
         }
       }
     }
   }
   async function createNewWorkout() {
     started();
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA");
     const workout = await setNewWorkoutPage(user, today);
     if (workout) {
-      setCurDate(today);
-      changeWorkoutList(today);
+      await changeWorkoutList(today);
     } else {
       console.log("error setting workout page");
     }
@@ -98,8 +106,7 @@ function Record() {
   function finished() {
     setworkoutStarted(false);
   }
-
-  async function changeWorkoutList(dateFormatted) {
+  async function changeSpecificWorkoutList(dateFormatted) {
     const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
       user,
       dateFormatted,
@@ -132,6 +139,43 @@ function Record() {
         }
       }
       setCurDate(dateFormatted);
+      setSpecificWorkoutList(WorkoutList);
+    } else {
+      setSpecificWorkoutList([]);
+    }
+  }
+  async function changeWorkoutList(dateFormatted) {
+    const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
+      user,
+      dateFormatted,
+    );
+    console.log(numberOfWorkouts);
+    if (numberOfWorkouts > 0) {
+      const WorkoutList = [];
+      for (let i = 0; i < numberOfWorkouts; i++) {
+        const exerciseList = [];
+        const numberOfExercises = await numberOfExercisessInThatWorkout(
+          user,
+          dateFormatted,
+          i,
+        );
+        console.log(numberOfExercises);
+        if (numberOfExercises > 0) {
+          for (let j = 0; j < numberOfExercises; j++) {
+            const exercise = await getExerciseData(user, dateFormatted, i, j);
+            if (exercise) {
+              console.log("exercise data: " + exercise.reps);
+              exerciseList.push({
+                name: exercise.exercise,
+                sets: exercise.sets,
+                reps: exercise.reps,
+                weight: exercise.weight,
+              });
+            }
+          }
+          WorkoutList.push(exerciseList);
+        }
+      }
       setWorkoutList(WorkoutList);
     } else {
       setWorkoutList([]);
@@ -139,12 +183,12 @@ function Record() {
   }
   async function viewWorkoutDate(e) {
     const dateFormatted = e.target.value;
-    await changeWorkoutList(dateFormatted);
+    await changeSpecificWorkoutList(dateFormatted);
   }
 
   return (
     <>
-      <form>
+      <form className="move">
         <label htmlFor="workoutPick">
           Pick workout date to view workouts of:{" "}
         </label>
@@ -155,12 +199,51 @@ function Record() {
           onChange={(e) => viewWorkoutDate(e)}
         ></input>
       </form>
-      {workoutList.length > 0 && (
-        <table>
+      {SpecificworkoutList.length > 0 && (
+        <table className="move2">
           <thead>
             <tr>
               <th id="dateHeading" colSpan="5">
                 Date: {curDate}
+              </th>
+            </tr>
+            <tr>
+              <th>Exercise number</th>
+              <th>Exercise Name</th>
+              <th>Reps</th>
+              <th>Sets</th>
+              <th>Weight (in kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SpecificworkoutList.map((workout, workoutIndex) => (
+              <React.Fragment key={workoutIndex}>
+                <tr>
+                  <td></td>
+                  <td id="workout_block_line" colSpan="4">
+                    Workout {workoutIndex + 1}
+                  </td>
+                </tr>
+                {workout.map((exercise, exerciseIndex) => (
+                  <tr key={exerciseIndex}>
+                    <td>Exercise {exerciseIndex + 1}</td>
+                    <td>{exercise.name}</td>
+                    <td>{exercise.reps}</td>
+                    <td>{exercise.sets}</td>
+                    <td>{exercise.weight}</td>
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {workoutList.length > 0 && (
+        <table className="center">
+          <thead>
+            <tr>
+              <th id="dateHeading" colSpan="5">
+                Date: {new Date().toLocaleDateString("en-CA")}
               </th>
             </tr>
             <tr>
@@ -208,7 +291,7 @@ function Record() {
           <label htmlFor="addEx">Exercise: </label>
           <div className="flexContainer">
             <input ref={exercise} id="addEx" type="text"></input>
-            <button onClick={restore} type="button">
+            <button onClick={() => restore("exercise")} type="button">
               Click to restore previous value
             </button>
           </div>
@@ -216,7 +299,7 @@ function Record() {
           <label htmlFor="addReps">Reps: </label>
           <div className="flexContainer">
             <input ref={reps} id="addReps" type="text"></input>
-            <button onClick={restore} type="button">
+            <button onClick={() => restore("reps")} type="button">
               Click to restore previous value
             </button>
           </div>
@@ -225,7 +308,7 @@ function Record() {
           <label htmlFor="addSets">Sets: </label>
           <div className="flexContainer">
             <input ref={sets} id="addSets" type="text"></input>
-            <button onClick={restore} type="button">
+            <button onClick={() => restore("sets")} type="button">
               Click to restore previous value
             </button>
           </div>
@@ -234,7 +317,7 @@ function Record() {
           <label htmlFor="addWeight">Weight (in kg): </label>
           <div className="flexContainer">
             <input ref={weight} id="addWeight" type="text"></input>
-            <button onClick={restore} type="button">
+            <button onClick={() => restore("weight")} type="button">
               Click to restore previous value
             </button>
           </div>
