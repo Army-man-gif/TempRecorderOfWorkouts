@@ -82,8 +82,8 @@ export async function setNewWorkoutPage(Username, workoutDate) {
 
 export async function getMostRecentWorkoutPage(Username, workoutDate) {
   const number = await numberOfWorkoutsOnThatDate(Username, workoutDate);
-  if (number) {
-    return number;
+  if (number || number === 0) {
+    return number - 1;
   }
 }
 export async function getWorkoutPage(Username, workoutDate, workoutNumber) {

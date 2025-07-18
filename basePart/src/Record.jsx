@@ -57,7 +57,7 @@ function Record() {
         " Reps: " +
         repsParsed +
         " Sets: " +
-        SVGUnitTypesParsed +
+        setsParsed +
         " Weight: " +
         weightParsed,
     );
