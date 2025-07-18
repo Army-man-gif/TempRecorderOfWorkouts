@@ -127,8 +127,8 @@ function Record() {
               });
             }
           }
+          WorkoutList.push(exerciseList);
         }
-        WorkoutList.push(exerciseList);
       }
       setCurDate(dateFormatted);
       setWorkoutList(WorkoutList);
