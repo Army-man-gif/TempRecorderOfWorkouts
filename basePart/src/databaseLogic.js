@@ -108,6 +108,8 @@ export async function exercisesSubcollection(
       Username,
       workoutDate,
     );
+    console.log(workoutPageID);
+    console.log(workoutDatesubcollection);
     if (workoutPageID && workoutDatesubcollection) {
       const exercisesSubcollection = collection(
         db,
@@ -186,8 +188,10 @@ export async function setNewExercise(
       const newID = "exercise" + count;
       const docRef = doc(fetch, newID);
       await setDoc(docRef, data, { merge: true });
+      return true;
     }
   }
+  return false;
 }
 export async function getExercise(
   Username,

@@ -57,11 +57,12 @@ function Record() {
         " Reps: " +
         repsParsed +
         " Sets: " +
-        repsParsed +
+        SVGUnitTypesParsed +
         " Weight: " +
         weightParsed,
     );
     const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
+    console.log(workoutNumber);
     if (workoutNumber || workoutNumber == 0) {
       const today = new Date().toISOString().split("T")[0];
       const Newexercise = await setNewExercise(user, today, workoutNumber, {
