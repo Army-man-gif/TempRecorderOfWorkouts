@@ -168,7 +168,7 @@ function Record() {
               <th>Exercise Name</th>
               <th>Reps</th>
               <th>Sets</th>
-              <th>Weight</th>
+              <th>Weight (in kg)</th>
             </tr>
           </thead>
           <tbody>
