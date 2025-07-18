@@ -71,6 +71,7 @@ export async function setNewWorkoutPage(Username, workoutDate) {
   const fetch = await WorkoutDateSubcollection(Username, workoutDate);
   if (fetch) {
     const count = await numberOfWorkoutsOnThatDate(Username, workoutDate);
+    console.log("Workout: " + count);
     if (count || count === 0) {
       const newID = "workout" + count;
       const docRef = doc(fetch, newID);
