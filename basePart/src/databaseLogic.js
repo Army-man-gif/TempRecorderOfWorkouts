@@ -75,6 +75,7 @@ export async function setNewWorkoutPage(Username, workoutDate) {
       const newID = "workout" + count;
       const docRef = doc(fetch, newID);
       await setDoc(docRef, {});
+      return docRef;
     }
   }
 }

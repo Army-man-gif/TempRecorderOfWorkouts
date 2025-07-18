@@ -51,7 +51,16 @@ function Record() {
     const repsParsed = parseInt(reps);
     const setsParsed = parseInt(sets);
     const weightParsed = parseFloat(weight);
-
+    console.log(
+      "Exercise: " +
+        exercise +
+        " Reps: " +
+        repsParsed +
+        " Sets: " +
+        repsParsed +
+        " Weight: " +
+        weightParsed,
+    );
     const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
     if (workoutNumber || workoutNumber == 0) {
       const today = new Date().toISOString().split("T")[0];
@@ -75,6 +84,7 @@ function Record() {
     const today = new Date().toISOString().split("T")[0];
     if (curDate != today) {
       const workout = await setNewWorkoutPage(user, today);
+      console.log(workout);
       if (workout) {
         setCurDate(today);
       } else {
