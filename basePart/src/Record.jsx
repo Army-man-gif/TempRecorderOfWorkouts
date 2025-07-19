@@ -56,31 +56,35 @@ function Record() {
       exercise.current.value = pExercise.current;
     }
     if (field == "sets") {
-      reps.current.value = pSets.current;
+      sets.current.value = pSets.current;
     }
     if (field == "reps") {
-      sets.current.value = pReps.current;
+      reps.current.value = pReps.current;
     }
     if (field == "weight") {
       weight.current.value = pWeight.current;
     }
   }
   async function addExercise() {
-    if (exercise != "" && reps != "" && sets != "" && weight != "") {
+    const ex = exercise.current?.value.trim();
+    const r = reps.current?.value.trim();
+    const s = sets.current?.value.trim();
+    const w = weight.current?.value.trim();
+    if (!ex || !r || !s || !w) {
       const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
       if (workoutNumber || workoutNumber == 0) {
         const today = new Date().toLocaleDateString("en-CA");
         const Newexercise = await setNewExercise(user, today, workoutNumber, {
-          exercise: exercise.current.value,
-          reps: reps.current.value,
-          sets: sets.current.value,
-          weight: weight.current.value,
+          exercise: ex,
+          reps: r,
+          sets: s,
+          weight: w,
         });
         if (Newexercise) {
-          pExercise.current = exercise.current.value;
-          pReps.current = reps.current.value;
-          pSets.current = sets.current.value;
-          pWeight.current = weight.current.value;
+          pExercise.current = ex;
+          pReps.current = r;
+          pSets.current = s;
+          pWeight.current = w;
           exercise.current.value = "";
           reps.current.value = "";
           sets.current.value = "";
@@ -149,7 +153,6 @@ function Record() {
       user,
       dateFormatted,
     );
-    console.log(numberOfWorkouts);
     if (numberOfWorkouts > 0) {
       const WorkoutList = [];
       for (let i = 0; i < numberOfWorkouts; i++) {
@@ -159,12 +162,10 @@ function Record() {
           dateFormatted,
           i,
         );
-        console.log(numberOfExercises);
         if (numberOfExercises > 0) {
           for (let j = 0; j < numberOfExercises; j++) {
             const exercise = await getExerciseData(user, dateFormatted, i, j);
             if (exercise) {
-              console.log("exercise data: " + exercise.reps);
               exerciseList.push({
                 name: exercise.exercise,
                 sets: exercise.sets,
