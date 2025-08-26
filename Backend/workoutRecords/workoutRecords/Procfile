@@ -1,1 +1,1 @@
-web: gunicorn PostgreTest.wsgi --log-file -
+web: gunicorn workoutRecords.wsgi --log-file -
