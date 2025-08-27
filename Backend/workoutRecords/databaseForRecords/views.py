@@ -1,3 +1,266 @@
 from django.shortcuts import render
+from django.middleware.csrf import get_token
+from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+import traceback
+import json
+from .models import Workout,Exercise
 
 # Create your views here.
+def get_csrf_token(request):
+    token = get_token(request)
+    return JsonResponse({"csrftoken": token})
+
+@ensure_csrf_cookie
+@require_GET
+def setToken(request):
+    # Sets the cookie on the frontend device
+    return JsonResponse({"detail":"CSRF token set"})
+
+
+@require_POST
+def createUser(request):
+    print("Method: ",request.method,"Body: ",request.body)
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            passkey = data.get("passkey")
+            user = User.objects.create_user(username=username,password=passkey)
+            user.save()
+            return JsonResponse({"message":"Created user"})
+        except Exception as e:
+            traceback.print_exc()
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+@require_POST
+def validateUser(request,username="",passkey=""):
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            user = authenticate(request,username=username,password=passkey)
+            if(user is not None):
+                return JsonResponse({"message":"User validated"})
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    else:
+        try:
+            user = authenticate(request,username=username,password=passkey)
+            if(user is not None):
+                return True
+        except Exception:
+            return False
+        
+@require_POST
+def getUser(request):
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username,passkey=passkey)
+                userDataToReturn = {"username":user.username,"passkey":user.passkey}
+                return JsonResponse(userDataToReturn)
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+@require_POST
+def deleteUser(request):
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username,passkey=passkey)
+                user.delete()
+                return JsonResponse({"message":"Deleted user"})
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+# ----------------------------------------------------------------------------------------
+
+@require_POST
+def loginView(request):
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            passkey = data.get("passkey")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username,password=passkey)
+                login(request, user)
+                return JsonResponse({"message":"User logged in"})
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+@login_required()
+def logoutView(request):
+    if request.user.is_authenticated:
+        logout(request)
+        return JsonResponse({"message": "User logged out"})
+    return JsonResponse({"error":"User not logged in yet"})
+
+
+# ----------------------------------------------------------------------------------------
+
+@login_required()
+@require_POST
+def addExercise(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            data = json.loads(request.body)
+            workout = data.get("workout")
+            exerciseName = data.get("exerciseName")
+            exerciseReps = data.get("exerciseReps")
+            exerciseSets = data.get("exerciseSets")
+            exerciseWeight = data.get("exerciseWeight")
+            exercise = Exercise(workout=workout, exerciseName=exerciseName, exerciseReps=exerciseReps, exerciseSets=exerciseSets,exerciseWeight=exerciseWeight)
+            exercise.save()
+            return JsonResponse({"message": "Exercise created"})
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+@login_required()
+@require_POST
+def updateExercise(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            try:
+                data = json.loads(request.body)
+                workout = data.get("workout")
+                exerciseName = data.get("exerciseName")
+                exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
+
+                exerciseReps = data.get("exerciseReps","")
+                exerciseSets = data.get("exerciseSets","")
+                exerciseWeight = data.get("exerciseWeight","")
+                if(exerciseReps != ""):
+                    exercise.exerciseReps = exerciseReps
+                if(exerciseSets != ""):
+                    exercise.exerciseSets = exerciseSets
+                if(exerciseWeight != ""):
+                    exercise.exerciseWeight = exerciseWeight
+                exercise.save()
+                return JsonResponse({"message": "Exercise updated"})
+            except Exercise.DoesNotExist:
+                return addExercise(request)
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+
+@login_required()
+@require_POST
+def deleteExercise(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            data = json.loads(request.body)
+            workout = data.get("workout")
+            exerciseName = data.get("exerciseName")
+            exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
+            exercise.delete()
+            return JsonResponse({"message": "Exercise deleted"})
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+# ----------------------------------------------------------------------------------------
+
+@login_required()
+@require_POST
+def addWorkout(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            data = json.loads(request.body)
+            workoutName = data.get("workoutName")
+            workout = Workout(user=request.user, workoutName=workoutName)
+            workout.save()
+            return JsonResponse({"message": "Workout created"})
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+@login_required()
+@require_POST
+def updateWorkout(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            try:
+                data = json.loads(request.body)
+                workoutName = data.get("workoutName")
+                workout = Workout(user=request.user)
+                workout.workoutName = workoutName
+                workout.save()
+                return JsonResponse({"message": "Workout updated"})
+            except Workout.DoesNotExist:
+                return addWorkout(request)
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+@login_required()
+@require_POST
+def deleteWorkout(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            data = json.loads(request.body)
+            workoutName = data.get("workoutName")
+            workout = Workout(user=request.user,workoutName=workoutName)
+            workout.delete()
+            return JsonResponse({"message": "Workout deleted"})
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
+
+@login_required()
+@require_POST
+def getAllWorkoutbasedOnDate(request):
+    pass
+    """
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username,passkey=passkey)
+                userDataToReturn = {"username":user.username,"passkey":user.passkey}
+                return JsonResponse(userDataToReturn)
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+    """
+
+@login_required()
+@require_POST
+def getAllExercisesBasedonWorkout(request):
+    pass
+    """
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username,passkey=passkey)
+                userDataToReturn = {"username":user.username,"passkey":user.passkey}
+                return JsonResponse(userDataToReturn)
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
+    """

@@ -1,0 +1,27 @@
+from django.urls import path,include
+from . import views
+urlpatterns = [
+    path("setToken/",views.setToken,name="setToken"),
+    path("getToken/",views.get_csrf_token,name="getToken"),
+    
+    path("createUser/", views.createUser,name="createUser"),
+    path("validateUser/", views.validateUser,name="validateUser"),
+    path("getUser/", views.getUser,name="getUser"),
+    path("deleteUser/<str:username>/", views.deleteUser,name="deleteUser"),
+    
+    path("login/", views.loginView,name="login"),
+    path("logout/", views.logoutView,name="logout"),
+    
+    path("addExercise/", views.addExercise,name="addExercise"),
+    path("updateExercise/", views.updateExercise,name="updateExercise"),
+    path("deleteExercise/", views.deleteExercise,name="deleteExercise"),
+    
+    
+    path("addWorkout/", views.addWorkout,name="addWorkout"),
+    path("updateWorkout/", views.updateWorkout,name="updateWorkout"),
+    path("deleteWorkout/",views.deleteWorkout,name="deleteWorkout"),
+    
+    path("getAllWorkoutbasedOnDate/", views.getAllWorkoutbasedOnDate,name="getAllWorkoutbasedOnDate"),
+    path("getAllExercisesBasedonWorkout/", views.getAllExercisesBasedonWorkout,name="getAllExercisesBasedonWorkout"),
+
+]
