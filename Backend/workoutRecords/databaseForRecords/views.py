@@ -123,45 +123,33 @@ def logoutView(request):
 
 @login_required()
 @require_POST
-def addExercise(request):
-    if request.user.is_authenticated:
-        if(request.method == "POST"):
-            data = json.loads(request.body)
-            workout = data.get("workout")
-            exerciseName = data.get("exerciseName")
-            exerciseReps = data.get("exerciseReps")
-            exerciseSets = data.get("exerciseSets")
-            exerciseWeight = data.get("exerciseWeight")
-            exercise = Exercise(workout=workout, exerciseName=exerciseName, exerciseReps=exerciseReps, exerciseSets=exerciseSets,exerciseWeight=exerciseWeight)
-            exercise.save()
-            return JsonResponse({"message": "Exercise created"})
-        return JsonResponse({"message":"Only POST method allowed"})
-    return JsonResponse({"message":"User not logged in"})
-
-@login_required()
-@require_POST
 def updateExercise(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
             try:
                 data = json.loads(request.body)
-                workout = data.get("workout")
-                exerciseName = data.get("exerciseName")
-                exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
-
-                exerciseReps = data.get("exerciseReps","")
-                exerciseSets = data.get("exerciseSets","")
-                exerciseWeight = data.get("exerciseWeight","")
-                if(exerciseReps != ""):
-                    exercise.exerciseReps = exerciseReps
-                if(exerciseSets != ""):
-                    exercise.exerciseSets = exerciseSets
-                if(exerciseWeight != ""):
-                    exercise.exerciseWeight = exerciseWeight
-                exercise.save()
-                return JsonResponse({"message": "Exercise updated"})
-            except Exercise.DoesNotExist:
-                return addExercise(request)
+                workoutName = data.get("workoutName")
+                exerciseName = data.get("exerciseName", "")
+                exerciseReps = data.get("exerciseReps",None)
+                exerciseSets = data.get("exerciseSets",None)
+                exerciseWeight = data.get("exerciseWeight",None)
+                workout, _ = Workout.objects.get_or_create(user=request.user, workoutName=workoutName)
+                exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
+                defaults={
+                    "exerciseReps":exerciseReps, 
+                    "exerciseSets":exerciseSets,
+                    "exerciseWeight":exerciseWeight
+                }
+                )
+                if not created:
+                    for field in ["exerciseReps","exerciseSets","exerciseWeight"]:
+                        value = data.get(field)
+                        if value is not None:
+                            setattr(exercise, field, value)
+                message = "Exercise created" if created else "Exercise updated"
+                return JsonResponse({"message": message})
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
         return JsonResponse({"message":"Only POST method allowed"})
     return JsonResponse({"message":"User not logged in"})
 
@@ -188,8 +176,8 @@ def addWorkout(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
             data = json.loads(request.body)
-            workoutName = data.get("workoutName")
-            workout = Workout(user=request.user, workoutName=workoutName)
+            newName = data.get("newName")
+            workout = Workout(user=request.user, workoutName=newName)
             workout.save()
             return JsonResponse({"message": "Workout created"})
         return JsonResponse({"message":"Only POST method allowed"})
@@ -202,9 +190,10 @@ def updateWorkout(request):
         if(request.method == "POST"):
             try:
                 data = json.loads(request.body)
-                workoutName = data.get("workoutName")
-                workout = Workout(user=request.user)
-                workout.workoutName = workoutName
+                originalName = data.get("originalName")
+                newName = data.get("newName")
+                workout = Workout.objects.get(user=request.user,name=originalName)
+                workout.name = newName
                 workout.save()
                 return JsonResponse({"message": "Workout updated"})
             except Workout.DoesNotExist:
@@ -227,40 +216,29 @@ def deleteWorkout(request):
 
 @login_required()
 @require_POST
-def getAllWorkoutbasedOnDate(request):
-    pass
-    """
-    if(request.method == "POST"):
-        try:
-            data = json.loads(request.body)
-            username = data.get("username","")
-            passkey = data.get("passkey","")
-            if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username,passkey=passkey)
-                userDataToReturn = {"username":user.username,"passkey":user.passkey}
-                return JsonResponse(userDataToReturn)
-            return JsonResponse({"error": "User does not exist"}, status=405)
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
-    return JsonResponse({"error": "Only POST allowed"}, status=405)
-    """
+def getAllExercisesbasedOnDate(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            try:
+                data = json.loads(request.body)
+                date = data.get("date")
+                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date)
 
-@login_required()
-@require_POST
-def getAllExercisesBasedonWorkout(request):
-    pass
-    """
-    if(request.method == "POST"):
-        try:
-            data = json.loads(request.body)
-            username = data.get("username","")
-            passkey = data.get("passkey","")
-            if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username,passkey=passkey)
-                userDataToReturn = {"username":user.username,"passkey":user.passkey}
-                return JsonResponse(userDataToReturn)
-            return JsonResponse({"error": "User does not exist"}, status=405)
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
-    return JsonResponse({"error": "Only POST allowed"}, status=405)
-    """
+                toReturn = {}
+                for exercise in exercises:
+                    workoutName = exercise.workout.name
+                    exerciseName = exercise.exerciseName
+                    if workoutName not in toReturn:
+                        toReturn[workoutName] = []
+                    toReturn[workoutName].append({
+                        "name" : exerciseName,
+                        "reps" : exercise.exerciseReps,
+                        "sets" : exercise.exerciseSets,
+                        "weight" : exercise.exerciseWeight 
+                    })
+                return JsonResponse(toReturn)
+            except Exception as e:
+                return JsonResponse({"error":str(e)},status=400)
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    return JsonResponse({"message":"User not logged in"})
+
