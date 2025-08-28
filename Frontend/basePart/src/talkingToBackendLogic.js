@@ -288,12 +288,12 @@ export async function SendData(url, data) {
 export async function User(Username, passkey) {
   const data = { username: Username, passkey: passkey };
   const user = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com//records/GetorMakeUser/",
+    "https://workoutsbackend-yn5p.onrender.com/records/GetorMakeUser/",
     data,
   );
   if (user.ok) {
     const login = await SendData(
-      "https://workoutsbackend-yn5p.onrender.com//records/login/",
+      "https://workoutsbackend-yn5p.onrender.com/records/login/",
       data,
     );
     if (login.ok) {
@@ -307,7 +307,7 @@ export async function User(Username, passkey) {
 export async function updateExercise(data) {
   // workoutName,exerciseName,exerciseReps,exerciseSets,exerciseWeight
   const changeOraddExercise = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com//records/updateExercise/",
+    "https://workoutsbackend-yn5p.onrender.com/records/updateExercise/",
     data,
   );
   if (changeOraddExercise.ok) {
@@ -317,7 +317,7 @@ export async function updateExercise(data) {
 
 export async function logout() {
   const loggingout = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com//records/logout/",
+    "https://workoutsbackend-yn5p.onrender.com/records/logout/",
     {},
   );
   if (loggingout.ok) {
@@ -328,7 +328,7 @@ export async function logout() {
 export async function getExercisesofThatDate(date) {
   const data = { date: date };
   const collectingExercises = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com//records/getAllExercisesbasedOnDate/",
+    "https://workoutsbackend-yn5p.onrender.com/records/getAllExercisesbasedOnDate/",
     data,
   );
   if (collectingExercises.ok) {
