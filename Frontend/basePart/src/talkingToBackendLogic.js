@@ -284,6 +284,7 @@ export async function SendData(url, data) {
   }
   return response;
 }
+//   if (user["status"] === "User created" || user["status"] === "User fetched") {
 
 export async function User(Username, passkey) {
   const data = { username: Username, passkey: passkey };
@@ -291,12 +292,12 @@ export async function User(Username, passkey) {
     "https://workoutsbackend-yn5p.onrender.com/records/GetorMakeUser/",
     data,
   );
-  if (user.ok) {
+  if (user["status"]) {
     const login = await SendData(
       "https://workoutsbackend-yn5p.onrender.com/records/login/",
       data,
     );
-    if (login.ok) {
+    if (login.message) {
       console.log("Logged in");
     } else {
       console.log("Login failed");
@@ -310,7 +311,7 @@ export async function updateExercise(data) {
     "https://workoutsbackend-yn5p.onrender.com/records/updateExercise/",
     data,
   );
-  if (changeOraddExercise.ok) {
+  if (changeOraddExercise.message) {
     console.log("Exercise changed/added");
   }
 }
@@ -320,7 +321,7 @@ export async function logout() {
     "https://workoutsbackend-yn5p.onrender.com/records/logout/",
     {},
   );
-  if (loggingout.ok) {
+  if (loggingout.message) {
     console.log("Logged out");
   }
 }
@@ -331,8 +332,8 @@ export async function getExercisesofThatDate(date) {
     "https://workoutsbackend-yn5p.onrender.com/records/getAllExercisesbasedOnDate/",
     data,
   );
-  if (collectingExercises.ok) {
+  if (collectingExercises["message"]) {
     console.log("Exercises collected");
-    return collectingExercises;
+    return collectingExercises["data"];
   }
 }
