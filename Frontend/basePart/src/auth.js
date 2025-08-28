@@ -1,5 +1,5 @@
 export async function setCookie() {
-  await fetch("https://workoutsbackend-yn5p.onrender.com//records/setToken/", {
+  await fetch("https://workoutsbackend-yn5p.onrender.com/records/setToken/", {
     method: "GET",
     credentials: "include",
   });
@@ -8,7 +8,7 @@ export async function setCookie() {
 
 export async function getCookieFromBrowser() {
   const fetchTheData = await fetch(
-    "https://workoutsbackend-yn5p.onrender.com//records/getToken/",
+    "https://workoutsbackend-yn5p.onrender.com/records/getToken/",
     {
       method: "GET",
       credentials: "include",
