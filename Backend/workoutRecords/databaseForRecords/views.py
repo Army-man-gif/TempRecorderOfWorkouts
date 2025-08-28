@@ -5,11 +5,13 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 import traceback
 import json
 from .models import Workout,Exercise
 
+def records_home(request):
+    return HttpResponse("Records root works!")
 # Create your views here.
 def get_csrf_token(request):
     token = get_token(request)
