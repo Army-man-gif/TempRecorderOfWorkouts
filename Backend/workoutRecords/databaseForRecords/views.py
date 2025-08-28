@@ -23,16 +23,19 @@ def setToken(request):
 
 
 @require_POST
-def createUser(request):
+def GetorMakeUser(request):
     print("Method: ",request.method,"Body: ",request.body)
     if(request.method == "POST"):
         try:
             data = json.loads(request.body)
             username = data.get("username")
             passkey = data.get("passkey")
-            user = User.objects.create_user(username=username,password=passkey)
+            user,created = User.objects.get_or_create(username=username,password=passkey)
             user.save()
-            return JsonResponse({"message":"Created user"})
+            if created:
+                user = User.objects.get(username=username,password=passkey)
+            userDataToReturn = {"username":user.username,"passkey":user.passkey}
+            return JsonResponse(userDataToReturn)
         except Exception as e:
             traceback.print_exc()
             return JsonResponse({"error":str(e)},status=400)
@@ -59,23 +62,6 @@ def validateUser(request,username="",passkey=""):
                 return True
         except Exception:
             return False
-        
-@require_POST
-def getUser(request):
-    if(request.method == "POST"):
-        try:
-            data = json.loads(request.body)
-            username = data.get("username","")
-            passkey = data.get("passkey","")
-            if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username,passkey=passkey)
-                userDataToReturn = {"username":user.username,"passkey":user.passkey}
-                return JsonResponse(userDataToReturn)
-            return JsonResponse({"error": "User does not exist"}, status=405)
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
-    return JsonResponse({"error": "Only POST allowed"}, status=405)
-
 @require_POST
 def deleteUser(request):
     if(request.method == "POST"):

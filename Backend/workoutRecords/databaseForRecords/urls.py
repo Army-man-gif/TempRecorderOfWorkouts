@@ -4,9 +4,8 @@ urlpatterns = [
     path("setToken/",views.setToken,name="setToken"),
     path("getToken/",views.get_csrf_token,name="getToken"),
     
-    path("createUser/", views.createUser,name="createUser"),
+    path("GetorMakeUser/", views.GetorMakeUser,name="GetorMakeUser"),
     path("validateUser/", views.validateUser,name="validateUser"),
-    path("getUser/", views.getUser,name="getUser"),
     path("deleteUser/<str:username>/", views.deleteUser,name="deleteUser"),
     
     path("login/", views.loginView,name="login"),
