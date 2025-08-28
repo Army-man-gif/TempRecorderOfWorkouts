@@ -6,7 +6,7 @@ urlpatterns = [
     
     path("GetorMakeUser/", views.GetorMakeUser,name="GetorMakeUser"),
     path("validateUser/", views.validateUser,name="validateUser"),
-    path("deleteUser/<str:username>/", views.deleteUser,name="deleteUser"),
+    path("deleteUser/", views.deleteUser,name="deleteUser"),
     
     path("login/", views.loginView,name="login"),
     path("logout/", views.logoutView,name="logout"),

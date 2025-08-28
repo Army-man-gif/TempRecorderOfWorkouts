@@ -265,7 +265,6 @@ async function SendData(url, data) {
       credentials: "include",
       body: JSON.stringify(dataToUse),
     });
-    updateRegisterData({ name: "email", value: CSRFToken }, false);
     const contentType = sendData.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       response = await sendData.json();
@@ -283,3 +282,5 @@ async function SendData(url, data) {
   }
   return response;
 }
+
+export async function User(Username) {}
