@@ -30,8 +30,7 @@ function Record() {
   useEffect(() => {
     async function load() {
       await User(user, passkey);
-      const today = new Date().toLocaleDateString("en-CA");
-      await changeWorkoutList(today);
+      await WorkoutListofToday();
     }
     load(user);
   }, [user]);
