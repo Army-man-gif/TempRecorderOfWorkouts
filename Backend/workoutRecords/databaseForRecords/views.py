@@ -24,7 +24,7 @@ def setToken(request):
     return JsonResponse({"detail":"CSRF token set"})
 
 
-@require_POST
+
 def GetorMakeUser(request):
     print("Method: ",request.method,"Body: ",request.body)
     if(request.method == "POST"):
@@ -44,7 +44,7 @@ def GetorMakeUser(request):
             return JsonResponse({"error":str(e)},status=400)
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
-@require_POST
+
 def validateUser(request,username="",passkey=""):
     if(request.method == "POST"):
         try:
@@ -65,7 +65,7 @@ def validateUser(request,username="",passkey=""):
                 return True
         except Exception:
             return False
-@require_POST
+
 def deleteUser(request):
     if(request.method == "POST"):
         try:
@@ -83,7 +83,6 @@ def deleteUser(request):
 
 # ----------------------------------------------------------------------------------------
 
-@require_POST
 def loginView(request):
     if(request.method == "POST"):
         try:
@@ -100,7 +99,6 @@ def loginView(request):
             return JsonResponse({"error":str(e)},status=400)
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
-@login_required()
 def logoutView(request):
     if request.user.is_authenticated:
         logout(request)
@@ -110,8 +108,6 @@ def logoutView(request):
 
 # ----------------------------------------------------------------------------------------
 
-@login_required()
-@require_POST
 def updateExercise(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
@@ -144,8 +140,6 @@ def updateExercise(request):
     return JsonResponse({"message":"User not logged in"})
 
 
-@login_required()
-@require_POST
 def deleteExercise(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
@@ -160,8 +154,7 @@ def deleteExercise(request):
 
 # ----------------------------------------------------------------------------------------
 
-@login_required()
-@require_POST
+
 def addWorkout(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
@@ -173,8 +166,6 @@ def addWorkout(request):
         return JsonResponse({"message":"Only POST method allowed"})
     return JsonResponse({"message":"User not logged in"})
 
-@login_required()
-@require_POST
 def updateWorkout(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
@@ -191,8 +182,7 @@ def updateWorkout(request):
         return JsonResponse({"message":"Only POST method allowed"})
     return JsonResponse({"message":"User not logged in"})
 
-@login_required()
-@require_POST
+
 def deleteWorkout(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
@@ -204,8 +194,7 @@ def deleteWorkout(request):
         return JsonResponse({"message":"Only POST method allowed"})
     return JsonResponse({"message":"User not logged in"})
 
-@login_required()
-@require_POST
+
 def getAllExercisesbasedOnDate(request):
     if request.user.is_authenticated:
         if(request.method == "POST"):
