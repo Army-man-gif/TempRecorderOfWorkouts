@@ -283,4 +283,7 @@ async function SendData(url, data) {
   return response;
 }
 
-export async function User(Username) {}
+export async function User(Username, passkey) {
+  const data = { username: Username, passkey: passkey };
+  await SendData(data);
+}

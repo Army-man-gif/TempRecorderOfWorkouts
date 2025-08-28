@@ -16,6 +16,7 @@ import {
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
+  const [passkey, setPasskey] = useState(() => prompt("Enter your passkey"));
   const [curDate, setCurDate] = useState("");
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [workoutList, setWorkoutList] = useState([]);
@@ -30,11 +31,7 @@ function Record() {
   let pWeight = useRef(null);
   useEffect(() => {
     async function load() {
-      await Users();
-      const lookFor = await getUser(user);
-      if (!lookFor) {
-        await addUser(user);
-      }
+      await User(user, passkey);
       const today = new Date().toLocaleDateString("en-CA");
       await changeWorkoutList(today);
     }
