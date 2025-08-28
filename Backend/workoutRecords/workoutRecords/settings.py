@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", ["workoutsbackend-yn5p.onrender.com","127.0.0.1"]).split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","").split(",")
 
 
 # Application definition
@@ -59,12 +59,12 @@ CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "None"
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", ["https://workoutsbackend-yn5p.onrender.com","https://army-man-gif.github.io"]).split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS","").split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 SECURE_SSL_REDIRECT = True
 
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS",  ["https://workoutsbackend-yn5p.onrender.com","https://army-man-gif.github.io"]).split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS","").split(",")
 ROOT_URLCONF = "workoutRecords.urls"
 
 TEMPLATES = [
@@ -94,7 +94,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     },
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL","postgresql://postgres.jdakkikfsmsmceirwvge:Toothless13.5@aws-1-eu-west-2.pooler.supabase.com:5432/postgres")
+        default=os.environ.get("DATABASE_URL","")
     )
 }
 
