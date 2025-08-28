@@ -122,6 +122,7 @@ def updateExercise(request):
                 exerciseSets = data.get("exerciseSets",None)
                 exerciseWeight = data.get("exerciseWeight",None)
                 workout, _ = Workout.objects.get_or_create(user=request.user, workoutName=workoutName)
+                # defaults are only used when the creation aspect of "get_or_create" is triggered
                 exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
                 defaults={
                     "exerciseReps":exerciseReps, 

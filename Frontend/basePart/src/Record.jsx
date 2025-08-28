@@ -1,30 +1,28 @@
 import "./record.css";
 import {
-  Users,
-  addUser,
-  getUser,
-  setNewWorkoutPage,
-  setNewExercise,
-  deleteWorkoutPage,
-  deleteExercise,
-  numberOfWorkoutsOnThatDate,
-  getMostRecentWorkoutPage,
-  numberOfExercisessInThatWorkout,
-  getExerciseData,
-} from "./databaseLogic.js";
+  User,
+  updateExercise,
+  logout,
+  getExercisesofThatDate,
+} from "./talkingToBackendLogic.js";
 
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
   const [passkey, setPasskey] = useState(() => prompt("Enter your passkey"));
-  const [curDate, setCurDate] = useState("");
+  const [curDate, setCurDate] = useState(() =>
+    new Date().toLocaleDateString("en-CA"),
+  );
   const [workoutStarted, setworkoutStarted] = useState(false);
-  const [workoutList, setWorkoutList] = useState([]);
+  const [workoutNameSet, setWorkoutNameSet] = useState(false);
+  const [todayWorkoutList, setTodayWorkoutList] = useState([]);
   const [SpecificworkoutList, setSpecificWorkoutList] = useState([]);
+  const workoutName = useRef(null);
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
   const weight = useRef(null);
+  let pWorkoutName = useRef(null);
   let pExercise = useRef(null);
   let pReps = useRef(null);
   let pSets = useRef(null);
@@ -34,16 +32,6 @@ function Record() {
       await User(user, passkey);
       const today = new Date().toLocaleDateString("en-CA");
       await changeWorkoutList(today);
-    }
-    alert(
-      `This username is to be kept private. If you reveal this to others,
-      they can access and alter your data. 
-      If you need to see ur username again for remembering type 
-      Yes in the following prompt`,
-    );
-    const confirm = prompt("Yes or No?");
-    if (confirm == "Yes") {
-      alert(user);
     }
     load(user);
   }, [user]);
@@ -61,127 +49,65 @@ function Record() {
     if (field == "weight") {
       weight.current.value = pWeight.current;
     }
+    if (field == "workoutName") {
+      workoutName.current.value = pWorkoutName.current;
+    }
   }
   async function addExercise() {
+    const wName = workoutName.current?.value.trim();
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
     const s = sets.current?.value.trim();
     const w = weight.current?.value.trim();
-    if (!ex || !r || !s || !w) {
-      const workoutNumber = await getMostRecentWorkoutPage(user, curDate);
-      if (workoutNumber || workoutNumber == 0) {
-        const today = new Date().toLocaleDateString("en-CA");
-        const Newexercise = await setNewExercise(user, today, workoutNumber, {
-          exercise: ex,
-          reps: r,
-          sets: s,
-          weight: w,
-        });
-        if (Newexercise) {
-          pExercise.current = ex;
-          pReps.current = r;
-          pSets.current = s;
-          pWeight.current = w;
-          exercise.current.value = "";
-          reps.current.value = "";
-          sets.current.value = "";
-          weight.current.value = "";
-          await changeWorkoutList(today);
-        }
+    if (!ex || !r || !s || !w || !wName) {
+      const data = {
+        workoutName: wName,
+        exerciseName: ex,
+        exerciseReps: r,
+        exerciseSets: s,
+        exerciseWeight: w,
+      };
+      const Newexercise = await updateExercise(data);
+      if (Newexercise.ok) {
+        pWorkoutName = wName;
+        pExercise.current = ex;
+        pReps.current = r;
+        pSets.current = s;
+        pWeight.current = w;
+        exercise.current.value = "";
+        reps.current.value = "";
+        sets.current.value = "";
+        weight.current.value = "";
+        await WorkoutListofToday();
       }
     }
   }
-  async function createNewWorkout() {
-    started();
-    const today = new Date().toLocaleDateString("en-CA");
-    const workout = await setNewWorkoutPage(user, today);
-    if (workout) {
-      await changeWorkoutList(today);
-    } else {
-      console.log("error setting workout page");
-    }
+
+  function changeWorkoutNameHasBeenSet() {
+    setWorkoutNameSet(true);
   }
   function started() {
     setworkoutStarted(true);
   }
-  function finished() {
+  async function finished() {
     setworkoutStarted(false);
+    setWorkoutNameSet(false);
+    workoutName.current.value = "";
+    await WorkoutListofToday();
   }
-  async function changeSpecificWorkoutList(dateFormatted) {
-    const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
-      user,
-      dateFormatted,
-    );
-    console.log(numberOfWorkouts);
-    if (numberOfWorkouts > 0) {
-      const WorkoutList = [];
-      for (let i = 0; i < numberOfWorkouts; i++) {
-        const exerciseList = [];
-        const numberOfExercises = await numberOfExercisessInThatWorkout(
-          user,
-          dateFormatted,
-          i,
-        );
-        console.log(numberOfExercises);
-        if (numberOfExercises > 0) {
-          for (let j = 0; j < numberOfExercises; j++) {
-            const exercise = await getExerciseData(user, dateFormatted, i, j);
-            if (exercise) {
-              console.log("exercise data: " + exercise.reps);
-              exerciseList.push({
-                name: exercise.exercise,
-                sets: exercise.sets,
-                reps: exercise.reps,
-                weight: exercise.weight,
-              });
-            }
-          }
-          WorkoutList.push(exerciseList);
-        }
-      }
-      setCurDate(dateFormatted);
-      setSpecificWorkoutList(WorkoutList);
-    } else {
-      setSpecificWorkoutList([]);
-    }
+  async function changeSpecificWorkoutList(date) {
+    const exercises = await getExercisesofThatDate(date);
+    setCurDate(date);
+    setSpecificWorkoutList(exercises);
   }
-  async function changeWorkoutList(dateFormatted) {
-    const numberOfWorkouts = await numberOfWorkoutsOnThatDate(
-      user,
-      dateFormatted,
-    );
-    if (numberOfWorkouts > 0) {
-      const WorkoutList = [];
-      for (let i = 0; i < numberOfWorkouts; i++) {
-        const exerciseList = [];
-        const numberOfExercises = await numberOfExercisessInThatWorkout(
-          user,
-          dateFormatted,
-          i,
-        );
-        if (numberOfExercises > 0) {
-          for (let j = 0; j < numberOfExercises; j++) {
-            const exercise = await getExerciseData(user, dateFormatted, i, j);
-            if (exercise) {
-              exerciseList.push({
-                name: exercise.exercise,
-                sets: exercise.sets,
-                reps: exercise.reps,
-                weight: exercise.weight,
-              });
-            }
-          }
-          WorkoutList.push(exerciseList);
-        }
-      }
-      setWorkoutList(WorkoutList);
-    } else {
-      setWorkoutList([]);
-    }
+  async function WorkoutListofToday() {
+    const date = new Date().toLocaleDateString("en-CA");
+    const exercises = await getExercisesofThatDate(date);
+    setTodayWorkoutList(exercises);
   }
   async function viewWorkoutDate(e) {
-    const dateFormatted = e.target.value;
-    await changeSpecificWorkoutList(dateFormatted);
+    const date = e.target.value;
+    await changeSpecificWorkoutList(date);
   }
 
   return (
@@ -214,29 +140,33 @@ function Record() {
             </tr>
           </thead>
           <tbody>
-            {SpecificworkoutList.map((workout, workoutIndex) => (
-              <React.Fragment key={workoutIndex}>
-                <tr>
-                  <td></td>
-                  <td id="workout_block_line" colSpan="4">
-                    Workout {workoutIndex + 1}
-                  </td>
-                </tr>
-                {workout.map((exercise, exerciseIndex) => (
-                  <tr key={exerciseIndex}>
-                    <td>Exercise {exerciseIndex + 1}</td>
-                    <td>{exercise.name}</td>
-                    <td>{exercise.reps}</td>
-                    <td>{exercise.sets}</td>
-                    <td>{exercise.weight}</td>
+            {Object.entries(SpecificworkoutList).map(
+              ([workoutName, workoutData], counter) => (
+                <React.Fragment key={`${workoutName}-${counter}`}>
+                  <tr>
+                    <td></td>
+                    <td id="workout_block_line" colSpan="4">
+                      {workoutName}
+                    </td>
                   </tr>
-                ))}
-              </React.Fragment>
-            ))}
+                  {workoutData.map((exercise, exerciseIndex) => (
+                    <tr
+                      key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
+                    >
+                      <td>Exercise {exerciseIndex + 1}</td>
+                      <td>{exercise["name"]}</td>
+                      <td>{exercise["reps"]}</td>
+                      <td>{exercise["sets"]}</td>
+                      <td>{exercise["weight"]}</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ),
+            )}
           </tbody>
         </table>
       )}
-      {workoutList.length > 0 && (
+      {todayWorkoutList.length > 0 && (
         <table className="center">
           <thead>
             <tr>
@@ -253,36 +183,50 @@ function Record() {
             </tr>
           </thead>
           <tbody>
-            {workoutList.map((workout, workoutIndex) => (
-              <React.Fragment key={workoutIndex}>
-                <tr>
-                  <td></td>
-                  <td id="workout_block_line" colSpan="4">
-                    Workout {workoutIndex + 1}
-                  </td>
-                </tr>
-                {workout.map((exercise, exerciseIndex) => (
-                  <tr key={exerciseIndex}>
-                    <td>Exercise {exerciseIndex + 1}</td>
-                    <td>{exercise.name}</td>
-                    <td>{exercise.reps}</td>
-                    <td>{exercise.sets}</td>
-                    <td>{exercise.weight}</td>
+            {Object.entries(todayWorkoutList).map(
+              ([workoutName, workoutData], counter) => (
+                <React.Fragment key={`${workoutName}-${counter}`}>
+                  <tr>
+                    <td></td>
+                    <td id="workout_block_line" colSpan="4">
+                      {workoutName}
+                    </td>
                   </tr>
-                ))}
-              </React.Fragment>
-            ))}
+                  {workoutData.map((exercise, exerciseIndex) => (
+                    <tr
+                      key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
+                    >
+                      <td>Exercise {exerciseIndex + 1}</td>
+                      <td>{exercise["name"]}</td>
+                      <td>{exercise["reps"]}</td>
+                      <td>{exercise["sets"]}</td>
+                      <td>{exercise["weight"]}</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ),
+            )}
           </tbody>
         </table>
       )}
-      <button
-        type="button"
-        onClick={createNewWorkout}
-        disabled={workoutStarted}
-      >
+      <button type="button" onClick={started} disabled={workoutStarted}>
         Click to add a new workout
       </button>
       {workoutStarted && (
+        <>
+          <label htmlFor="workoutName">Workout name: </label>
+          <div className="flexContainer">
+            <input ref={workoutName} id="workoutName" type="text"></input>
+            <button onClick={() => restore("workoutName")} type="button">
+              Click to restore previous value
+            </button>
+          </div>
+          <button type="button" onClick={changeWorkoutNameHasBeenSet}>
+            Confirm name
+          </button>
+        </>
+      )}
+      {workoutStarted && workoutNameSet && (
         <>
           <br></br>
           <br></br>
