@@ -10,6 +10,7 @@ import {
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { ensureCSRFToken } from "./auth.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -247,4 +248,38 @@ export async function deleteExercise(
     );
     await deleteDoc(docRef);
   }
+}
+
+async function SendData(url, data) {
+  let response;
+  const dataToUse = data;
+  console.log(dataToUse);
+  let CSRFToken = await ensureCSRFToken();
+  try {
+    const sendData = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": CSRFToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(dataToUse),
+    });
+    updateRegisterData({ name: "email", value: CSRFToken }, false);
+    const contentType = sendData.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      response = await sendData.json();
+    } else {
+      response = await sendData.text();
+    }
+    if (sendData.ok) {
+      console.log("Server responded with: ", response);
+      sessionStorage.setItem("Logged-In", true);
+    } else {
+      console.log("Server threw an error", response);
+    }
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+  return response;
 }

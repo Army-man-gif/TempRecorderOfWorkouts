@@ -11,7 +11,6 @@ urlpatterns = [
     path("login/", views.loginView,name="login"),
     path("logout/", views.logoutView,name="logout"),
     
-    path("addExercise/", views.addExercise,name="addExercise"),
     path("updateExercise/", views.updateExercise,name="updateExercise"),
     path("deleteExercise/", views.deleteExercise,name="deleteExercise"),
     
