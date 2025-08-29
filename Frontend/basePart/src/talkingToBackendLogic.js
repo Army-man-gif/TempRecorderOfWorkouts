@@ -274,7 +274,7 @@ export async function SendData(url, data) {
       response = await sendData.text();
     }
     if (sendData.ok) {
-      console.log("Server responded with: ", response);
+      //console.log("Server responded with: ", response);
       sessionStorage.setItem("Logged-In", true);
     } else {
       console.log("Server threw an error", response);
@@ -335,7 +335,7 @@ export async function getExercisesofThatDate(date) {
     )) ?? {};
   if (Object.keys(collectingExercises) !== 0) {
     if (collectingExercises["message"]) {
-      console.log("Exercises collected");
+      console.log("Exercises collected", collectingExercises["data"]);
       return collectingExercises["data"];
     }
   } else {
