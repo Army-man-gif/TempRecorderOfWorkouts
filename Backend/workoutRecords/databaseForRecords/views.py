@@ -93,6 +93,7 @@ def loginView(request):
                 user = User.objects.get(username=username,password=passkey)
                 login(request, user)
                 return JsonResponse({"message":"User logged in"})
+            return JsonResponse({"error": "User not found"}, status=404)
         except User.DoesNotExist:
             return JsonResponse({"error": "User does not exist"}, status=404)
         except Exception as e:
