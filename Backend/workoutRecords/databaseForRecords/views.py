@@ -26,17 +26,17 @@ def setToken(request):
 
 
 def GetorMakeUser(request):
-    print("Method: ",request.method,"Body: ",request.body)
     if(request.method == "POST"):
         try:
             data = json.loads(request.body)
             username = data.get("username")
             passkey = data.get("passkey")
             user,created = User.objects.get_or_create(username=username)
-            user.set_password(passkey)
+            if created:
+                user.set_password(passkey)
             user.save()
             message = "User created" if created else "User fetched"
-            userDataToReturn = {"username":user.username,"passkey":user.password,"status":message}
+            userDataToReturn = {"username":user.username,"passkey":user.passkey,"status":message}
             return JsonResponse(userDataToReturn)
         except Exception as e:
             traceback.print_exc()
