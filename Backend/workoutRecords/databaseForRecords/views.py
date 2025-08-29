@@ -94,7 +94,7 @@ def loginView(request):
                 login(request, user)
                 return JsonResponse({"message":"User logged in"})
         except User.DoesNotExist:
-            return JsonResponse({"error": "User does not exist"}, status=405)
+            return JsonResponse({"error": "User does not exist"}, status=404)
         except Exception as e:
             return JsonResponse({"error":str(e)},status=400)
     return JsonResponse({"error": "Only POST allowed"}, status=405)
