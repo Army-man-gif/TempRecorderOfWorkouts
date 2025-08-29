@@ -31,7 +31,6 @@ function Record() {
     async function load() {
       await User(user, passkey);
       await WorkoutListofToday();
-      console.log("Workout list of today:", todayWorkoutList);
     }
     load(user);
   }, [user]);
@@ -110,6 +109,7 @@ function Record() {
 
   return (
     <>
+      <div>Workout list of today: {todayWorkoutList}</div>
       <form className="move">
         <label htmlFor="workoutPick">
           Pick workout date to view workouts of:{" "}
