@@ -46,11 +46,13 @@ def GetorMakeUser(request):
 
 
 def validateUser(request,username="",passkey=""):
+    print("B4 entering logic",username,passkey)
     if(request.method == "POST"):
         try:
             data = json.loads(request.body)
             username = data.get("username","")
             passkey = data.get("passkey","")
+            print("After entering logic",username,passkey)
             user = authenticate(request,username=username,password=passkey)
             if(user is not None):
                 return JsonResponse({"message":"User validated"})
