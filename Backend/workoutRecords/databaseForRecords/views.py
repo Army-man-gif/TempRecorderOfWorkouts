@@ -168,7 +168,7 @@ def addWorkout(request):
         if(request.method == "POST"):
             data = json.loads(request.body)
             newName = data.get("newName")
-            workout = Workout(user=request.user, workoutName=newName)
+            workout = Workout(user=request.user, name=newName)
             workout.save()
             return JsonResponse({"message": "Workout created"})
         return JsonResponse({"message":"Only POST method allowed"})
@@ -196,7 +196,7 @@ def deleteWorkout(request):
         if(request.method == "POST"):
             data = json.loads(request.body)
             workoutName = data.get("workoutName")
-            workout = Workout(user=request.user,workoutName=workoutName)
+            workout = Workout(user=request.user,name=workoutName)
             workout.delete()
             return JsonResponse({"message": "Workout deleted"})
         return JsonResponse({"message":"Only POST method allowed"})
