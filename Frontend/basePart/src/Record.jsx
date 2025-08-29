@@ -84,12 +84,12 @@ function Record() {
 
   function changeWorkoutNameHasBeenSet() {
     setWorkoutNameSet(true);
+    setworkoutStarted(false);
   }
   function started() {
     setworkoutStarted(true);
   }
   async function finished() {
-    setworkoutStarted(false);
     setWorkoutNameSet(false);
     workoutName.current.value = "";
     await WorkoutListofToday();
