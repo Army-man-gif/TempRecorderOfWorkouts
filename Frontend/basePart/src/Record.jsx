@@ -109,7 +109,6 @@ function Record() {
 
   return (
     <>
-      <div>Workout list of today: {todayWorkoutList}</div>
       <form className="move">
         <label htmlFor="workoutPick">
           Pick workout date to view workouts of:{" "}
@@ -121,7 +120,7 @@ function Record() {
           onChange={(e) => viewWorkoutDate(e)}
         ></input>
       </form>
-      {SpecificworkoutList.length > 0 && (
+      {Object.keys(SpecificworkoutList).length > 0 && (
         <table className="move2">
           <thead>
             <tr>
@@ -164,7 +163,7 @@ function Record() {
           </tbody>
         </table>
       )}
-      {todayWorkoutList.length > 0 && (
+      {Object.keys(todayWorkoutList).length > 0 && (
         <table className="center">
           <thead>
             <tr>
