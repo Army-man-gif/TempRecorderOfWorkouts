@@ -31,6 +31,7 @@ function Record() {
     async function load() {
       await User(user, passkey);
       await WorkoutListofToday();
+      console.log("Workout list of today:", WorkoutListofToday);
     }
     load(user);
   }, [user]);
