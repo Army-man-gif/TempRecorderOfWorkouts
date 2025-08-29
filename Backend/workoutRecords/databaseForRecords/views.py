@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import check_password
 import traceback
 import json
+import datetime
 from .models import Workout,Exercise
 
 def records_home(request):
@@ -209,7 +210,8 @@ def getAllExercisesbasedOnDate(request):
             try:
                 data = json.loads(request.body)
                 date = data.get("date")
-                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date)
+                date_obj = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date_obj)
 
                 toReturn = {}
                 for exercise in exercises:
