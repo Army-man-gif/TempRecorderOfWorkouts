@@ -53,7 +53,7 @@ function Record() {
     }
   }
   async function addExercise() {
-    const wName = workoutName.current?.value.trim();
+    const wName = workoutName;
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
     const s = sets.current?.value.trim();
