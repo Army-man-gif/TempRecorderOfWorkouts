@@ -333,8 +333,12 @@ export async function getExercisesofThatDate(date) {
       "https://workoutsbackend-yn5p.onrender.com/records/getAllExercisesbasedOnDate/",
       data,
     )) ?? {};
-  if (collectingExercises["message"]) {
-    console.log("Exercises collected");
-    return collectingExercises["data"];
+  if (Object.keys(collectingExercises) !== 0) {
+    if (collectingExercises["message"]) {
+      console.log("Exercises collected");
+      return collectingExercises["data"];
+    }
+  } else {
+    return {};
   }
 }
