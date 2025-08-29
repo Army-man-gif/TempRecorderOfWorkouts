@@ -66,19 +66,17 @@ function Record() {
         exerciseSets: s,
         exerciseWeight: w,
       };
-      const Newexercise = await updateExercise(data);
-      if (Newexercise.ok) {
-        pWorkoutName = wName;
-        pExercise.current = ex;
-        pReps.current = r;
-        pSets.current = s;
-        pWeight.current = w;
-        exercise.current.value = "";
-        reps.current.value = "";
-        sets.current.value = "";
-        weight.current.value = "";
-        await WorkoutListofToday();
-      }
+      await updateExercise(data);
+      pWorkoutName = wName;
+      pExercise.current = ex;
+      pReps.current = r;
+      pSets.current = s;
+      pWeight.current = w;
+      exercise.current.value = "";
+      reps.current.value = "";
+      sets.current.value = "";
+      weight.current.value = "";
+      await WorkoutListofToday();
     }
   }
 
