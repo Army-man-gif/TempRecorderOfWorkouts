@@ -213,6 +213,8 @@ function Record() {
       </button>
       {workoutStarted && (
         <>
+          <br></br>
+          <br></br>
           <label htmlFor="workoutName">Workout name: </label>
           <div className="flexContainer">
             <input ref={workoutName} id="workoutName" type="text"></input>
