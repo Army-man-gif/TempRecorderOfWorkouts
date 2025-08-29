@@ -223,7 +223,7 @@ def getAllExercisesbasedOnDate(request):
                         "sets" : exercise.exerciseSets,
                         "weight" : exercise.exerciseWeight 
                     })
-                return JsonResponse({"message":"success",data:toReturn})
+                return JsonResponse({"message":"success","data":toReturn})
             except Exception as e:
                 return JsonResponse({"error":str(e)},status=400)
         return JsonResponse({"error": "Only POST allowed"}, status=405)
