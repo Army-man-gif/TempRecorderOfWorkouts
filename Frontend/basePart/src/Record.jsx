@@ -227,7 +227,7 @@ function Record() {
           </button>
         </>
       )}
-      {workoutStarted && workoutNameSet && (
+      {workoutNameSet && (
         <>
           <br></br>
           <br></br>
