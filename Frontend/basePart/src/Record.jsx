@@ -17,8 +17,8 @@ function Record() {
   const [previousworkoutName, setPreviousworkoutName] = useState("");
   const [workoutName, setWorkoutName] = useState("");
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
-  const [todayWorkoutList, setTodayWorkoutList] = useState([]);
-  const [SpecificworkoutList, setSpecificWorkoutList] = useState([]);
+  const [todayWorkoutList, setTodayWorkoutList] = useState({});
+  const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
