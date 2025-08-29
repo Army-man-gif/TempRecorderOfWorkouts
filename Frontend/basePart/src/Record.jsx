@@ -14,15 +14,15 @@ function Record() {
     new Date().toLocaleDateString("en-CA"),
   );
   const [workoutStarted, setworkoutStarted] = useState(false);
+  const [previousworkoutName, setPreviousworkoutName] = useState("");
+  const [workoutName, setWorkoutName] = useState("");
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState([]);
   const [SpecificworkoutList, setSpecificWorkoutList] = useState([]);
-  const workoutName = useRef(null);
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
   const weight = useRef(null);
-  let pWorkoutName = useRef(null);
   let pExercise = useRef(null);
   let pReps = useRef(null);
   let pSets = useRef(null);
@@ -49,7 +49,7 @@ function Record() {
       weight.current.value = pWeight.current;
     }
     if (field == "workoutName") {
-      workoutName.current.value = pWorkoutName.current;
+      setWorkoutName(previousworkoutName);
     }
   }
   async function addExercise() {
@@ -67,7 +67,7 @@ function Record() {
         exerciseWeight: w,
       };
       await updateExercise(data);
-      pWorkoutName = wName;
+      setPreviousworkoutName(wName);
       pExercise.current = ex;
       pReps.current = r;
       pSets.current = s;
@@ -89,7 +89,7 @@ function Record() {
   }
   async function finished() {
     setWorkoutNameSet(false);
-    workoutName.current.value = "";
+    setWorkoutName("");
     await WorkoutListofToday();
   }
   async function changeSpecificWorkoutList(date) {
@@ -215,7 +215,12 @@ function Record() {
           <br></br>
           <label htmlFor="workoutName">Workout name: </label>
           <div className="flexContainer">
-            <input ref={workoutName} id="workoutName" type="text"></input>
+            <input
+              value={workoutName}
+              id="workoutName"
+              type="text"
+              onChange={(e) => setWorkoutName(e.target.value)}
+            ></input>
             <button onClick={() => restore("workoutName")} type="button">
               Click to restore previous value
             </button>
