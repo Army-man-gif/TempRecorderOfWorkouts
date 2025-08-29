@@ -328,10 +328,11 @@ export async function logout() {
 
 export async function getExercisesofThatDate(date) {
   const data = { date: date };
-  const collectingExercises = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com/records/getAllExercisesbasedOnDate/",
-    data,
-  );
+  const collectingExercises =
+    (await SendData(
+      "https://workoutsbackend-yn5p.onrender.com/records/getAllExercisesbasedOnDate/",
+      data,
+    )) ?? {};
   if (collectingExercises["message"]) {
     console.log("Exercises collected");
     return collectingExercises["data"];
