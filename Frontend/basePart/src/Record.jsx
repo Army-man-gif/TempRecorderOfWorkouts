@@ -58,7 +58,7 @@ function Record() {
     const r = reps.current?.value.trim();
     const s = sets.current?.value.trim();
     const w = weight.current?.value.trim();
-    if (!ex || !r || !s || !w || !wName) {
+    if (ex && r && s && w && wName) {
       const data = {
         workoutName: wName,
         exerciseName: ex,
