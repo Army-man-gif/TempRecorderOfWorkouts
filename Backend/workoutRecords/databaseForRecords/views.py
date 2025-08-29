@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.hashers import check_password
 import traceback
 import json
 from .models import Workout,Exercise
@@ -74,9 +75,11 @@ def deleteUser(request):
             username = data.get("username","")
             passkey = data.get("passkey","")
             if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username,passkey=passkey)
-                user.delete()
-                return JsonResponse({"message":"Deleted user"})
+                user = User.objects.get(username=username)
+                if(check_password(passkey,user.password)):
+                    user.delete()
+                    return JsonResponse({"message":"Deleted user"})
+                return JsonResponse({"error":"Wrong password"})
             return JsonResponse({"error": "User does not exist"}, status=405)
         except Exception as e:
             return JsonResponse({"error":str(e)},status=400)
@@ -92,9 +95,11 @@ def loginView(request):
             username = data.get("username")
             passkey = data.get("passkey")
             if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username,password=passkey)
-                login(request, user)
-                return JsonResponse({"message":"User logged in"})
+                user = User.objects.get(username=username)
+                if(check_password(passkey,user.password)):
+                    login(request, user)
+                    return JsonResponse({"message":"User logged in"})
+                return JsonResponse({"error":"Wrong password"})
             return JsonResponse({"error": "User not found"}, status=404)
         except User.DoesNotExist:
             return JsonResponse({"error": "User does not exist"}, status=404)
