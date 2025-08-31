@@ -234,7 +234,7 @@ function Record() {
                     onClick={() => main("restore", "exercise")}
                     type="button"
                   >
-                    Click to restore previous value
+                    Restore
                   </button>
                 </div>
                 <br></br>
@@ -242,7 +242,7 @@ function Record() {
                 <div className="flexContainer">
                   <input ref={reps} id="addReps" type="text"></input>
                   <button onClick={() => main("restore", "reps")} type="button">
-                    Click to restore previous value
+                    Restore
                   </button>
                 </div>
                 <br></br>
@@ -251,7 +251,7 @@ function Record() {
                 <div className="flexContainer">
                   <input ref={sets} id="addSets" type="text"></input>
                   <button onClick={() => main("restore", "sets")} type="button">
-                    Click to restore previous value
+                    Restore
                   </button>
                 </div>
                 <br></br>
@@ -263,7 +263,7 @@ function Record() {
                     onClick={() => main("restore", "weight")}
                     type="button"
                   >
-                    Click to restore previous value
+                    Restore
                   </button>
                 </div>
               </div>
