@@ -36,6 +36,7 @@ function Record() {
     }
     load(user);
   }, [user]);
+
   function restore(field) {
     if (field == "exercise") {
       exercise.current.value = pExercise.current;
@@ -83,7 +84,7 @@ function Record() {
     }
   }
 
-  async function change(param, data = null) {
+  async function main(param, data = null) {
     if (param === "changeWorkoutNameHasBeenSet") {
       setWorkoutNameSet(true);
       setworkoutStarted(false);
@@ -175,7 +176,7 @@ function Record() {
             <button
               className="SquishSize"
               type="button"
-              onClick={() => change("started")}
+              onClick={() => main("started")}
               disabled={workoutStarted || !loggedIn}
             >
               Click to add a new workout
@@ -183,7 +184,7 @@ function Record() {
           ) : (
             <button
               type="button"
-              onClick={() => change("started")}
+              onClick={() => main("started")}
               disabled={workoutStarted || !loggedIn}
             >
               Logging you in
@@ -202,7 +203,7 @@ function Record() {
                   onChange={(e) => setWorkoutName(e.target.value)}
                 ></input>
                 <button
-                  onClick={() => change("restore", "workoutName")}
+                  onClick={() => main("restore", "workoutName")}
                   type="button"
                 >
                   Click to restore previous value
@@ -211,11 +212,11 @@ function Record() {
               <div className="flexContainer lessGap">
                 <button
                   type="button"
-                  onClick={() => change("changeWorkoutNameHasBeenSet")}
+                  onClick={() => main("changeWorkoutNameHasBeenSet")}
                 >
                   Confirm name
                 </button>
-                <button type="button" onClick={() => change("cancelWorkout")}>
+                <button type="button" onClick={() => main("cancelWorkout")}>
                   Cancel workout
                 </button>
               </div>
@@ -230,7 +231,7 @@ function Record() {
                 <div className="flexContainer">
                   <input ref={exercise} id="addEx" type="text"></input>
                   <button
-                    onClick={() => change("restore", "exercise")}
+                    onClick={() => main("restore", "exercise")}
                     type="button"
                   >
                     Click to restore previous value
@@ -240,10 +241,7 @@ function Record() {
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
                   <input ref={reps} id="addReps" type="text"></input>
-                  <button
-                    onClick={() => change("restore", "reps")}
-                    type="button"
-                  >
+                  <button onClick={() => main("restore", "reps")} type="button">
                     Click to restore previous value
                   </button>
                 </div>
@@ -252,10 +250,7 @@ function Record() {
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
                   <input ref={sets} id="addSets" type="text"></input>
-                  <button
-                    onClick={() => change("restore", "sets")}
-                    type="button"
-                  >
+                  <button onClick={() => main("restore", "sets")} type="button">
                     Click to restore previous value
                   </button>
                 </div>
@@ -265,7 +260,7 @@ function Record() {
                 <div className="flexContainer">
                   <input ref={weight} id="addWeight" type="text"></input>
                   <button
-                    onClick={() => change("restore", "weight")}
+                    onClick={() => main("restore", "weight")}
                     type="button"
                   >
                     Click to restore previous value
@@ -284,14 +279,14 @@ function Record() {
               <button
                 className="SquishSize"
                 type="button"
-                onClick={() => change("finished")}
+                onClick={() => main("finished")}
               >
                 Click to finish workout
               </button>
               <button
                 className="SquishSize"
                 type="button"
-                onClick={() => change("cancelExercise")}
+                onClick={() => main("cancelExercise")}
               >
                 Click to cancel exercise
               </button>
@@ -308,7 +303,7 @@ function Record() {
                 type="date"
                 id="workoutPick"
                 name="workoutPick"
-                onChange={(e) => change("view", e)}
+                onChange={(e) => main("view", e)}
               ></input>
             </form>
           )}
