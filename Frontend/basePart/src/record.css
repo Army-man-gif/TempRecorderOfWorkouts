@@ -29,6 +29,10 @@
   flex-direction: row;
   gap: 20px;
 }
+.lessGap {
+  margin-top: 10px;
+  gap: 1px;
+}
 .table {
   border: 1px solid black;
 }

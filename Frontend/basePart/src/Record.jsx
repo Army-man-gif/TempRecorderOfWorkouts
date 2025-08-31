@@ -19,6 +19,7 @@ function Record() {
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
+  const [loggedIn, setLoggedIn] = useState(false);
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
@@ -30,6 +31,7 @@ function Record() {
   useEffect(() => {
     async function load() {
       await User(user, passkey);
+      setLoggedIn(true);
       await WorkoutListofToday();
     }
     load(user);
@@ -53,6 +55,7 @@ function Record() {
     }
   }
   async function addExercise() {
+    const date = new Date().toLocaleDateString("en-CA");
     const wName = workoutName;
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
@@ -60,6 +63,7 @@ function Record() {
     const w = weight.current?.value.trim();
     if (ex && r && s && w && wName) {
       const data = {
+        date: date,
         workoutName: wName,
         exerciseName: ex,
         exerciseReps: r,
@@ -82,6 +86,10 @@ function Record() {
 
   function changeWorkoutNameHasBeenSet() {
     setWorkoutNameSet(true);
+    setworkoutStarted(false);
+  }
+  function cancelWorkout() {
+    setWorkoutNameSet(false);
     setworkoutStarted(false);
   }
   function started() {
@@ -109,18 +117,20 @@ function Record() {
 
   return (
     <>
-      <form className="move">
-        <label htmlFor="workoutPick">
-          Pick workout date to view workouts of:{" "}
-        </label>
-        <input
-          type="date"
-          id="workoutPick"
-          name="workoutPick"
-          onChange={(e) => viewWorkoutDate(e)}
-        ></input>
-      </form>
-      {Object.keys(SpecificworkoutList).length > 0 && (
+      {loggedIn && (
+        <form className="move">
+          <label htmlFor="workoutPick">
+            Pick workout date to view workouts of:{" "}
+          </label>
+          <input
+            type="date"
+            id="workoutPick"
+            name="workoutPick"
+            onChange={(e) => viewWorkoutDate(e)}
+          ></input>
+        </form>
+      )}
+      {loggedIn && Object.keys(SpecificworkoutList).length > 0 && (
         <table className="move2">
           <thead>
             <tr>
@@ -163,7 +173,7 @@ function Record() {
           </tbody>
         </table>
       )}
-      {Object.keys(todayWorkoutList).length > 0 && (
+      {loggedIn && Object.keys(todayWorkoutList).length > 0 && (
         <table className="center">
           <thead>
             <tr>
@@ -206,9 +216,24 @@ function Record() {
           </tbody>
         </table>
       )}
-      <button type="button" onClick={started} disabled={workoutStarted}>
-        Click to add a new workout
-      </button>
+      {loggedIn ? (
+        <button
+          type="button"
+          onClick={started}
+          disabled={workoutStarted || !loggedIn}
+        >
+          Click to add a new workout
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={started}
+          disabled={workoutStarted || !loggedIn}
+        >
+          Logging you in
+        </button>
+      )}
+
       {workoutStarted && (
         <>
           <br></br>
@@ -225,9 +250,14 @@ function Record() {
               Click to restore previous value
             </button>
           </div>
-          <button type="button" onClick={changeWorkoutNameHasBeenSet}>
-            Confirm name
-          </button>
+          <div className="flexContainer lessGap">
+            <button type="button" onClick={changeWorkoutNameHasBeenSet}>
+              Confirm name
+            </button>
+            <button type="button" onClick={cancelWorkout}>
+              Cancel workout
+            </button>
+          </div>
         </>
       )}
       {workoutNameSet && (
