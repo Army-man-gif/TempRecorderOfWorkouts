@@ -36,7 +36,6 @@ function Record() {
     }
     load(user);
   }, [user]);
-
   function restore(field) {
     if (field == "exercise") {
       exercise.current.value = pExercise.current;
@@ -83,7 +82,6 @@ function Record() {
       await WorkoutListofToday();
     }
   }
-
   function changeWorkoutNameHasBeenSet() {
     setWorkoutNameSet(true);
     setworkoutStarted(false);
@@ -117,197 +115,209 @@ function Record() {
 
   return (
     <>
-      {loggedIn && (
-        <form className="move">
-          <label htmlFor="workoutPick">
-            Pick workout date to view workouts of:{" "}
-          </label>
-          <input
-            type="date"
-            id="workoutPick"
-            name="workoutPick"
-            onChange={(e) => viewWorkoutDate(e)}
-          ></input>
-        </form>
-      )}
-      {loggedIn && Object.keys(SpecificworkoutList).length > 0 && (
-        <table className="move2">
-          <thead>
-            <tr>
-              <th id="dateHeading" colSpan="5">
-                Date: {curDate}
-              </th>
-            </tr>
-            <tr>
-              <th>Exercise number</th>
-              <th>Exercise Name</th>
-              <th>Reps</th>
-              <th>Sets</th>
-              <th>Weight (in kg)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(SpecificworkoutList).map(
-              ([workoutName, workoutData], counter) => (
-                <React.Fragment key={`${workoutName}-${counter}`}>
-                  <tr>
-                    <td></td>
-                    <td id="workout_block_line" colSpan="4">
-                      {workoutName}
-                    </td>
-                  </tr>
-                  {workoutData.map((exercise, exerciseIndex) => (
-                    <tr
-                      key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
-                    >
-                      <td>Exercise {exerciseIndex + 1}</td>
-                      <td>{exercise["name"]}</td>
-                      <td>{exercise["reps"]}</td>
-                      <td>{exercise["sets"]}</td>
-                      <td>{exercise["weight"]}</td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ),
-            )}
-          </tbody>
-        </table>
-      )}
-      {loggedIn && Object.keys(todayWorkoutList).length > 0 && (
-        <table className="center">
-          <thead>
-            <tr>
-              <th id="dateHeading" colSpan="5">
-                Date: {new Date().toLocaleDateString("en-CA")}
-              </th>
-            </tr>
-            <tr>
-              <th>Exercise number</th>
-              <th>Exercise Name</th>
-              <th>Reps</th>
-              <th>Sets</th>
-              <th>Weight (in kg)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(todayWorkoutList).map(
-              ([workoutName, workoutData], counter) => (
-                <React.Fragment key={`${workoutName}-${counter}`}>
-                  <tr>
-                    <td></td>
-                    <td id="workout_block_line" colSpan="4">
-                      {workoutName}
-                    </td>
-                  </tr>
-                  {workoutData.map((exercise, exerciseIndex) => (
-                    <tr
-                      key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
-                    >
-                      <td>Exercise {exerciseIndex + 1}</td>
-                      <td>{exercise["name"]}</td>
-                      <td>{exercise["reps"]}</td>
-                      <td>{exercise["sets"]}</td>
-                      <td>{exercise["weight"]}</td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ),
-            )}
-          </tbody>
-        </table>
-      )}
-      {loggedIn ? (
-        <button
-          type="button"
-          onClick={started}
-          disabled={workoutStarted || !loggedIn}
-        >
-          Click to add a new workout
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={started}
-          disabled={workoutStarted || !loggedIn}
-        >
-          Logging you in
-        </button>
-      )}
+      <div className="flexContainer moreGap">
+        <div className="flex-container">
+          {loggedIn && Object.keys(todayWorkoutList).length > 0 && (
+            <table className="adjustTodayDataDisplay">
+              <thead>
+                <tr>
+                  <th id="dateHeading" colSpan="5">
+                    Date: {new Date().toLocaleDateString("en-CA")}
+                  </th>
+                </tr>
+                <tr>
+                  <th>Exercise number</th>
+                  <th>Exercise Name</th>
+                  <th>Reps</th>
+                  <th>Sets</th>
+                  <th>Weight (in kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(todayWorkoutList).map(
+                  ([workoutName, workoutData], counter) => (
+                    <React.Fragment key={`${workoutName}-${counter}`}>
+                      <tr>
+                        <td></td>
+                        <td id="workout_block_line" colSpan="4">
+                          {workoutName}
+                        </td>
+                      </tr>
+                      {workoutData.map((exercise, exerciseIndex) => (
+                        <tr
+                          key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
+                        >
+                          <td>Exercise {exerciseIndex + 1}</td>
+                          <td>{exercise["name"]}</td>
+                          <td>{exercise["reps"]}</td>
+                          <td>{exercise["sets"]}</td>
+                          <td>{exercise["weight"]}</td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ),
+                )}
+              </tbody>
+            </table>
+          )}
+          {loggedIn ? (
+            <button
+              className="SquishSize"
+              type="button"
+              onClick={started}
+              disabled={workoutStarted || !loggedIn}
+            >
+              Click to add a new workout
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={started}
+              disabled={workoutStarted || !loggedIn}
+            >
+              Logging you in
+            </button>
+          )}
 
-      {workoutStarted && (
-        <>
-          <br></br>
-          <br></br>
-          <label htmlFor="workoutName">Workout name: </label>
-          <div className="flexContainer">
-            <input
-              value={workoutName}
-              id="workoutName"
-              type="text"
-              onChange={(e) => setWorkoutName(e.target.value)}
-            ></input>
-            <button onClick={() => restore("workoutName")} type="button">
-              Click to restore previous value
-            </button>
-          </div>
-          <div className="flexContainer lessGap">
-            <button type="button" onClick={changeWorkoutNameHasBeenSet}>
-              Confirm name
-            </button>
-            <button type="button" onClick={cancelWorkout}>
-              Cancel workout
-            </button>
-          </div>
-        </>
-      )}
-      {workoutNameSet && (
-        <>
-          <br></br>
-          <br></br>
-          <label htmlFor="addEx">Exercise: </label>
-          <div className="flexContainer">
-            <input ref={exercise} id="addEx" type="text"></input>
-            <button onClick={() => restore("exercise")} type="button">
-              Click to restore previous value
-            </button>
-          </div>
-          <br></br>
-          <label htmlFor="addReps">Reps: </label>
-          <div className="flexContainer">
-            <input ref={reps} id="addReps" type="text"></input>
-            <button onClick={() => restore("reps")} type="button">
-              Click to restore previous value
-            </button>
-          </div>
-          <br></br>
+          {workoutStarted && (
+            <>
+              <br></br>
+              <br></br>
+              <label htmlFor="workoutName">Workout name: </label>
+              <div className="flexContainer">
+                <input
+                  value={workoutName}
+                  id="workoutName"
+                  type="text"
+                  onChange={(e) => setWorkoutName(e.target.value)}
+                ></input>
+                <button onClick={() => restore("workoutName")} type="button">
+                  Click to restore previous value
+                </button>
+              </div>
+              <div className="flexContainer lessGap">
+                <button type="button" onClick={changeWorkoutNameHasBeenSet}>
+                  Confirm name
+                </button>
+                <button type="button" onClick={cancelWorkout}>
+                  Cancel workout
+                </button>
+              </div>
+            </>
+          )}
+          {workoutNameSet && (
+            <>
+              <br></br>
+              <br></br>
+              <label htmlFor="addEx">Exercise: </label>
+              <div className="adjustHeight">
+                <div className="flexContainer">
+                  <input ref={exercise} id="addEx" type="text"></input>
+                  <button onClick={() => restore("exercise")} type="button">
+                    Click to restore previous value
+                  </button>
+                </div>
+                <br></br>
+                <label htmlFor="addReps">Reps: </label>
+                <div className="flexContainer">
+                  <input ref={reps} id="addReps" type="text"></input>
+                  <button onClick={() => restore("reps")} type="button">
+                    Click to restore previous value
+                  </button>
+                </div>
+                <br></br>
 
-          <label htmlFor="addSets">Sets: </label>
-          <div className="flexContainer">
-            <input ref={sets} id="addSets" type="text"></input>
-            <button onClick={() => restore("sets")} type="button">
-              Click to restore previous value
-            </button>
-          </div>
-          <br></br>
+                <label htmlFor="addSets">Sets: </label>
+                <div className="flexContainer">
+                  <input ref={sets} id="addSets" type="text"></input>
+                  <button onClick={() => restore("sets")} type="button">
+                    Click to restore previous value
+                  </button>
+                </div>
+                <br></br>
 
-          <label htmlFor="addWeight">Weight (in kg): </label>
-          <div className="flexContainer">
-            <input ref={weight} id="addWeight" type="text"></input>
-            <button onClick={() => restore("weight")} type="button">
-              Click to restore previous value
-            </button>
-          </div>
+                <label htmlFor="addWeight">Weight (in kg): </label>
+                <div className="flexContainer">
+                  <input ref={weight} id="addWeight" type="text"></input>
+                  <button onClick={() => restore("weight")} type="button">
+                    Click to restore previous value
+                  </button>
+                </div>
+              </div>
+              <br></br>
 
-          <br></br>
-
-          <button type="button" onClick={addExercise}>
-            Click to add exercise
-          </button>
-          <button type="button" onClick={finished}>
-            Click to finish workout
-          </button>
-        </>
-      )}
+              <button
+                className="SquishSize"
+                type="button"
+                onClick={addExercise}
+              >
+                Click to add exercise
+              </button>
+              <button className="SquishSize" type="button" onClick={finished}>
+                Click to finish workout
+              </button>
+            </>
+          )}
+        </div>
+        <div className="flex-container rightSideSpecificWorkoutformat">
+          {loggedIn && (
+            <form>
+              <label htmlFor="workoutPick">
+                Pick workout date to view workouts of:{" "}
+              </label>
+              <input
+                type="date"
+                id="workoutPick"
+                name="workoutPick"
+                onChange={(e) => viewWorkoutDate(e)}
+              ></input>
+            </form>
+          )}
+          {loggedIn && Object.keys(SpecificworkoutList).length > 0 && (
+            <table>
+              <thead>
+                <tr>
+                  <th id="dateHeading" colSpan="5">
+                    Date: {curDate}
+                  </th>
+                </tr>
+                <tr>
+                  <th>Exercise number</th>
+                  <th>Exercise Name</th>
+                  <th>Reps</th>
+                  <th>Sets</th>
+                  <th>Weight (in kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(SpecificworkoutList).map(
+                  ([workoutName, workoutData], counter) => (
+                    <React.Fragment key={`${workoutName}-${counter}`}>
+                      <tr>
+                        <td></td>
+                        <td id="workout_block_line" colSpan="4">
+                          {workoutName}
+                        </td>
+                      </tr>
+                      {workoutData.map((exercise, exerciseIndex) => (
+                        <tr
+                          key={`Workout-${workoutName}-${counter}-Exercise-${exerciseIndex}-${counter}`}
+                        >
+                          <td>Exercise {exerciseIndex + 1}</td>
+                          <td>{exercise["name"]}</td>
+                          <td>{exercise["reps"]}</td>
+                          <td>{exercise["sets"]}</td>
+                          <td>{exercise["weight"]}</td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ),
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </>
   );
 }
