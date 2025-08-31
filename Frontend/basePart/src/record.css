@@ -42,3 +42,12 @@
   background-color: black;
   color: white;
 }
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  body {
+    font-size: 1em;
+    line-height: 1.6;
+    width: 100%;
+    padding: 0 1em;
+  }
+}
