@@ -82,21 +82,36 @@ function Record() {
       await WorkoutListofToday();
     }
   }
-  function changeWorkoutNameHasBeenSet() {
-    setWorkoutNameSet(true);
-    setworkoutStarted(false);
-  }
-  function cancelWorkout() {
-    setWorkoutNameSet(false);
-    setworkoutStarted(false);
-  }
-  function started() {
-    setworkoutStarted(true);
-  }
-  async function finished() {
-    setWorkoutNameSet(false);
-    setWorkoutName("");
-    await WorkoutListofToday();
+
+  async function change(param, data = null) {
+    if (param === "changeWorkoutNameHasBeenSet") {
+      setWorkoutNameSet(true);
+      setworkoutStarted(false);
+    }
+    if (param === "cancelWorkout") {
+      setWorkoutNameSet(false);
+      setworkoutStarted(false);
+    }
+    if (param === "cancelExercise") {
+      setWorkoutNameSet(false);
+      setworkoutStarted(true);
+      restore("workoutName");
+    }
+    if (param === "started") {
+      setworkoutStarted(true);
+    }
+    if (param === "finished") {
+      setWorkoutNameSet(false);
+      setWorkoutName("");
+      await WorkoutListofToday();
+    }
+    if (param === "view") {
+      const date = data.target.value;
+      await changeSpecificWorkoutList(date);
+    }
+    if (param === "restore") {
+      restore(data);
+    }
   }
   async function changeSpecificWorkoutList(date) {
     const exercises = await getExercisesofThatDate(date);
@@ -107,10 +122,6 @@ function Record() {
     const date = new Date().toLocaleDateString("en-CA");
     const exercises = await getExercisesofThatDate(date);
     setTodayWorkoutList(exercises);
-  }
-  async function viewWorkoutDate(e) {
-    const date = e.target.value;
-    await changeSpecificWorkoutList(date);
   }
 
   return (
@@ -164,7 +175,7 @@ function Record() {
             <button
               className="SquishSize"
               type="button"
-              onClick={started}
+              onClick={() => change("started")}
               disabled={workoutStarted || !loggedIn}
             >
               Click to add a new workout
@@ -172,13 +183,12 @@ function Record() {
           ) : (
             <button
               type="button"
-              onClick={started}
+              onClick={() => change("started")}
               disabled={workoutStarted || !loggedIn}
             >
               Logging you in
             </button>
           )}
-
           {workoutStarted && (
             <>
               <br></br>
@@ -191,15 +201,21 @@ function Record() {
                   type="text"
                   onChange={(e) => setWorkoutName(e.target.value)}
                 ></input>
-                <button onClick={() => restore("workoutName")} type="button">
+                <button
+                  onClick={() => change("restore", "workoutName")}
+                  type="button"
+                >
                   Click to restore previous value
                 </button>
               </div>
               <div className="flexContainer lessGap">
-                <button type="button" onClick={changeWorkoutNameHasBeenSet}>
+                <button
+                  type="button"
+                  onClick={() => change("changeWorkoutNameHasBeenSet")}
+                >
                   Confirm name
                 </button>
-                <button type="button" onClick={cancelWorkout}>
+                <button type="button" onClick={() => change("cancelWorkout")}>
                   Cancel workout
                 </button>
               </div>
@@ -213,7 +229,10 @@ function Record() {
               <div className="adjustHeight">
                 <div className="flexContainer">
                   <input ref={exercise} id="addEx" type="text"></input>
-                  <button onClick={() => restore("exercise")} type="button">
+                  <button
+                    onClick={() => change("restore", "exercise")}
+                    type="button"
+                  >
                     Click to restore previous value
                   </button>
                 </div>
@@ -221,7 +240,10 @@ function Record() {
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
                   <input ref={reps} id="addReps" type="text"></input>
-                  <button onClick={() => restore("reps")} type="button">
+                  <button
+                    onClick={() => change("restore", "reps")}
+                    type="button"
+                  >
                     Click to restore previous value
                   </button>
                 </div>
@@ -230,7 +252,10 @@ function Record() {
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
                   <input ref={sets} id="addSets" type="text"></input>
-                  <button onClick={() => restore("sets")} type="button">
+                  <button
+                    onClick={() => change("restore", "sets")}
+                    type="button"
+                  >
                     Click to restore previous value
                   </button>
                 </div>
@@ -239,7 +264,10 @@ function Record() {
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
                   <input ref={weight} id="addWeight" type="text"></input>
-                  <button onClick={() => restore("weight")} type="button">
+                  <button
+                    onClick={() => change("restore", "weight")}
+                    type="button"
+                  >
                     Click to restore previous value
                   </button>
                 </div>
@@ -253,8 +281,19 @@ function Record() {
               >
                 Click to add exercise
               </button>
-              <button className="SquishSize" type="button" onClick={finished}>
+              <button
+                className="SquishSize"
+                type="button"
+                onClick={() => change("finished")}
+              >
                 Click to finish workout
+              </button>
+              <button
+                className="SquishSize"
+                type="button"
+                onClick={() => change("cancelExercise")}
+              >
+                Click to cancel exercise
               </button>
             </>
           )}
@@ -269,7 +308,7 @@ function Record() {
                 type="date"
                 id="workoutPick"
                 name="workoutPick"
-                onChange={(e) => viewWorkoutDate(e)}
+                onChange={(e) => change("view", e)}
               ></input>
             </form>
           )}
