@@ -11,6 +11,9 @@ import traceback
 import json
 import datetime
 from .models import Workout,Exercise
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import make_aware
+import pytz
 
 def records_home(request):
     return HttpResponse("Records root works!")
@@ -127,8 +130,13 @@ def updateExercise(request):
                 exerciseSets = data.get("exerciseSets",None)
                 exerciseWeight = data.get("exerciseWeight",None)
                 date = data.get("date")
-                date_obj = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date_obj,)
+                timezone = data.get("timezone")
+                general_date_obj = parse_datetime(date)
+                general_date_obj = make_aware(general_date_obj)
+                user_timezone = pytz.timezone(timezone)
+                local_date_obj = general_date_obj.astimezone(user_timezone)
+                local_date_obj = local_date_obj.date()
+                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=local_date_obj,)
                 # defaults are only used when the creation aspect of "get_or_create" is triggered
                 exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
                 defaults={
@@ -211,8 +219,13 @@ def getAllExercisesbasedOnDate(request):
             try:
                 data = json.loads(request.body)
                 date = data.get("date")
-                date_obj = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date_obj)
+                timezone = data.get("timezone")
+                general_date_obj = parse_datetime(date)
+                general_date_obj = make_aware(general_date_obj)
+                user_timezone = pytz.timezone(timezone)
+                local_date_obj = general_date_obj.astimezone(user_timezone)
+                local_date_obj = local_date_obj.date()
+                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=local_date_obj)
 
                 toReturn = {}
                 for exercise in exercises:

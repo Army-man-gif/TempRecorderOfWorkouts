@@ -9,13 +9,8 @@ import {
 
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
-  const now = new Date();
-  let Localdate =
-    now.getFullYear() +
-    "-" +
-    String(now.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(now.getDate()).padStart(2, "0");
+  let Localdate = new Date().toISOString();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [curDate, setCurDate] = useState(Localdate);
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [previousworkoutName, setPreviousworkoutName] = useState("");
@@ -81,13 +76,11 @@ function Record() {
   }
   async function addExercise() {
     setAdding(true);
-    const now = new Date();
-    const date =
-      now.getFullYear() +
-      "-" +
-      String(now.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(now.getDate()).padStart(2, "0");
+    Localdate = new Date().toISOString();
+    let areBothDatesSame = false;
+    if (curDate == Localdate) {
+      areBothDatesSame = true;
+    }
     const wName = workoutName;
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
@@ -95,7 +88,8 @@ function Record() {
     const w = weight.current?.value.trim();
     if (ex && r && s && w && wName) {
       const data = {
-        date: date,
+        date: Localdate,
+        timezone: timezone,
         workoutName: wName,
         exerciseName: ex,
         exerciseReps: r,
@@ -114,6 +108,11 @@ function Record() {
       sets.current.value = "";
       weight.current.value = "";
       await WorkoutListofToday();
+      console.log(areBothDatesSame);
+      if (areBothDatesSame) {
+        console.log(SpecificworkoutList[wName]);
+        setSpecificWorkoutList(SpecificworkoutList[wName].append(data));
+      }
     }
   }
 
@@ -153,16 +152,9 @@ function Record() {
     setSpecificWorkoutList(exercises);
   }
   async function WorkoutListofToday() {
-    const now = new Date();
-    const date =
-      now.getFullYear() +
-      "-" +
-      String(now.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(now.getDate()).padStart(2, "0");
-    const exercises = await getExercisesofThatDate(date);
+    Localdate = new Date().toISOString();
+    const exercises = await getExercisesofThatDate(Localdate, timezone);
     setTodayWorkoutList(exercises);
-    Localdate = date;
   }
 
   return (

@@ -74,8 +74,11 @@ export async function logout() {
   }
 }
 
-export async function getExercisesofThatDate(date) {
+export async function getExercisesofThatDate(date, timezone = null) {
   const data = { date: date };
+  if (timezone != null) {
+    data["timezone"] = timezone;
+  }
   const collectingExercises =
     (await SendData(
       `${intialBackendString}/getAllExercisesbasedOnDate/`,
