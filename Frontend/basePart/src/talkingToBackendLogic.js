@@ -34,7 +34,9 @@ export async function SendData(url, data) {
 }
 //   if (user["status"] === "User created" || user["status"] === "User fetched") {
 
-export async function User(Username, passkey) {
+export async function User() {
+  const Username = prompt("Enter username: ");
+  const passkey = prompt("Enter passkey: ");
   const data = { username: Username, passkey: passkey };
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
