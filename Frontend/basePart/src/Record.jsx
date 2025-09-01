@@ -3,6 +3,7 @@ import {
   User,
   updateExercise,
   logout,
+  justLogin,
   getExercisesofThatDate,
 } from "./talkingToBackendLogic.js";
 
@@ -36,9 +37,31 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      await User(user, passkey);
-      setLoggedIn(true);
-      await WorkoutListofToday();
+      const name = JSON.parse(localStorage.getItem("username")) ?? "";
+      let emptyName = false;
+      if (name != "") {
+        if (name.length == 0) {
+          emptyName = true;
+        }
+      } else {
+        emptyName = true;
+      }
+      const passkey = JSON.parse(localStorage.getItem("passkey")) ?? "";
+      let emptyPasskey = false;
+      if (passkey != "") {
+        if (passkey.length == 0) {
+          emptyPasskey = true;
+        }
+      } else {
+        emptyPasskey = true;
+      }
+      if (!emptyPasskey || !emptyName) {
+        await User(user, passkey);
+        setLoggedIn(true);
+        await WorkoutListofToday();
+      } else {
+        await justLogin(user, passkey);
+      }
     }
     load(user);
   }, [user]);

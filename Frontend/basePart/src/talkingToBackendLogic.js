@@ -294,11 +294,24 @@ export async function User(Username, passkey) {
   );
   if (user["status"]) {
     console.log("Logged in");
+    localStorage.setItem("username", JSON.stringify(user["username"]));
+    localStorage.setItem("passkey", JSON.stringify(user["passkey"]));
   } else {
     console.log("Login failed");
   }
 }
-
+export async function justLogin(name, passkey) {
+  const data = { username: name, passkey: passkey };
+  const user = await SendData(
+    "https://workoutsbackend-yn5p.onrender.com/records/loginView/",
+    data,
+  );
+  if (user.message) {
+    console.log("Login worked");
+  } else {
+    console.log("Login failed");
+  }
+}
 export async function updateExercise(data) {
   // workoutName,exerciseName,exerciseReps,exerciseSets,exerciseWeight
   const changeOraddExercise = await SendData(

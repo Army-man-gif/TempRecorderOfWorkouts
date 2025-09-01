@@ -96,13 +96,11 @@ def loginView(request):
             data = json.loads(request.body)
             username = data.get("username")
             passkey = data.get("passkey")
-            if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username)
-                if(check_password(passkey,user.password)):
-                    login(request, user)
-                    return JsonResponse({"message":"User logged in"})
-                return JsonResponse({"error":"Wrong password"})
-            return JsonResponse({"error": "User not found"}, status=404)
+            user = User.objects.get(username=username)
+            if(check_password(passkey,user.password)):
+                login(request, user)
+                return JsonResponse({"message":"User logged in"})
+            return JsonResponse({"error":"Wrong password"})
         except User.DoesNotExist:
             return JsonResponse({"error": "User does not exist"}, status=404)
         except Exception as e:
