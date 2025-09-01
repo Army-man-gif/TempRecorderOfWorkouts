@@ -10,9 +10,14 @@ import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const [user, setUser] = useState(() => prompt("Enter your username"));
   const [passkey, setPasskey] = useState(() => prompt("Enter your passkey"));
-  const [curDate, setCurDate] = useState(() =>
-    new Date().toLocaleDateString("en-CA"),
-  );
+  const now = new Date();
+  let Localdate =
+    now.getFullYear() +
+    "-" +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(now.getDate()).padStart(2, "0");
+  const [curDate, setCurDate] = useState(Localdate);
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [previousworkoutName, setPreviousworkoutName] = useState("");
   const [workoutName, setWorkoutName] = useState("");
@@ -55,7 +60,13 @@ function Record() {
     }
   }
   async function addExercise() {
-    const date = new Date().toLocaleDateString("en-CA");
+    const now = new Date();
+    const date =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0");
     const wName = workoutName;
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
@@ -120,9 +131,16 @@ function Record() {
     setSpecificWorkoutList(exercises);
   }
   async function WorkoutListofToday() {
-    const date = new Date().toLocaleDateString("en-CA");
+    const now = new Date();
+    const date =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0");
     const exercises = await getExercisesofThatDate(date);
     setTodayWorkoutList(exercises);
+    Localdate = date;
   }
 
   return (
@@ -134,7 +152,7 @@ function Record() {
               <thead>
                 <tr>
                   <th id="dateHeading" colSpan="5">
-                    Date: {new Date().toLocaleDateString("en-CA")}
+                    Date: {Localdate}
                   </th>
                 </tr>
                 <tr>
