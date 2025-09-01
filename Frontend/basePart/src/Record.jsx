@@ -53,10 +53,8 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
-        console.log("I'm not loggin in from local");
         await User(user, passkey);
       } else {
-        console.log("I'm loggin in from local");
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
