@@ -45,7 +45,7 @@ function Record() {
           emptyName = true;
         }
       } else {
-        emptyName = true;
+        emptyName = false;
       }
       const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) ?? "";
       let emptyPasskey = false;
@@ -54,7 +54,7 @@ function Record() {
           emptyPasskey = true;
         }
       } else {
-        emptyPasskey = true;
+        emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
         await User(user, passkey);
@@ -109,7 +109,7 @@ function Record() {
       };
       await updateExercise(data);
       setPreviousworkoutName(wName);
-      setAdding(true);
+      setAdding(false);
       pExercise.current = ex;
       pReps.current = r;
       pSets.current = s;

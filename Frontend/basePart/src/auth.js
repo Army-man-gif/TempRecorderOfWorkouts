@@ -3,7 +3,6 @@ export async function setCookie() {
     method: "GET",
     credentials: "include",
   });
-  return new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 export async function getCookieFromBrowser() {
@@ -21,11 +20,10 @@ export async function ensureCSRFToken() {
   let token = await getCookieFromBrowser("csrftoken");
   if (!token) {
     await setCookie();
-    // wait until cookie actually exists
     for (let i = 0; i < 10; i++) {
       token = await getCookieFromBrowser("csrftoken");
       if (token) break;
-      await new Promise((r) => setTimeout(r, 100)); // wait 100ms
+      await new Promise((r) => setTimeout(r, 100));
     }
   }
   return token;
