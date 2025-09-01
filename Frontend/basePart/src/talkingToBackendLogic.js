@@ -303,7 +303,7 @@ export async function User(Username, passkey) {
 export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
   const user = await SendData(
-    "https://workoutsbackend-yn5p.onrender.com/records/loginView/",
+    "https://workoutsbackend-yn5p.onrender.com/records/login/",
     data,
   );
   if (user.message) {

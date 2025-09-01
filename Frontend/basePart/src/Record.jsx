@@ -46,7 +46,7 @@ function Record() {
       } else {
         emptyName = true;
       }
-      const passkey = JSON.parse(localStorage.getItem("passkey")) ?? "";
+      const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) ?? "";
       let emptyPasskey = false;
       if (passkey != "") {
         if (passkey.length == 0) {
@@ -55,13 +55,13 @@ function Record() {
       } else {
         emptyPasskey = true;
       }
-      if (!emptyPasskey || !emptyName) {
+      if (emptyPasskey || emptyName) {
         await User(user, passkey);
-        setLoggedIn(true);
-        await WorkoutListofToday();
       } else {
-        await justLogin(user, passkey);
+        await justLogin(name, passkeyPulled);
       }
+      setLoggedIn(true);
+      await WorkoutListofToday();
     }
     load(user);
   }, [user]);
