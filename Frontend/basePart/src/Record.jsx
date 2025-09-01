@@ -40,25 +40,23 @@ function Record() {
     async function load() {
       const name = JSON.parse(localStorage.getItem("username")) ?? "";
       let emptyName = false;
-      if (name != "") {
-        if (name.length == 0) {
-          emptyName = true;
-        }
+      if (name == "") {
+        emptyName = true;
       } else {
         emptyName = false;
       }
       const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) ?? "";
       let emptyPasskey = false;
-      if (passkey != "") {
-        if (passkey.length == 0) {
-          emptyPasskey = true;
-        }
+      if (passkey == "") {
+        emptyPasskey = true;
       } else {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
+        console.log("I'm not loggin in from local");
         await User(user, passkey);
       } else {
+        console.log("I'm loggin in from local");
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
