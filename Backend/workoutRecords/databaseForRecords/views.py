@@ -37,7 +37,8 @@ def GetorMakeUser(request):
             if created:
                 user.set_password(passkey)
             user.save()
-            message = "User created" if created else "User fetched"
+            login(request, user)
+            message = "User created and logged in" if created else "User fetched and logged in"
             userDataToReturn = {"username":user.username,"passkey":passkey,"status":message}
             return JsonResponse(userDataToReturn)
         except Exception as e:

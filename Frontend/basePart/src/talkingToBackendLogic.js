@@ -293,15 +293,9 @@ export async function User(Username, passkey) {
     data,
   );
   if (user["status"]) {
-    const login = await SendData(
-      "https://workoutsbackend-yn5p.onrender.com/records/login/",
-      data,
-    );
-    if (login.message) {
-      console.log("Logged in");
-    } else {
-      console.log("Login failed");
-    }
+    console.log("Logged in");
+  } else {
+    console.log("Login failed");
   }
 }
 

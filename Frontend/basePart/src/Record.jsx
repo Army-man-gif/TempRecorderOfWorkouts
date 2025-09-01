@@ -33,6 +33,7 @@ function Record() {
   let pReps = useRef(null);
   let pSets = useRef(null);
   let pWeight = useRef(null);
+
   useEffect(() => {
     async function load() {
       await User(user, passkey);
