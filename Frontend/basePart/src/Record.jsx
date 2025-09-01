@@ -9,8 +9,6 @@ import {
 
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
-  const [user, setUser] = useState("");
-  const [passkey, setPasskey] = useState("");
   const now = new Date();
   let Localdate =
     now.getFullYear() +
@@ -61,7 +59,7 @@ function Record() {
       setLoggedIn(true);
       await WorkoutListofToday();
     }
-    load(user);
+    load();
   }, []);
 
   function restore(field) {
