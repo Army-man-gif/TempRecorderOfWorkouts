@@ -6,7 +6,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+tr.txt
 # Distribution / packaging
 .Python
 build/
