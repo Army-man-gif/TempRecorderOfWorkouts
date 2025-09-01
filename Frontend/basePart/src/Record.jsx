@@ -26,6 +26,7 @@ function Record() {
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
+  const [adding, setAdding] = useState(false);
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
@@ -84,6 +85,7 @@ function Record() {
     }
   }
   async function addExercise() {
+    setAdding(true);
     const now = new Date();
     const date =
       now.getFullYear() +
@@ -107,6 +109,7 @@ function Record() {
       };
       await updateExercise(data);
       setPreviousworkoutName(wName);
+      setAdding(true);
       pExercise.current = ex;
       pReps.current = r;
       pSets.current = s;
@@ -271,10 +274,16 @@ function Record() {
               <label htmlFor="addEx">Exercise: </label>
               <div className="adjustHeight">
                 <div className="flexContainer">
-                  <input ref={exercise} id="addEx" type="text"></input>
+                  <input
+                    ref={exercise}
+                    id="addEx"
+                    type="text"
+                    disabled={adding}
+                  ></input>
                   <button
                     onClick={() => main("restore", "exercise")}
                     type="button"
+                    disabled={adding}
                   >
                     Restore
                   </button>
@@ -282,8 +291,17 @@ function Record() {
                 <br></br>
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
-                  <input ref={reps} id="addReps" type="text"></input>
-                  <button onClick={() => main("restore", "reps")} type="button">
+                  <input
+                    ref={reps}
+                    id="addReps"
+                    type="text"
+                    disabled={adding}
+                  ></input>
+                  <button
+                    onClick={() => main("restore", "reps")}
+                    type="button"
+                    disabled={adding}
+                  >
                     Restore
                   </button>
                 </div>
@@ -291,8 +309,17 @@ function Record() {
 
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
-                  <input ref={sets} id="addSets" type="text"></input>
-                  <button onClick={() => main("restore", "sets")} type="button">
+                  <input
+                    ref={sets}
+                    id="addSets"
+                    type="text"
+                    disabled={adding}
+                  ></input>
+                  <button
+                    onClick={() => main("restore", "sets")}
+                    type="button"
+                    disabled={adding}
+                  >
                     Restore
                   </button>
                 </div>
@@ -300,10 +327,16 @@ function Record() {
 
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
-                  <input ref={weight} id="addWeight" type="text"></input>
+                  <input
+                    ref={weight}
+                    id="addWeight"
+                    type="text"
+                    disabled={adding}
+                  ></input>
                   <button
                     onClick={() => main("restore", "weight")}
                     type="button"
+                    disabled={adding}
                   >
                     Restore
                   </button>
@@ -315,6 +348,7 @@ function Record() {
                 className="SquishSize"
                 type="button"
                 onClick={addExercise}
+                disabled={adding}
               >
                 Click to add exercise
               </button>
@@ -322,6 +356,7 @@ function Record() {
                 className="SquishSize"
                 type="button"
                 onClick={() => main("finished")}
+                disabled={adding}
               >
                 Click to finish workout
               </button>
@@ -329,6 +364,7 @@ function Record() {
                 className="SquishSize"
                 type="button"
                 onClick={() => main("cancelExercise")}
+                disabled={adding}
               >
                 Click to cancel exercise
               </button>
