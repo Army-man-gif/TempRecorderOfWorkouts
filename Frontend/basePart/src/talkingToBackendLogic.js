@@ -1,5 +1,5 @@
 import { ensureCSRFToken } from "./auth.js";
-const intialBackendString = "https://workoutsBackend-qta1.onrender.com";
+const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 export async function SendData(url, data) {
   let response;
   const dataToUse = data;
@@ -36,10 +36,7 @@ export async function SendData(url, data) {
 
 export async function User(Username, passkey) {
   const data = { username: Username, passkey: passkey };
-  const user = await SendData(
-    `${intialBackendString}/records/GetorMakeUser/`,
-    data,
-  );
+  const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
     console.log("Logged in");
     localStorage.setItem("username", JSON.stringify(user["username"]));
@@ -50,7 +47,7 @@ export async function User(Username, passkey) {
 }
 export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
-  const user = await SendData(`${intialBackendString}/records/login/`, data);
+  const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
     console.log("Login worked");
   } else {
@@ -60,7 +57,7 @@ export async function justLogin(name, passkey) {
 export async function updateExercise(data) {
   // workoutName,exerciseName,exerciseReps,exerciseSets,exerciseWeight
   const changeOraddExercise = await SendData(
-    `${intialBackendString}/records/updateExercise/`,
+    `${intialBackendString}/updateExercise/`,
     data,
   );
   if (changeOraddExercise.message) {
@@ -69,10 +66,7 @@ export async function updateExercise(data) {
 }
 
 export async function logout() {
-  const loggingout = await SendData(
-    `${intialBackendString}/records/logout/`,
-    {},
-  );
+  const loggingout = await SendData(`${intialBackendString}/logout/`, {});
   if (loggingout.message) {
     console.log("Logged out");
   }
@@ -82,7 +76,7 @@ export async function getExercisesofThatDate(date) {
   const data = { date: date };
   const collectingExercises =
     (await SendData(
-      `${intialBackendString}/records/getAllExercisesbasedOnDate/`,
+      `${intialBackendString}/getAllExercisesbasedOnDate/`,
       data,
     )) ?? {};
   if (collectingExercises) {
