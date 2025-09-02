@@ -68,7 +68,8 @@ export async function updateExercise(data) {
 }
 export async function batchupdateExercise() {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
-  const data = { batchUpdate: stored };
+  const timezone = JSON.parse(localStorage.getItem("timezone")) || "";
+  const data = { batchUpdate: stored, timezone: timezone };
   const updateInBulk = await SendData(
     `${intialBackendString}/batchupdateExercise/`,
     data,

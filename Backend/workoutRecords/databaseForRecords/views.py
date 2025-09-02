@@ -123,9 +123,9 @@ def batchupdateExercise(request):
             try:
                 data = json.loads(request.body)
                 batchupdateData = data.get("batchUpdate",None)
+                timezone = data.get("timezone",None)
                 if(batchupdateData is not None):
                     batchupdateDataworkoutNames = list(batchupdateData.keys())
-                    timezone = batchupdateData[batchupdateDataworkoutNames[0]][0]["timezone"]
                     dates = []
                     exerciseNames = []
                     exerciseData = []

@@ -121,6 +121,7 @@ function Record() {
         }
       }
       localStorage.setItem("workouts", JSON.stringify(stored));
+      localStorage.setItem("timezone", JSON.stringify(timezone));
       setPreviousworkoutName(wName);
       setAdding(false);
       pExercise.current = ex;
