@@ -129,7 +129,7 @@ def batchupdateExercise(request):
                     dates = []
                     exerciseNames = []
                     exerciseData = []
-                    date_workoutName_pairs = {}
+                    date_workoutName_pairs = []
                     user_timezone = pytz.timezone(timezone)
                     for i in batchupdateDataworkoutNames:
                         for j in batchupdateData[i]:
@@ -138,7 +138,7 @@ def batchupdateExercise(request):
                             local_date_obj = general_date_obj.astimezone(user_timezone)
                             local_date_obj = local_date_obj.date()
                             dates.append(local_date_obj)
-                            date_workoutName_pairs[local_date_obj] = j["workoutName"]
+                            date_workoutName_pairs.append(j["workoutName"],local_date_obj)
                             exerciseNames.append(j["exerciseName"])
                             exerciseData.append({
                                 "workoutName": j["workoutName"],                    
@@ -149,23 +149,20 @@ def batchupdateExercise(request):
                             
                             
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
-                    workoutDatesFound = []
-                    for i in workouts:
-                        workoutDatesFound.append(i.date)
+                    existingWorkoutPairsFound = {(w.name, w.date) for w in workouts}
                     workoutsToMake = []
-                    for i in range(len(dates)):
-                        if(dates[i] not in workoutDatesFound):
-                            workoutsToMake.append(Workout(user=request.user,name=date_workoutName_pairs[dates[i]],date=dates[i]))
+                    for (w_name,w_date) in date_workoutName_pairs:
+                        if((w_name,w_date) not in existingWorkoutPairsFound):
+                            workoutsToMake.append(Workout(user=request.user,name=w_name,date=w_date))
+                            existingWorkoutPairsFound.add((w_name,w_date))
                     Workout.objects.bulk_create(workoutsToMake,batch_size=500)
                     
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
-                    exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
-                    exerciseNamesFound = []
-                    for i in exercises:
-                        exerciseNamesFound.append(i.exerciseName)
-                    exercisesToMake = []
-                    
                     workout_lookup = {(w.name, w.date): w for w in workouts}
+
+                    exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
+                    exerciseNamesFound = [e.exerciseName for e in exercises]
+                    exercisesToMake = []
                     for i in range(len(exerciseNames)):
                         if(exerciseNames[i] not in exerciseNamesFound):
                             workout_name = exerciseData[i]["workoutName"]
