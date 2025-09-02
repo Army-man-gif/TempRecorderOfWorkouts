@@ -149,7 +149,7 @@ def batchupdateExercise(request):
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
                     workoutDatesFound = []
                     for i in workouts:
-                        workoutDatesFound.append(i["date"])
+                        workoutDatesFound.append(i.date)
                     workoutsToMake = []
                     for i in range(len(dates)):
                         if(dates[i] not in workoutDatesFound):
@@ -160,7 +160,7 @@ def batchupdateExercise(request):
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
                     exerciseNamesFound = []
                     for i in exercises:
-                        exerciseNamesFound.append(i["exerciseName"])
+                        exerciseNamesFound.append(i.exerciseName)
                     exercisesToMake = []
                     
                     workout_lookup = {(w.name, w.date): w for w in workouts}
