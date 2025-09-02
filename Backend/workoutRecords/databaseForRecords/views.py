@@ -138,7 +138,7 @@ def batchupdateExercise(request):
                             local_date_obj = general_date_obj.astimezone(user_timezone)
                             local_date_obj = local_date_obj.date()
                             dates.append(local_date_obj)
-                            date_workoutName_pairs.append(j["workoutName"],local_date_obj)
+                            date_workoutName_pairs.append((j["workoutName"],local_date_obj))
                             exerciseNames.append(j["exerciseName"])
                             exerciseData.append({
                                 "workoutName": j["workoutName"],                    
