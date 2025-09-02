@@ -12,7 +12,6 @@ import json
 import datetime
 from .models import Workout,Exercise
 from django.utils.dateparse import parse_datetime
-from django.utils.timezone import make_aware
 import pytz
 
 def records_home(request):
@@ -132,7 +131,6 @@ def updateExercise(request):
                 date = data.get("date")
                 timezone = data.get("timezone")
                 general_date_obj = parse_datetime(date)
-                general_date_obj = make_aware(general_date_obj)
                 user_timezone = pytz.timezone(timezone)
                 local_date_obj = general_date_obj.astimezone(user_timezone)
                 local_date_obj = local_date_obj.date()
@@ -221,7 +219,6 @@ def getAllExercisesbasedOnDate(request):
                 date = data.get("date")
                 timezone = data.get("timezone")
                 general_date_obj = parse_datetime(date)
-                general_date_obj = make_aware(general_date_obj)
                 user_timezone = pytz.timezone(timezone)
                 local_date_obj = general_date_obj.astimezone(user_timezone)
                 local_date_obj = local_date_obj.date()
