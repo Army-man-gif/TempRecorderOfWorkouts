@@ -147,7 +147,8 @@ function Record() {
     }
   }
   async function changeSpecificWorkoutList(date) {
-    const exercises = await getExercisesofThatDate(date);
+    const chosenDate = new Date(date).toISOString();
+    const exercises = await getExercisesofThatDate(chosenDate, timezone);
     setCurDate(date);
     setSpecificWorkoutList(exercises);
   }
