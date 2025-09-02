@@ -360,7 +360,7 @@ function Record() {
               <thead>
                 <tr>
                   <th id="dateHeading" colSpan="5">
-                    Date: {curDate}
+                    Date: {curunformattedDate}
                   </th>
                 </tr>
                 <tr>
