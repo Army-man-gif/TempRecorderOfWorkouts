@@ -50,4 +50,9 @@
     width: 100%;
     padding: 0 1em;
   }
+  .flexContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
 }

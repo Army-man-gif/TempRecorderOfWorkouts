@@ -117,6 +117,66 @@ def logoutView(request):
 
 
 # ----------------------------------------------------------------------------------------
+def batchupdateExercise(request):
+    if request.user.is_authenticated:
+        if(request.method == "POST"):
+            try:
+                data = json.loads(request.body)
+                batchupdateData = data.get("batchUpdate",None)
+                if(batchupdateData is not None):
+                    batchupdateDataworkoutNames = list(batchupdateData.keys())
+                    timezone = batchupdateData[batchupdateDataworkoutNames[0]][0]["timezone"]
+                    dates = []
+                    exerciseNames = []
+                    exerciseData = []
+                    user_timezone = pytz.timezone(timezone)
+                    for i in batchupdateDataworkoutNames:
+                        for j in batchupdateData[i]:
+                            date = j["date"]
+                            general_date_obj = parse_datetime(date)
+                            local_date_obj = general_date_obj.astimezone(user_timezone)
+                            local_date_obj = local_date_obj.date()
+                            dates.append(local_date_obj)
+                            exerciseNames.append(j["exerciseName"])
+                            exerciseData.append({
+                                "workoutName": j["workoutName"],                    
+                                "exerciseReps":j["exerciseReps"], 
+                                "exerciseSets":j["exerciseSets"],
+                                "exerciseWeight":j["exerciseWeight"]
+                            })
+                            
+                            
+                    workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
+                    workoutDatesFound = []
+                    for i in workouts:
+                        workoutDatesFound.append(i["date"])
+                    workoutsToMake = []
+                    for i in range(len(dates)):
+                        if(dates[i] not in workoutDatesFound):
+                            workoutsToMake.append(Workout(user=request.user,name=batchupdateDataworkoutNames[i],date=dates[i]))
+                    Workout.objects.bulk_create(workoutsToMake, return_defaults=True,batch_size=500)
+                    
+                    workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
+                    exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
+                    exerciseNamesFound = []
+                    for i in exercises:
+                        exerciseNamesFound.append(i["exerciseName"])
+                    exercisesToMake = []
+                    
+                    workout_lookup = {(w.name, w.date): w for w in workouts}
+                    for i in range(len(exerciseNames)):
+                        if(exerciseNames[i] not in exerciseNamesFound):
+                            workout_name = exerciseData[i]["workoutName"]
+                            workout_date = dates[i]
+                            workout_obj = workout_lookup.get((workout_name, workout_date))
+                            exercisesToMake.append(Exercise(workout=workout_obj,exerciseName=exerciseNames[i],exerciseReps=exerciseData[i]["exerciseReps"],exerciseSets=exerciseData[i]["exerciseSets"],exerciseWeight=exerciseData[i]["exerciseWeight"]))
+                    Exercise.objects.bulk_create(exercisesToMake,return_defaults=True,batch_size=500)
+                else:
+                    return JsonResponse({"message":"Empty batchUpdate"})
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({"message":"Only POST method allowed"})
+    return JsonResponse({"message":"User not logged in"})
 
 def updateExercise(request):
     if request.user.is_authenticated:

@@ -66,7 +66,10 @@ export async function updateExercise(data) {
     console.log("Exercise changed/added");
   }
 }
-
+export async function batchupdateExercise() {
+  const stored = JSON.parse(localStorage.getItem("workouts")) || {};
+  const data = { batchUpdate: stored };
+}
 export async function logout() {
   const loggingout = await SendData(`${intialBackendString}/logout/`, {});
   if (loggingout.message) {

@@ -2,6 +2,7 @@ import "./record.css";
 import {
   User,
   updateExercise,
+  batchupdateExercise,
   logout,
   justLogin,
   getExercisesofThatDate,
@@ -106,6 +107,19 @@ function Record() {
         sets: s,
         weight: w,
       };
+      const stored = JSON.parse(localStorage.getItem("workouts")) || {};
+      if (!(wName in stored)) {
+        stored[wName] = [];
+      } else {
+        const changeExerciseIndex = stored[wName].findIndex(
+          (exercise) => exercise.exerciseName === ex,
+        );
+        if (changeExerciseIndex) {
+          stored[wName][changeExerciseIndex] = data;
+        }
+      }
+      stored[wName].append(data);
+      localStorage.setItem("workouts", JSON.stringify(stored));
       await updateExercise(data);
       setPreviousworkoutName(wName);
       setAdding(false);
@@ -151,11 +165,12 @@ function Record() {
     if (param === "finished") {
       setWorkoutNameSet(false);
       setWorkoutName("");
-      await WorkoutListofToday();
     }
     if (param === "view") {
       const date = data.target.value;
-      await changeSpecificWorkoutList(date);
+      if (date != curunformattedDate) {
+        await changeSpecificWorkoutList(date);
+      }
     }
     if (param === "restore") {
       restore(data);

@@ -13,6 +13,7 @@ urlpatterns = [
     path("logout/", views.logoutView,name="logout"),
     
     path("updateExercise/", views.updateExercise,name="updateExercise"),
+    path("batchupdateExercise/", views.batchupdateExercise,name="batchupdateExercise"),
     path("deleteExercise/", views.deleteExercise,name="deleteExercise"),
     
     
