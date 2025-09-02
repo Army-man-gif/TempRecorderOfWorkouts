@@ -217,6 +217,7 @@ def getAllExercisesbasedOnDate(request):
             try:
                 data = json.loads(request.body)
                 date = data.get("date")
+                # nice
                 timezone = data.get("timezone","")
                 general_date_obj = parse_datetime(date)
                 user_timezone = pytz.timezone(timezone)
