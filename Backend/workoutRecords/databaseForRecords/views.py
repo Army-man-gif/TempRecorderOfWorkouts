@@ -171,6 +171,7 @@ def batchupdateExercise(request):
                             workout_obj = workout_lookup.get((workout_name, workout_date))
                             exercisesToMake.append(Exercise(workout=workout_obj,exerciseName=exerciseNames[i],exerciseReps=exerciseData[i]["exerciseReps"],exerciseSets=exerciseData[i]["exerciseSets"],exerciseWeight=exerciseData[i]["exerciseWeight"]))
                     Exercise.objects.bulk_create(exercisesToMake,return_defaults=True,batch_size=500)
+                    return JsonResponse({"message":"Batch update complete"})
                 else:
                     return JsonResponse({"message":"Empty batchUpdate"})
             except Exception as e:

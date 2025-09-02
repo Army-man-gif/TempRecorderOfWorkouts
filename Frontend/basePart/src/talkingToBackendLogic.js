@@ -69,6 +69,13 @@ export async function updateExercise(data) {
 export async function batchupdateExercise() {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
   const data = { batchUpdate: stored };
+  const updateInBulk = await SendData(
+    `${intialBackendString}/batchupdateExercise/`,
+    data,
+  );
+  if (updateInBulk.message) {
+    console.log(updateInBulk.message);
+  }
 }
 export async function logout() {
   const loggingout = await SendData(`${intialBackendString}/logout/`, {});

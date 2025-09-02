@@ -114,13 +114,13 @@ function Record() {
         const changeExerciseIndex = stored[wName].findIndex(
           (exercise) => exercise.exerciseName === ex,
         );
-        if (changeExerciseIndex) {
+        if (changeExerciseIndex >= 0) {
           stored[wName][changeExerciseIndex] = data;
+        } else {
+          stored[wName].push(data);
         }
       }
-      stored[wName].append(data);
       localStorage.setItem("workouts", JSON.stringify(stored));
-      await updateExercise(data);
       setPreviousworkoutName(wName);
       setAdding(false);
       pExercise.current = ex;
@@ -131,16 +131,54 @@ function Record() {
       reps.current.value = "";
       sets.current.value = "";
       weight.current.value = "";
-      setTodayWorkoutList((prev) => ({
-        ...prev,
-        [wName]: [...(prev[wName] ?? []), dateToChangeWorkoutStateListsWith],
-      }));
+      setTodayWorkoutList((prev) => {
+        const existingList = prev[wName] ?? [];
+
+        const changeExerciseIndex = existingList.findIndex(
+          (exercise) => exercise.name === ex,
+        );
+
+        let newList;
+
+        if (changeExerciseIndex >= 0) {
+          // Replace existing exercise
+          newList = [...existingList];
+          newList[changeExerciseIndex] = dateToChangeWorkoutStateListsWith;
+        } else {
+          // Add new exercise
+          newList = [...existingList, dateToChangeWorkoutStateListsWith];
+        }
+
+        return {
+          ...prev,
+          [wName]: newList,
+        };
+      });
       console.log(areBothDatesSame);
       if (areBothDatesSame) {
-        setSpecificWorkoutList((prev2) => ({
-          ...prev2,
-          [wName]: [...(prev2[wName] ?? []), dateToChangeWorkoutStateListsWith],
-        }));
+        setSpecificWorkoutList((prev2) => {
+          const existingList = prev2[wName] ?? [];
+
+          const changeExerciseIndex = existingList.findIndex(
+            (exercise) => exercise.name === ex,
+          );
+
+          let newList;
+
+          if (changeExerciseIndex >= 0) {
+            // Replace existing exercise
+            newList = [...existingList];
+            newList[changeExerciseIndex] = dateToChangeWorkoutStateListsWith;
+          } else {
+            // Add new exercise
+            newList = [...existingList, dateToChangeWorkoutStateListsWith];
+          }
+
+          return {
+            ...prev2,
+            [wName]: newList,
+          };
+        });
       }
     }
   }
@@ -165,6 +203,7 @@ function Record() {
     if (param === "finished") {
       setWorkoutNameSet(false);
       setWorkoutName("");
+      await batchupdateExercise();
     }
     if (param === "view") {
       const date = data.target.value;
