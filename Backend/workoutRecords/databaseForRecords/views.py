@@ -165,9 +165,7 @@ def batchupdateExercise(request):
                     exercisesToMake = []
                     for i in range(len(exerciseNames)):
                         if(exerciseNames[i] not in exerciseNamesFound):
-                            workout_name = exerciseData[i]["workoutName"]
-                            workout_date = dates[i]
-                            workout_obj = workout_lookup.get((workout_name, workout_date))
+                            workout_obj = workout_lookup.get(date_workoutName_pairs[i])
                             exercisesToMake.append(Exercise(workout=workout_obj,exerciseName=exerciseNames[i],exerciseReps=exerciseData[i]["exerciseReps"],exerciseSets=exerciseData[i]["exerciseSets"],exerciseWeight=exerciseData[i]["exerciseWeight"]))
                     Exercise.objects.bulk_create(exercisesToMake,batch_size=500)
                     return JsonResponse({"message":"Batch update complete"})
