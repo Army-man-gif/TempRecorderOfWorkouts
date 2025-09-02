@@ -10,8 +10,11 @@ import {
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   let Localdate = new Date().toISOString();
+  let LocaldateunFormatted = new Date().toLocaleDateString();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [curDate, setCurDate] = useState(Localdate);
+  const [curunformattedDate, setCurunformattedDate] =
+    useState(LocaldateunFormatted);
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [previousworkoutName, setPreviousworkoutName] = useState("");
   const [workoutName, setWorkoutName] = useState("");
@@ -77,8 +80,9 @@ function Record() {
   async function addExercise() {
     setAdding(true);
     Localdate = new Date().toISOString();
+    LocaldateunFormatted = new Date().toLocaleDateString();
     let areBothDatesSame = false;
-    if (curDate == Localdate) {
+    if (curunformattedDate == LocaldateunFormatted) {
       areBothDatesSame = true;
     }
     const wName = workoutName;
@@ -96,6 +100,12 @@ function Record() {
         exerciseSets: s,
         exerciseWeight: w,
       };
+      const dateToChangeWorkoutStateListsWith = {
+        name: ex,
+        reps: r,
+        sets: s,
+        weight: w,
+      };
       await updateExercise(data);
       setPreviousworkoutName(wName);
       setAdding(false);
@@ -107,11 +117,16 @@ function Record() {
       reps.current.value = "";
       sets.current.value = "";
       weight.current.value = "";
-      await WorkoutListofToday();
+      setTodayWorkoutList((prev) => ({
+        ...prev,
+        [wName]: [...(prev[wName] ?? []), dateToChangeWorkoutStateListsWith],
+      }));
       console.log(areBothDatesSame);
       if (areBothDatesSame) {
-        console.log(SpecificworkoutList[wName]);
-        setSpecificWorkoutList(SpecificworkoutList[wName].append(data));
+        setSpecificWorkoutList((prev2) => ({
+          ...prev2,
+          [wName]: [...(prev2[wName] ?? []), dateToChangeWorkoutStateListsWith],
+        }));
       }
     }
   }
@@ -148,12 +163,15 @@ function Record() {
   }
   async function changeSpecificWorkoutList(date) {
     const chosenDate = new Date(date).toISOString();
+    const chosenDateunFormatted = new Date(date).toLocaleDateString();
     const exercises = await getExercisesofThatDate(chosenDate, timezone);
     setCurDate(date);
+    setCurunformattedDate(chosenDateunFormatted);
     setSpecificWorkoutList(exercises);
   }
   async function WorkoutListofToday() {
     Localdate = new Date().toISOString();
+    LocaldateunFormatted = new Date().toLocaleDateString();
     const exercises = await getExercisesofThatDate(Localdate, timezone);
     setTodayWorkoutList(exercises);
   }
@@ -167,7 +185,7 @@ function Record() {
               <thead>
                 <tr>
                   <th id="dateHeading" colSpan="5">
-                    Date: {Localdate}
+                    Date: {LocaldateunFormatted}
                   </th>
                 </tr>
                 <tr>
