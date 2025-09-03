@@ -184,7 +184,7 @@ def batchupdateExercise(request):
                                 ))
                             existingExercisePairsFound.add(key)
                         else:
-                            exercise_obj = exercise_lookup.get((workout_obj.name,exerciseNames[i]))
+                            exercise_obj = exercise_lookup.get(key)
                             for field in ["exerciseReps","exerciseSets","exerciseWeight"]:
                                     value = exerciseData[i][field]
                                     if value is not None:
