@@ -162,11 +162,15 @@ def batchupdateExercise(request):
                     workout_lookup = {(w.name, w.date): w for w in workouts}
 
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
-                    exerciseNamesFound = [e.exerciseName for e in exercises]
-                    print(exerciseNamesFound)
+                    existingExercisePairsFound = {(e.workout.name, e.exerciseName) for e in exercises}
+                    print(existingExercisePairsFound)
                     exercisesToMake = []
                     for i in range(len(exerciseNames)):
-                        if(exerciseNames[i] not in exerciseNamesFound):
+                        workout_obj = workout_lookup.get(date_workoutName_pairs[i])
+                        if workout_obj is None:
+                            print("⚠️ Workout not found for:", date_workoutName_pairs[i])
+                            continue
+                        if((workout_obj.name,exerciseNames[i]) not in existingExercisePairsFound):
                             workout_obj = workout_lookup.get(date_workoutName_pairs[i])
                             exercisesToMake.append(Exercise(workout=workout_obj,exerciseName=exerciseNames[i],exerciseReps=exerciseData[i]["exerciseReps"],exerciseSets=exerciseData[i]["exerciseSets"],exerciseWeight=exerciseData[i]["exerciseWeight"]))
                     Exercise.objects.bulk_create(exercisesToMake,batch_size=500)
