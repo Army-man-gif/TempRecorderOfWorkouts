@@ -87,6 +87,7 @@ export async function logout() {
 
 export async function getExercisesofThatDate(date) {
   const data = { date: date };
+  console.log(date);
   const collectingExercises =
     (await SendData(
       `${intialBackendString}/getAllExercisesbasedOnDate/`,

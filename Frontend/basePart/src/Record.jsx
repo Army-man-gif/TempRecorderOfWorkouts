@@ -16,14 +16,16 @@ function Record() {
     const generalDate = new Date(dateString);
 
     // Format the date into the given timezone
-    const formatter = new Intl.DateTimeFormat("en-GB", {
+    const parts = new Intl.DateTimeFormat("en-GB", {
       timeZone: timezone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-    });
-
-    return formatter.format(generalDate);
+    }).formatToParts(generalDate);
+    const year = parts.find((p) => p.type === "year").value;
+    const month = parts.find((p) => p.type === "month").value;
+    const day = parts.find((p) => p.type === "day").value;
+    return `${year}-${month}-${day}`;
   }
 
   let Localdate = new Date().toISOString();
