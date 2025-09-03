@@ -147,9 +147,10 @@ def batchupdateExercise(request):
                                 "exerciseWeight":j["exerciseWeight"]
                             })
                             
-                            
+                    print(date_workoutName_pairs)        
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
                     existingWorkoutPairsFound = {(w.name, w.date) for w in workouts}
+                    print(existingWorkoutPairsFound)
                     workoutsToMake = []
                     for (w_name,w_date) in date_workoutName_pairs:
                         if((w_name,w_date) not in existingWorkoutPairsFound):
@@ -162,6 +163,7 @@ def batchupdateExercise(request):
 
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
                     exerciseNamesFound = [e.exerciseName for e in exercises]
+                    print(exerciseNamesFound)
                     exercisesToMake = []
                     for i in range(len(exerciseNames)):
                         if(exerciseNames[i] not in exerciseNamesFound):
