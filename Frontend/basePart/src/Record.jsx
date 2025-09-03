@@ -10,9 +10,24 @@ import {
 
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
-  let Localdate = new Date().toISOString();
-  let LocaldateunFormatted = new Date().toLocaleDateString();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  function convert(dateString, timezone) {
+    // Parse the input date (assumes it's an ISO string, e.g. "2025-09-04T12:00:00Z")
+    const generalDate = new Date(dateString);
+
+    // Format the date into the given timezone
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    return formatter.format(generalDate);
+  }
+
+  let Localdate = new Date().toISOString();
+  let LocaldateunFormatted = convert(Localdate, timezone);
   const [curDate, setCurDate] = useState(null);
   const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
@@ -77,10 +92,11 @@ function Record() {
       setWorkoutName(previousworkoutName);
     }
   }
+
   async function addExercise() {
     setAdding(true);
     Localdate = new Date().toISOString();
-    LocaldateunFormatted = new Date().toLocaleDateString();
+    LocaldateunFormatted = convert(Localdate, timezone);
     let areBothDatesSame = false;
     if (curunformattedDate == LocaldateunFormatted) {
       areBothDatesSame = true;
@@ -92,7 +108,7 @@ function Record() {
     const w = weight.current?.value.trim();
     if (ex && r && s && w && wName) {
       const data = {
-        date: Localdate,
+        date: LocaldateunFormatted,
         timezone: timezone,
         workoutName: wName,
         exerciseName: ex,
@@ -186,7 +202,6 @@ function Record() {
       }
     }
   }
-
   async function main(param, data = null) {
     if (param === "changeWorkoutNameHasBeenSet") {
       setWorkoutNameSet(true);
@@ -221,16 +236,16 @@ function Record() {
   }
   async function changeSpecificWorkoutList(date) {
     const chosenDate = new Date(date).toISOString();
-    const chosenDateunFormatted = new Date(date).toLocaleDateString();
-    const exercises = await getExercisesofThatDate(chosenDate, timezone);
+    const chosenDateunFormatted = convert(chosenDate, timezone);
+    const exercises = await getExercisesofThatDate(chosenDateunFormatted);
     setCurDate(date);
     setCurunformattedDate(chosenDateunFormatted);
     setSpecificWorkoutList(exercises);
   }
   async function WorkoutListofToday() {
     Localdate = new Date().toISOString();
-    LocaldateunFormatted = new Date().toLocaleDateString();
-    const exercises = await getExercisesofThatDate(Localdate, timezone);
+    LocaldateunFormatted = convert(Localdate, timezone);
+    const exercises = await getExercisesofThatDate(LocaldateunFormatted);
     setTodayWorkoutList(exercises);
   }
 

@@ -22,5 +22,6 @@ urlpatterns = [
     path("deleteWorkout/",views.deleteWorkout,name="deleteWorkout"),
     
     path("getAllExercisesbasedOnDate/", views.getAllExercisesbasedOnDate,name="getAllExercisesbasedOnDate"),
+    path("getAll/", views.getAll,name="getAll"),
 
 ]

@@ -68,8 +68,7 @@ export async function updateExercise(data) {
 }
 export async function batchupdateExercise() {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
-  const timezone = JSON.parse(localStorage.getItem("timezone")) || "";
-  const data = { batchUpdate: stored, timezone: timezone };
+  const data = { batchUpdate: stored };
   const updateInBulk = await SendData(
     `${intialBackendString}/batchupdateExercise/`,
     data,
@@ -86,11 +85,8 @@ export async function logout() {
   }
 }
 
-export async function getExercisesofThatDate(date, timezone = null) {
+export async function getExercisesofThatDate(date) {
   const data = { date: date };
-  if (timezone != null) {
-    data["timezone"] = timezone;
-  }
   const collectingExercises =
     (await SendData(
       `${intialBackendString}/getAllExercisesbasedOnDate/`,
@@ -105,3 +101,5 @@ export async function getExercisesofThatDate(date, timezone = null) {
     return {};
   }
 }
+
+export async function getAll() {}

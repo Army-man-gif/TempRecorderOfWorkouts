@@ -123,22 +123,24 @@ def batchupdateExercise(request):
             try:
                 data = json.loads(request.body)
                 batchupdateData = data.get("batchUpdate",None)
-                timezone = data.get("timezone",None)
+                # timezone = data.get("timezone",None)
                 if(batchupdateData is not None):
                     batchupdateDataworkoutNames = list(batchupdateData.keys())
                     dates = []
                     exerciseNames = []
                     exerciseData = []
                     date_workoutName_pairs = []
-                    user_timezone = pytz.timezone(timezone)
+                    # user_timezone = pytz.timezone(timezone)
                     for i in batchupdateDataworkoutNames:
                         for j in batchupdateData[i]:
                             date = j["date"]
+                            '''
                             general_date_obj = parse_datetime(date)
                             local_date_obj = general_date_obj.astimezone(user_timezone)
                             local_date_obj = local_date_obj.date()
-                            dates.append(local_date_obj)
-                            date_workoutName_pairs.append((j["workoutName"],local_date_obj))
+                            '''
+                            dates.append(date)
+                            date_workoutName_pairs.append((j["workoutName"],date))
                             exerciseNames.append(j["exerciseName"])
                             exerciseData.append({
                                 "workoutName": j["workoutName"],                    
@@ -305,12 +307,14 @@ def getAllExercisesbasedOnDate(request):
                 data = json.loads(request.body)
                 date = data.get("date")
                 # nice
+                '''
                 timezone = data.get("timezone","")
                 general_date_obj = parse_datetime(date)
                 user_timezone = pytz.timezone(timezone)
                 local_date_obj = general_date_obj.astimezone(user_timezone)
                 local_date_obj = local_date_obj.date()
-                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=local_date_obj)
+                '''
+                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date)
 
                 toReturn = {}
                 for exercise in exercises:
@@ -329,4 +333,28 @@ def getAllExercisesbasedOnDate(request):
                 return JsonResponse({"error":str(e)},status=400)
         return JsonResponse({"error": "Only POST allowed"}, status=405)
     return JsonResponse({"message":"User not logged in"})
+
+def getAll(request):
+    if request.user.is_authenticated:
+        try:
+            everyExercise = Exercise.objects.filter(workout__user=request.user)
+            toReturn = {}
+            for exercise in everyExercise:
+                date = exercise.workout.date
+                workoutName = exercise.workout.name
+                if date not in toReturn:
+                    toReturn[date] = {}
+                if workoutName not in toReturn[date]:
+                    toReturn[date][workoutName] = []
+                toReturn[date][workoutName].append({
+                    "name" : exercise.exerciseName,
+                    "reps" : exercise.exerciseReps,
+                    "sets" : exercise.exerciseSets,
+                    "weight" : exercise.exerciseWeight 
+                })
+            return JsonResponse({"message":"success","data":toReturn})
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"message":"User not logged in"})
+
 
