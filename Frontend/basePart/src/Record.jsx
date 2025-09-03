@@ -13,9 +13,8 @@ function Record() {
   let Localdate = new Date().toISOString();
   let LocaldateunFormatted = new Date().toLocaleDateString();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [curDate, setCurDate] = useState(Localdate);
-  const [curunformattedDate, setCurunformattedDate] =
-    useState(LocaldateunFormatted);
+  const [curDate, setCurDate] = useState(null);
+  const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [previousworkoutName, setPreviousworkoutName] = useState("");
   const [workoutName, setWorkoutName] = useState("");
@@ -110,6 +109,7 @@ function Record() {
       const stored = JSON.parse(localStorage.getItem("workouts")) || {};
       if (!(wName in stored)) {
         stored[wName] = [];
+        stored[wName].push(data);
       } else {
         const changeExerciseIndex = stored[wName].findIndex(
           (exercise) => exercise.exerciseName === ex,
@@ -120,6 +120,7 @@ function Record() {
           stored[wName].push(data);
         }
       }
+      console.log(stored);
       localStorage.setItem("workouts", JSON.stringify(stored));
       localStorage.setItem("timezone", JSON.stringify(timezone));
       setPreviousworkoutName(wName);
@@ -165,10 +166,12 @@ function Record() {
           );
 
           let newList;
-
+          newList = [...existingList];
+          newList = Array.from(
+            new Map(newList.map((ex) => [ex.name, ex])).values(),
+          );
           if (changeExerciseIndex >= 0) {
             // Replace existing exercise
-            newList = [...existingList];
             newList[changeExerciseIndex] = dateToChangeWorkoutStateListsWith;
           } else {
             // Add new exercise
