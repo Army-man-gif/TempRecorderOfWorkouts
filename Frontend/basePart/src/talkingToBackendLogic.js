@@ -76,6 +76,8 @@ export async function batchupdateExercise() {
   );
   if (updateInBulk.message) {
     console.log(updateInBulk.message);
+    localStorage.removeItem("workouts");
+    localStorage.removeItem("timezone");
   }
 }
 export async function logout() {
