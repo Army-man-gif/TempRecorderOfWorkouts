@@ -218,12 +218,14 @@ def updateExercise(request):
                 exerciseSets = data.get("exerciseSets",None)
                 exerciseWeight = data.get("exerciseWeight",None)
                 date = data.get("date")
+                '''
                 timezone = data.get("timezone")
                 general_date_obj = parse_datetime(date)
                 user_timezone = pytz.timezone(timezone)
                 local_date_obj = general_date_obj.astimezone(user_timezone)
                 local_date_obj = local_date_obj.date()
-                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=local_date_obj,)
+                '''
+                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date,)
                 # defaults are only used when the creation aspect of "get_or_create" is triggered
                 exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
                 defaults={

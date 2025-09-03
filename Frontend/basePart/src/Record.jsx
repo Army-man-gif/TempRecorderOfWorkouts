@@ -111,7 +111,6 @@ function Record() {
     if (ex && r && s && w && wName) {
       const data = {
         date: LocaldateunFormatted,
-        timezone: timezone,
         workoutName: wName,
         exerciseName: ex,
         exerciseReps: r,
