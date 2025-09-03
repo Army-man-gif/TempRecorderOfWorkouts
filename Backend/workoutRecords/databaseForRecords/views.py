@@ -162,7 +162,7 @@ def batchupdateExercise(request):
                     workout_lookup = {(w.name, w.date): w for w in workouts}
 
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
-                    exercise_lookup = {(e.workout,e.exerciseName):e for e in exercises}
+                    exercise_lookup = {(e.workout.name,e.exerciseName):e for e in exercises}
                     existingExercisePairsFound = {(e.workout.name, e.exerciseName) for e in exercises}
                     print(existingExercisePairsFound)
                     exercisesToMake = []
@@ -174,7 +174,7 @@ def batchupdateExercise(request):
                         if((workout_obj.name,exerciseNames[i]) not in existingExercisePairsFound):
                             exercisesToMake.append(Exercise(workout=workout_obj,exerciseName=exerciseNames[i],exerciseReps=exerciseData[i]["exerciseReps"],exerciseSets=exerciseData[i]["exerciseSets"],exerciseWeight=exerciseData[i]["exerciseWeight"]))
                         else:
-                            exercise_obj = exercise_lookup.get((workout_obj,exerciseNames[i]))
+                            exercise_obj = exercise_lookup.get((workout_obj.name,exerciseNames[i]))
                             for field in ["exerciseReps","exerciseSets","exerciseWeight"]:
                                     value = exerciseData[i][field]
                                     if value is not None:
