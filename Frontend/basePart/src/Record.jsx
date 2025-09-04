@@ -70,17 +70,18 @@ function Record() {
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
-      const info = await getAll();
-      localStorage.setItem("data", JSON.stringify(info));
-      WorkoutListofToday();
-      /*
-      const dataPool = JSON.parse(localStorage.getItem("data")) || {};
-      if (Object.keys(dataPool).length === 0 || dataPool == undefined) {
+      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
 
+      if (
+        dataToLookThrough == undefined ||
+        Object.keys(dataToLookThrough).length == 0
+      ) {
+        const info = await getAll();
+        localStorage.setItem("data", JSON.stringify(info));
+        WorkoutListofToday();
       } else {
         WorkoutListofToday();
       }
-      */
     }
     load();
   }, []);
@@ -143,7 +144,8 @@ function Record() {
 
       const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
         wName
-      ].findIndex((exercise) => exercise.exerciseName === ex);
+      ].findIndex((exercise) => exercise.name === ex);
+      console.log(changeExerciseIndexinDataPool);
       if (changeExerciseIndexinDataPool >= 0) {
         dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
           dateToChangeWorkoutStateListsWith;
@@ -216,9 +218,6 @@ function Record() {
 
           let newList;
           newList = [...existingList];
-          newList = Array.from(
-            new Map(newList.map((ex) => [ex.name, ex])).values(),
-          );
           if (changeExerciseIndex >= 0) {
             // Replace existing exercise
             newList[changeExerciseIndex] = dateToChangeWorkoutStateListsWith;
@@ -280,7 +279,7 @@ function Record() {
     Localdate = new Date().toISOString();
     LocaldateunFormatted = convert(Localdate, timezone);
     const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
-    const exercises = dataToLookThrough[LocaldateunFormatted];
+    const exercises = dataToLookThrough[LocaldateunFormatted] || {};
     setTodayWorkoutList(exercises);
   }
 
