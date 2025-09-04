@@ -291,7 +291,8 @@ def getAllExercisesbasedOnDate(request):
             try:
                 data = json.loads(request.body)
                 date = data.get("date")
-                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date)
+                date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date_obj)
 
                 toReturn = {}
                 for exercise in exercises:
