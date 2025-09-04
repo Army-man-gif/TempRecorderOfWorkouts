@@ -11,8 +11,6 @@ import traceback
 import json
 from datetime import datetime
 from .models import Workout,Exercise
-from django.utils.dateparse import parse_datetime
-import pytz
 
 def records_home(request):
     return HttpResponse("Records root works!")
@@ -123,23 +121,16 @@ def batchupdateExercise(request):
             try:
                 data = json.loads(request.body)
                 batchupdateData = data.get("batchUpdate",None)
-                # timezone = data.get("timezone",None)
                 if(batchupdateData is not None):
                     batchupdateDataworkoutNames = list(batchupdateData.keys())
                     dates = []
                     exerciseNames = []
                     exerciseData = []
                     date_workoutName_pairs = []
-                    # user_timezone = pytz.timezone(timezone)
                     for i in batchupdateDataworkoutNames:
                         for j in batchupdateData[i]:
                             date = j["date"]
                             date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-                            '''
-                            general_date_obj = parse_datetime(date)
-                            local_date_obj = general_date_obj.astimezone(user_timezone)
-                            local_date_obj = local_date_obj.date()
-                            '''
                             dates.append(date_obj)
                             date_workoutName_pairs.append((j["workoutName"],date_obj))
                             exerciseNames.append(j["exerciseName"])
@@ -150,10 +141,8 @@ def batchupdateExercise(request):
                                 "exerciseWeight":j["exerciseWeight"]
                             })
                             
-                    print(date_workoutName_pairs)        
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
                     existingWorkoutPairsFound = {(w.name, w.date) for w in workouts}
-                    print(existingWorkoutPairsFound)
                     workoutsToMake = []
                     for (w_name,w_date) in date_workoutName_pairs:
                         key = (w_name, w_date)
@@ -162,14 +151,12 @@ def batchupdateExercise(request):
                             existingWorkoutPairsFound.add(key)
                     if workoutsToMake:
                         Workout.objects.bulk_create(workoutsToMake,batch_size=500)
-                        print("Workouts created")
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
                     workout_lookup = {(w.name, w.date): w for w in workouts}
 
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
                     exercise_lookup = {(e.workout.name,e.workout.date,e.exerciseName):e for e in exercises}
                     existingExercisePairsFound = set(exercise_lookup.keys())
-                    print(existingExercisePairsFound)
                     exercisesToMake = []
                     for i in range(len(exerciseNames)):
                         workout_obj = workout_lookup.get(date_workoutName_pairs[i])
@@ -195,14 +182,12 @@ def batchupdateExercise(request):
                                         setattr(exercise_obj, field, value)
                     if exercisesToMake:
                         Exercise.objects.bulk_create(exercisesToMake,batch_size=500)
-                        print("Exercises made")
                     if exercise_lookup:
                         Exercise.objects.bulk_update(
                             exercise_lookup.values(),
                             ["exerciseReps", "exerciseSets", "exerciseWeight"],
                             batch_size=500
                         )
-                        print("Exercises updated")
                     return JsonResponse({"message":"Batch update complete"})
                 else:
                     return JsonResponse({"message":"Empty batchUpdate"})
@@ -223,13 +208,6 @@ def updateExercise(request):
                 exerciseWeight = data.get("exerciseWeight",None)
                 date = data.get("date")
                 date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-                '''
-                timezone = data.get("timezone")
-                general_date_obj = parse_datetime(date)
-                user_timezone = pytz.timezone(timezone)
-                local_date_obj = general_date_obj.astimezone(user_timezone)
-                local_date_obj = local_date_obj.date()
-                '''
                 workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date_obj,)
                 # defaults are only used when the creation aspect of "get_or_create" is triggered
                 exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
@@ -313,14 +291,6 @@ def getAllExercisesbasedOnDate(request):
             try:
                 data = json.loads(request.body)
                 date = data.get("date")
-                # nice
-                '''
-                timezone = data.get("timezone","")
-                general_date_obj = parse_datetime(date)
-                user_timezone = pytz.timezone(timezone)
-                local_date_obj = general_date_obj.astimezone(user_timezone)
-                local_date_obj = local_date_obj.date()
-                '''
                 exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date)
 
                 toReturn = {}
