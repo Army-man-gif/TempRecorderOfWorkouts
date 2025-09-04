@@ -2,10 +2,8 @@ import "./record.css";
 import {
   User,
   batchupdateExercise,
-  logout,
   getAll,
   justLogin,
-  getExercisesofThatDate,
 } from "./talkingToBackendLogic.js";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -72,11 +70,14 @@ function Record() {
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
-      /*
-        const info  = await getAll();
+      const dataPool = JSON.parse(localStorage.getItem("data")) || {};
+      if (Object.keys(dataPool).length === 0) {
+        const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
-      */
-      await WorkoutListofToday();
+        WorkoutListofToday();
+      } else {
+        WorkoutListofToday();
+      }
     }
     load();
   }, []);
@@ -127,21 +128,43 @@ function Record() {
         sets: s,
         weight: w,
       };
+
+      const dataPool = JSON.parse(localStorage.getItem("data")) || {};
+
+      if (!(LocaldateunFormatted in dataPool)) {
+        dataPool[LocaldateunFormatted] = {};
+      }
+      if (!(wName in dataPool[LocaldateunFormatted])) {
+        dataPool[LocaldateunFormatted][wName] = [];
+      }
+
+      const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
+        wName
+      ].findIndex((exercise) => exercise.exerciseName === ex);
+      if (changeExerciseIndexinDataPool >= 0) {
+        dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
+          data;
+      } else {
+        dataPool[LocaldateunFormatted][wName].push(data);
+      }
+
+      localStorage.setItem("data", JSON.stringify(dataPool));
+
       const stored = JSON.parse(localStorage.getItem("workouts")) || {};
+
       if (!(wName in stored)) {
         stored[wName] = [];
-        stored[wName].push(data);
-      } else {
-        const changeExerciseIndex = stored[wName].findIndex(
-          (exercise) => exercise.exerciseName === ex,
-        );
-        if (changeExerciseIndex >= 0) {
-          stored[wName][changeExerciseIndex] = data;
-        } else {
-          stored[wName].push(data);
-        }
       }
-      console.log(stored);
+
+      const changeExerciseIndex = stored[wName].findIndex(
+        (exercise) => exercise.exerciseName === ex,
+      );
+      if (changeExerciseIndex >= 0) {
+        stored[wName][changeExerciseIndex] = data;
+      } else {
+        stored[wName].push(data);
+      }
+
       localStorage.setItem("workouts", JSON.stringify(stored));
       localStorage.setItem("timezone", JSON.stringify(timezone));
       setPreviousworkoutName(wName);
@@ -232,33 +255,28 @@ function Record() {
     if (param === "view") {
       const date = data.target.value;
       if (date != curunformattedDate) {
-        await changeSpecificWorkoutList(date);
+        changeSpecificWorkoutList(date);
       }
     }
     if (param === "restore") {
       restore(data);
     }
   }
-  async function changeSpecificWorkoutList(date) {
+  function changeSpecificWorkoutList(date) {
     const chosenDate = new Date(date).toISOString();
     const chosenDateunFormatted = convert(chosenDate, timezone);
-    const exercises = await getExercisesofThatDate(chosenDateunFormatted);
+    const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    const exercises = dataToLookThrough[chosenDateunFormatted];
     setCurDate(date);
     setCurunformattedDate(chosenDateunFormatted);
     setSpecificWorkoutList(exercises);
   }
-  async function WorkoutListofToday() {
+  function WorkoutListofToday() {
     Localdate = new Date().toISOString();
     LocaldateunFormatted = convert(Localdate, timezone);
-    const exercises = await getExercisesofThatDate(LocaldateunFormatted);
+    const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    const exercises = dataToLookThrough[LocaldateunFormatted];
     setTodayWorkoutList(exercises);
-    /*
-      Localdate = new Date().toISOString();
-      LocaldateunFormatted = convert(Localdate, timezone);
-      const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
-      const exercises = dataToLookThrough[LocaldateunFormatted];
-      setTodayWorkoutList(exercises);
-    */
   }
 
   return (

@@ -318,18 +318,20 @@ def getAll(request):
             everyExercise = Exercise.objects.filter(workout__user=request.user)
             toReturn = {}
             for exercise in everyExercise:
-                date = exercise.workout.date
+                dateTimeObjDate = exercise.workout.date
+                dateKeyString = dateTimeObjDate.isoformat()
                 workoutName = exercise.workout.name
-                if date not in toReturn:
-                    toReturn[date] = {}
-                if workoutName not in toReturn[date]:
-                    toReturn[date][workoutName] = []
-                toReturn[date][workoutName].append({
+                if dateKeyString not in toReturn:
+                    toReturn[dateKeyString] = {}
+                if workoutName not in toReturn[dateKeyString]:
+                    toReturn[dateKeyString][workoutName] = []
+                toReturn[dateKeyString][workoutName].append({
                     "name" : exercise.exerciseName,
                     "reps" : exercise.exerciseReps,
                     "sets" : exercise.exerciseSets,
                     "weight" : exercise.exerciseWeight 
                 })
+
             return JsonResponse({"message":"success","data":toReturn})
         except Exception as e:
             return JsonResponse({"error":str(e)},status=400)

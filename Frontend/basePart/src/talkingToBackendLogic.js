@@ -98,6 +98,7 @@ export async function getAll() {
   if (getItAll) {
     if (getItAll["message"]) {
       console.log("Exercises collected", getItAll["data"]);
+
       return getItAll["data"];
     }
   } else {
