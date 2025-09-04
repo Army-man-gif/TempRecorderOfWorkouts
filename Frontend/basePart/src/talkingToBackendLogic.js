@@ -56,16 +56,6 @@ export async function justLogin(name, passkey) {
     console.log("Login failed");
   }
 }
-export async function updateExercise(data) {
-  // workoutName,exerciseName,exerciseReps,exerciseSets,exerciseWeight
-  const changeOraddExercise = await SendData(
-    `${intialBackendString}/updateExercise/`,
-    data,
-  );
-  if (changeOraddExercise.message) {
-    console.log("Exercise changed/added");
-  }
-}
 export async function batchupdateExercise() {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
   const data = { batchUpdate: stored };
@@ -103,4 +93,14 @@ export async function getExercisesofThatDate(date) {
   }
 }
 
-export async function getAll() {}
+export async function getAll() {
+  const getItAll = await SendData(`${intialBackendString}/getAll/`, {});
+  if (getItAll) {
+    if (getItAll["message"]) {
+      console.log("Exercises collected", getItAll["data"]);
+      return getItAll["data"];
+    }
+  } else {
+    return {};
+  }
+}

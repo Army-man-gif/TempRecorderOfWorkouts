@@ -1,9 +1,9 @@
 import "./record.css";
 import {
   User,
-  updateExercise,
   batchupdateExercise,
   logout,
+  getAll,
   justLogin,
   getExercisesofThatDate,
 } from "./talkingToBackendLogic.js";
@@ -72,6 +72,10 @@ function Record() {
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
+      /*
+        const info  = await getAll();
+        localStorage.setItem("data", JSON.stringify(info));
+      */
       await WorkoutListofToday();
     }
     load();
@@ -248,6 +252,13 @@ function Record() {
     LocaldateunFormatted = convert(Localdate, timezone);
     const exercises = await getExercisesofThatDate(LocaldateunFormatted);
     setTodayWorkoutList(exercises);
+    /*
+      Localdate = new Date().toISOString();
+      LocaldateunFormatted = convert(Localdate, timezone);
+      const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+      const exercises = dataToLookThrough[LocaldateunFormatted];
+      setTodayWorkoutList(exercises);
+    */
   }
 
   return (
