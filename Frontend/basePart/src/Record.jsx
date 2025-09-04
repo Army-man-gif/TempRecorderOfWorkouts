@@ -70,14 +70,17 @@ function Record() {
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
+      const info = await getAll();
+      localStorage.setItem("data", JSON.stringify(info));
+      WorkoutListofToday();
+      /*
       const dataPool = JSON.parse(localStorage.getItem("data")) || {};
-      if (Object.keys(dataPool).length === 0) {
-        const info = await getAll();
-        localStorage.setItem("data", JSON.stringify(info));
-        WorkoutListofToday();
+      if (Object.keys(dataPool).length === 0 || dataPool == undefined) {
+
       } else {
         WorkoutListofToday();
       }
+      */
     }
     load();
   }, []);
@@ -143,9 +146,11 @@ function Record() {
       ].findIndex((exercise) => exercise.exerciseName === ex);
       if (changeExerciseIndexinDataPool >= 0) {
         dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
-          data;
+          dateToChangeWorkoutStateListsWith;
       } else {
-        dataPool[LocaldateunFormatted][wName].push(data);
+        dataPool[LocaldateunFormatted][wName].push(
+          dateToChangeWorkoutStateListsWith,
+        );
       }
 
       localStorage.setItem("data", JSON.stringify(dataPool));
@@ -266,7 +271,7 @@ function Record() {
     const chosenDate = new Date(date).toISOString();
     const chosenDateunFormatted = convert(chosenDate, timezone);
     const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
-    const exercises = dataToLookThrough[chosenDateunFormatted];
+    const exercises = dataToLookThrough[chosenDateunFormatted] || {};
     setCurDate(date);
     setCurunformattedDate(chosenDateunFormatted);
     setSpecificWorkoutList(exercises);
