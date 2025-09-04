@@ -9,7 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import check_password
 import traceback
 import json
-import datetime
+from datetime import datetime
 from .models import Workout,Exercise
 from django.utils.dateparse import parse_datetime
 import pytz
@@ -134,13 +134,14 @@ def batchupdateExercise(request):
                     for i in batchupdateDataworkoutNames:
                         for j in batchupdateData[i]:
                             date = j["date"]
+                            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
                             '''
                             general_date_obj = parse_datetime(date)
                             local_date_obj = general_date_obj.astimezone(user_timezone)
                             local_date_obj = local_date_obj.date()
                             '''
-                            dates.append(date)
-                            date_workoutName_pairs.append((j["workoutName"],date))
+                            dates.append(date_obj)
+                            date_workoutName_pairs.append((j["workoutName"],date_obj))
                             exerciseNames.append(j["exerciseName"])
                             exerciseData.append({
                                 "workoutName": j["workoutName"],                    
@@ -221,6 +222,7 @@ def updateExercise(request):
                 exerciseSets = data.get("exerciseSets",None)
                 exerciseWeight = data.get("exerciseWeight",None)
                 date = data.get("date")
+                date_obj = datetime.strptime(date, "%Y-%m-%d").date()
                 '''
                 timezone = data.get("timezone")
                 general_date_obj = parse_datetime(date)
@@ -228,7 +230,7 @@ def updateExercise(request):
                 local_date_obj = general_date_obj.astimezone(user_timezone)
                 local_date_obj = local_date_obj.date()
                 '''
-                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date,)
+                workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date_obj,)
                 # defaults are only used when the creation aspect of "get_or_create" is triggered
                 exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
                 defaults={
