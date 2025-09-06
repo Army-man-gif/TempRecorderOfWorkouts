@@ -1,14 +1,16 @@
 import "./record.css";
 import {
-  User,
   batchupdateExercise,
-  getAll,
+  User,
   justLogin,
+  getAll,
+  loginLogic,
 } from "./talkingToBackendLogic.js";
 
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const [trackingExNameChange, setTrackingExNameChange] = useState(false);
   function convert(dateString, timezone) {
     // Parse the input date (assumes it's an ISO string, e.g. "2025-09-04T12:00:00Z")
     const generalDate = new Date(dateString);
@@ -51,15 +53,10 @@ function Record() {
   useEffect(() => {
     async function load() {
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-
-      if (
-        dataToLookThrough !== undefined ||
-        Object.keys(dataToLookThrough).length > 0
-      ) {
-        const info = await getAll();
-        localStorage.setItem("data", JSON.stringify(info));
+      if (Object.keys(dataToLookThrough).length > 0) {
         WorkoutListofToday();
       }
+
       const name = JSON.parse(localStorage.getItem("username")) || "";
       let emptyName = false;
       if (name == "") {
@@ -79,15 +76,13 @@ function Record() {
       } else {
         await justLogin(name, passkeyPulled);
       }
-      setLoggedIn(true);
-      if (
-        dataToLookThrough == undefined ||
-        Object.keys(dataToLookThrough).length == 0
-      ) {
+
+      if (Object.keys(dataToLookThrough).length === 0) {
         const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
-        WorkoutListofToday();
       }
+
+      setLoggedIn(true);
     }
     load();
   }, []);
@@ -231,6 +226,7 @@ function Record() {
         });
       }
     }
+    setTrackingExNameChange(false);
   }
   async function main(param, data = null) {
     if (param == "ExerciseFororBack") {
@@ -427,15 +423,18 @@ function Record() {
             <>
               <br></br>
               <br></br>
-              <label htmlFor="addEx">Exercise: </label>
               <div className="adjustHeight">
+                <label htmlFor="addEx">Exercise: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => setTrackingExNameChange(true)}
                     ref={exercise}
                     id="addEx"
                     type="text"
                   ></input>
+                  {trackingExNameChange && (
+                    <button onClick={addExercise}>Confirm name</button>
+                  )}
                 </div>
                 <br></br>
                 <label htmlFor="addReps">Reps: </label>
