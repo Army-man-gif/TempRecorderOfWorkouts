@@ -74,7 +74,6 @@ function Record() {
       } else {
         emptyPasskey = false;
       }
-      console.log(name, passkeyPulled);
       if (emptyPasskey || emptyName) {
         await User();
       } else {
@@ -151,7 +150,6 @@ function Record() {
       const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
         wName
       ].findIndex((exercise) => exercise.name === ex);
-      console.log(changeExerciseIndexinDataPool);
       if (changeExerciseIndexinDataPool >= 0) {
         dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
           dateToChangeWorkoutStateListsWith;
@@ -212,7 +210,6 @@ function Record() {
           [wName]: newList,
         };
       });
-      console.log(areBothDatesSame);
       if (areBothDatesSame) {
         setSpecificWorkoutList((prev2) => {
           const existingList = prev2[wName] ?? [];
@@ -240,6 +237,9 @@ function Record() {
     }
   }
   async function main(param, data = null) {
+    if (param == "ExerciseFororBack") {
+      oneExerciseForwardorBack(data);
+    }
     if (param === "changeWorkoutNameHasBeenSet") {
       setWorkoutNameSet(true);
       setworkoutStarted(false);
@@ -300,7 +300,52 @@ function Record() {
     const exercises = dataToLookThrough[LocaldateunFormatted] || {};
     setTodayWorkoutList(exercises);
   }
-
+  function oneExerciseForwardorBack(change) {
+    const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+    const dates = Object.keys(dataToLookThrough).reverse();
+    outerLoop: for (const date of dates) {
+      const workouts = Object.keys(dataToLookThrough[date]).reverse();
+      for (const workout of workouts) {
+        const exercisesList = dataToLookThrough[date][workout];
+        for (let index = 0; index < exercisesList.length; index++) {
+          if (workout === workoutName) {
+            if (exercisesList[index]["name"] === exercise.current.value) {
+              let netChange = index + change;
+              if (netChange < 0 || netChange >= exercisesList.length) {
+                netChange = index;
+              }
+              exercise.current.value = exercisesList[netChange]["name"];
+              reps.current.value = exercisesList[netChange]["reps"];
+              sets.current.value = exercisesList[netChange]["sets"];
+              weight.current.value = exercisesList[netChange]["weight"];
+              break outerLoop;
+            }
+          }
+        }
+      }
+    }
+  }
+  useEffect(() => {
+    if (workoutNameSet) {
+      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      const dates = Object.keys(dataToLookThrough).reverse();
+      outerLoop: for (const date of dates) {
+        const workouts = Object.keys(dataToLookThrough[date]).reverse();
+        for (const workout of workouts) {
+          const exercisesList = dataToLookThrough[date][workout];
+          for (const exerciseCur of exercisesList) {
+            if (workout === workoutName) {
+              exercise.current.value = exerciseCur["name"];
+              reps.current.value = exerciseCur["reps"];
+              sets.current.value = exerciseCur["sets"];
+              weight.current.value = exerciseCur["weight"];
+              break outerLoop;
+            }
+          }
+        }
+      }
+    }
+  }, [workoutNameSet, workoutName]);
   return (
     <>
       <div className="flexContainer moreGap">
@@ -458,8 +503,12 @@ function Record() {
                 Click to cancel exercise
               </button>
               <div className="flexContainer spaceNicely">
-                <button>◄ Go back an exercise</button>
-                <button>Go to next exercise ►</button>
+                <button onClick={() => main("ExerciseFororBack", -1)}>
+                  ◄ Go back an exercise
+                </button>
+                <button onClick={() => main("ExerciseFororBack", 1)}>
+                  Go to next exercise ►
+                </button>
               </div>
             </>
           )}
