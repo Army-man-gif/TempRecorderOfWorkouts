@@ -446,6 +446,10 @@ function Record() {
               >
                 Click to cancel exercise
               </button>
+              <div>
+                <button>◄ Go back an exercise</button>
+                <button>► Go to next exercise</button>
+              </div>
             </>
           )}
         </div>

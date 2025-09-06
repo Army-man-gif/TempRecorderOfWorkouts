@@ -142,6 +142,7 @@ def batchupdateExercise(request):
                             })
                             
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)
+                    workouts = list(workouts)
                     existingWorkoutPairsFound = {(w.name, w.date) for w in workouts}
                     workoutsToMake = []
                     for (w_name,w_date) in date_workoutName_pairs:
@@ -155,6 +156,7 @@ def batchupdateExercise(request):
                     workout_lookup = {(w.name, w.date): w for w in workouts}
 
                     exercises = Exercise.objects.filter(workout__in = workouts,exerciseName__in = exerciseNames)
+                    exercises = list(exercises)
                     exercise_lookup = {(e.workout.name,e.workout.date,e.exerciseName):e for e in exercises}
                     existingExercisePairsFound = set(exercise_lookup.keys())
                     exercisesToMake = []
@@ -292,7 +294,7 @@ def getAllExercisesbasedOnDate(request):
                 data = json.loads(request.body)
                 date = data.get("date")
                 date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-                exercises = Exercise.objects.filter(workout__user=request.user,workout__date=date_obj)
+                exercises = list(Exercise.objects.filter(workout__user=request.user,workout__date=date_obj))
 
                 toReturn = {}
                 for exercise in exercises:
@@ -315,22 +317,23 @@ def getAllExercisesbasedOnDate(request):
 def getAll(request):
     if request.user.is_authenticated:
         try:
-            everyExercise = Exercise.objects.filter(workout__user=request.user)
+            everyExercise = list(Exercise.objects.filter(workout__user=request.user))
             toReturn = {}
-            for exercise in everyExercise:
-                dateTimeObjDate = exercise.workout.date
-                dateKeyString = dateTimeObjDate.isoformat()
-                workoutName = exercise.workout.name
-                if dateKeyString not in toReturn:
-                    toReturn[dateKeyString] = {}
-                if workoutName not in toReturn[dateKeyString]:
-                    toReturn[dateKeyString][workoutName] = []
-                toReturn[dateKeyString][workoutName].append({
-                    "name" : exercise.exerciseName,
-                    "reps" : exercise.exerciseReps,
-                    "sets" : exercise.exerciseSets,
-                    "weight" : exercise.exerciseWeight 
-                })
+            if everyExercise:
+                for exercise in everyExercise:
+                    dateTimeObjDate = exercise.workout.date
+                    dateKeyString = dateTimeObjDate.isoformat()
+                    workoutName = exercise.workout.name
+                    if dateKeyString not in toReturn:
+                        toReturn[dateKeyString] = {}
+                    if workoutName not in toReturn[dateKeyString]:
+                        toReturn[dateKeyString][workoutName] = []
+                    toReturn[dateKeyString][workoutName].append({
+                        "name" : exercise.exerciseName,
+                        "reps" : exercise.exerciseReps,
+                        "sets" : exercise.exerciseSets,
+                        "weight" : exercise.exerciseWeight 
+                    })
 
             return JsonResponse({"message":"success","data":toReturn})
         except Exception as e:
