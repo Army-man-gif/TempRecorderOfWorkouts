@@ -50,6 +50,16 @@ function Record() {
 
   useEffect(() => {
     async function load() {
+      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+
+      if (
+        dataToLookThrough !== undefined ||
+        Object.keys(dataToLookThrough).length > 0
+      ) {
+        const info = await getAll();
+        localStorage.setItem("data", JSON.stringify(info));
+        WorkoutListofToday();
+      }
       const name = JSON.parse(localStorage.getItem("username")) || "";
       let emptyName = false;
       if (name == "") {
@@ -71,16 +81,12 @@ function Record() {
         await justLogin(name, passkeyPulled);
       }
       setLoggedIn(true);
-      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-
       if (
         dataToLookThrough == undefined ||
         Object.keys(dataToLookThrough).length == 0
       ) {
         const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
-        WorkoutListofToday();
-      } else {
         WorkoutListofToday();
       }
     }
@@ -112,6 +118,7 @@ function Record() {
     }
     const wName = workoutName;
     localStorage.setItem("workoutNameATM", JSON.stringify(wName));
+    setWorkoutName(wName);
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
     const s = sets.current?.value.trim();
