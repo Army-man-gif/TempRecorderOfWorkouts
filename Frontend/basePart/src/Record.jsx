@@ -31,8 +31,9 @@ function Record() {
   const [curDate, setCurDate] = useState(null);
   const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
-  const [previousworkoutName, setPreviousworkoutName] = useState("");
-  const [workoutName, setWorkoutName] = useState("");
+  const [workoutName, setWorkoutName] = useState(
+    JSON.parse(localStorage.getItem("workoutNameATM")) || "",
+  );
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
@@ -49,14 +50,14 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      const name = JSON.parse(localStorage.getItem("username")) ?? "";
+      const name = JSON.parse(localStorage.getItem("username")) || "";
       let emptyName = false;
       if (name == "") {
         emptyName = true;
       } else {
         emptyName = false;
       }
-      const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) ?? "";
+      const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) || "";
       let emptyPasskey = false;
       if (passkeyPulled == "") {
         emptyPasskey = true;
@@ -99,9 +100,6 @@ function Record() {
     if (field == "weight") {
       weight.current.value = pWeight.current;
     }
-    if (field == "workoutName") {
-      setWorkoutName(previousworkoutName);
-    }
   }
 
   async function addExercise() {
@@ -113,6 +111,7 @@ function Record() {
       areBothDatesSame = true;
     }
     const wName = workoutName;
+    localStorage.setItem("workoutNameATM", JSON.stringify(wName));
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
     const s = sets.current?.value.trim();
@@ -174,7 +173,6 @@ function Record() {
 
       localStorage.setItem("workouts", JSON.stringify(stored));
       localStorage.setItem("timezone", JSON.stringify(timezone));
-      setPreviousworkoutName(wName);
       setAdding(false);
       pExercise.current = ex;
       pReps.current = r;
@@ -254,7 +252,9 @@ function Record() {
     if (param === "finished") {
       setWorkoutNameSet(false);
       setWorkoutName("");
-      await batchupdateExercise();
+      if (loggedIn) {
+        await batchupdateExercise();
+      }
     }
     if (param === "view") {
       const date = data.target.value;
@@ -287,7 +287,7 @@ function Record() {
     <>
       <div className="flexContainer moreGap">
         <div className="flex-container">
-          {loggedIn && Object.keys(todayWorkoutList).length > 0 && (
+          {Object.keys(todayWorkoutList).length > 0 && (
             <table className="adjustTodayDataDisplay">
               <thead>
                 <tr>
@@ -350,12 +350,6 @@ function Record() {
                   type="text"
                   onChange={(e) => setWorkoutName(e.target.value)}
                 ></input>
-                <button
-                  onClick={() => main("restore", "workoutName")}
-                  type="button"
-                >
-                  Click to restore previous value
-                </button>
               </div>
               <div className="flexContainer lessGap">
                 <button
@@ -449,20 +443,18 @@ function Record() {
           )}
         </div>
         <div className="flex-container rightSideSpecificWorkoutformat">
-          {loggedIn && (
-            <form>
-              <label htmlFor="workoutPick">
-                Pick workout date to view workouts of:{" "}
-              </label>
-              <input
-                type="date"
-                id="workoutPick"
-                name="workoutPick"
-                onChange={(e) => main("view", e)}
-              ></input>
-            </form>
-          )}
-          {loggedIn && Object.keys(SpecificworkoutList).length > 0 && (
+          <form>
+            <label htmlFor="workoutPick">
+              Pick workout date to view workouts of:{" "}
+            </label>
+            <input
+              type="date"
+              id="workoutPick"
+              name="workoutPick"
+              onChange={(e) => main("view", e)}
+            ></input>
+          </form>
+          {Object.keys(SpecificworkoutList).length > 0 && (
             <table>
               <thead>
                 <tr>
