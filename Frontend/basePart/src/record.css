@@ -26,6 +26,9 @@
   flex-direction: row;
   gap: 0.5em;
 }
+.spaceNicely {
+  justify-content: space-between;
+}
 .moreGap {
   justify-content: space-between;
 }
