@@ -183,10 +183,6 @@ function Record() {
       pReps.current = r;
       pSets.current = s;
       pWeight.current = w;
-      exercise.current.value = "";
-      reps.current.value = "";
-      sets.current.value = "";
-      weight.current.value = "";
       setTodayWorkoutList((prev) => {
         const existingList = prev[wName] ?? [];
 
@@ -434,59 +430,49 @@ function Record() {
               <label htmlFor="addEx">Exercise: </label>
               <div className="adjustHeight">
                 <div className="flexContainer">
-                  <input ref={exercise} id="addEx" type="text"></input>
-                  <button
-                    onClick={() => main("restore", "exercise")}
-                    type="button"
-                  >
-                    Restore
-                  </button>
+                  <input
+                    onChange={addExercise}
+                    ref={exercise}
+                    id="addEx"
+                    type="text"
+                  ></input>
                 </div>
                 <br></br>
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
-                  <input ref={reps} id="addReps" type="text"></input>
-                  <button onClick={() => main("restore", "reps")} type="button">
-                    Restore
-                  </button>
+                  <input
+                    onChange={addExercise}
+                    ref={reps}
+                    id="addReps"
+                    type="text"
+                  ></input>
                 </div>
                 <br></br>
 
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
-                  <input ref={sets} id="addSets" type="text"></input>
-                  <button onClick={() => main("restore", "sets")} type="button">
-                    Restore
-                  </button>
+                  <input
+                    onChange={addExercise}
+                    ref={sets}
+                    id="addSets"
+                    type="text"
+                  ></input>
                 </div>
                 <br></br>
 
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
                   <input
+                    onChange={addExercise}
                     ref={weight}
                     id="addWeight"
                     type="text"
                     disabled={adding && !loggedIn}
                   ></input>
-                  <button
-                    onClick={() => main("restore", "weight")}
-                    type="button"
-                  >
-                    Restore
-                  </button>
                 </div>
               </div>
               <br></br>
 
-              <button
-                className="SquishSize"
-                type="button"
-                onClick={addExercise}
-                disabled={adding && !loggedIn}
-              >
-                Click to add exercise
-              </button>
               <button
                 className="SquishSize"
                 type="button"
