@@ -243,6 +243,13 @@ function Record() {
     if (param === "changeWorkoutNameHasBeenSet") {
       setWorkoutNameSet(true);
       setworkoutStarted(false);
+      const batchupdateWorked =
+        JSON.parse(localStorage.getItem("batchUpdateSuccess")) || false;
+      if (!batchupdateWorked) {
+        if (loggedIn) {
+          await batchupdateExercise();
+        }
+      }
     }
     if (param === "cancelWorkout") {
       setWorkoutNameSet(false);
@@ -448,7 +455,7 @@ function Record() {
               </button>
               <div className="flexContainer">
                 <button>◄ Go back an exercise</button>
-                <button>► Go to next exercise</button>
+                <button>Go to next exercise ►</button>
               </div>
             </>
           )}

@@ -65,7 +65,10 @@ export async function batchupdateExercise() {
   );
   if (updateInBulk.message) {
     console.log(updateInBulk.message);
+    localStorage.setItem("batchUpdateSuccess", JSON.stringify(true));
     localStorage.setItem("workouts", JSON.stringify({}));
+  } else {
+    localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
   }
 }
 export async function logout() {
