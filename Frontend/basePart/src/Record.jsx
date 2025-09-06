@@ -248,6 +248,8 @@ function Record() {
       if (!batchupdateWorked) {
         if (loggedIn) {
           await batchupdateExercise();
+        } else {
+          localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
         }
       }
     }
@@ -268,6 +270,8 @@ function Record() {
       setWorkoutName("");
       if (loggedIn) {
         await batchupdateExercise();
+      } else {
+        localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
       }
     }
     if (param === "view") {
