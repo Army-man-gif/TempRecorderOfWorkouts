@@ -80,6 +80,7 @@ function Record() {
       if (Object.keys(dataToLookThrough).length === 0) {
         const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
+        WorkoutListofToday();
       }
 
       setLoggedIn(true);
