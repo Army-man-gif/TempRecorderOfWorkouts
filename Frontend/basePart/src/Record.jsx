@@ -343,8 +343,8 @@ function Record() {
 
     // set a new timer
     const timeout = setTimeout(() => {
-      addExercise(); // call your function after 1s
-    }, 1000);
+      addExercise();
+    }, 1500);
 
     setTypingTimeout(timeout);
   }
