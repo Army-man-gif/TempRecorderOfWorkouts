@@ -30,12 +30,8 @@ function Record() {
   const [curDate, setCurDate] = useState(null);
   const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
-  const [workoutName, setWorkoutName] = useState(
-    JSON.parse(localStorage.getItem("workoutNameATM")) || "",
-  );
-  const [workoutNamesList, setWorkoutNamesList] = useState(
-    JSON.parse(localStorage.getItem("workoutNamesList")) || [],
-  );
+  const [workoutName, setWorkoutName] = useState("");
+  const [workoutNamesList, setWorkoutNamesList] = useState(null);
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
@@ -230,7 +226,6 @@ function Record() {
         });
       }
     }
-    setTrackingExNameChange(false);
   }
   async function main(param, data = null) {
     if (param == "ExerciseFororBack") {
@@ -302,12 +297,21 @@ function Record() {
     setTodayWorkoutList(exercises);
   }
   function workoutNames() {
-    const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-    const dates = Object.keys(dataToLookThrough);
-    for (const date of dates) {
-      const workouts = Object.keys(dataToLookThrough[date]);
-      setWorkoutNamesList(workouts);
+    let names = JSON.parse(localStorage.getItem("workoutNamesList")) || [];
+    if (names.length === 0) {
+      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      const dates = Object.keys(dataToLookThrough);
+      for (const date of dates) {
+        const workouts = Object.keys(dataToLookThrough[date]);
+        for (const workout of workouts) {
+          if (!names.includes(workout.trim())) {
+            names.push(workout.trim());
+          }
+        }
+      }
     }
+    setWorkoutNamesList(names);
+    localStorage.setItem("workoutNamesList", JSON.stringify(names));
   }
   function oneExerciseForwardorBack(change) {
     const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
@@ -432,7 +436,7 @@ function Record() {
                   id="workoutName"
                   type="text"
                   placeholder="Choose or type..."
-                  onChange={(e) => handleWorkoutNameChange(e)}
+                  onChange={(e) => setWorkoutName(e.target.value)}
                 ></input>
                 <datalist id="workoutNameOptions">
                   <option value="">-- Select a workout --</option>
