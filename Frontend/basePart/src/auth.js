@@ -16,6 +16,7 @@ export async function getCookieFromBrowser() {
   return cookiesData.csrftoken;
 }
 export async function ensureCSRFToken() {
+  await setCookie();
   let token = await getCookieFromBrowser("csrftoken");
   if (!token) {
     await setCookie();
