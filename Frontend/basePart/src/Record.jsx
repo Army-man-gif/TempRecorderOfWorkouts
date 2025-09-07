@@ -10,12 +10,10 @@ import {
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [trackingExNameChange, setTrackingExNameChange] = useState(false);
-  function convert(dateString, timezone) {
-    // Parse the input date (assumes it's an ISO string, e.g. "2025-09-04T12:00:00Z")
-    const generalDate = new Date(dateString);
+  const [typingTimeout, setTypingTimeout] = useState(null);
 
-    // Format the date into the given timezone
+  function convert(dateString, timezone) {
+    const generalDate = new Date(dateString);
     const parts = new Intl.DateTimeFormat("en-GB", {
       timeZone: timezone,
       year: "numeric",
@@ -27,7 +25,6 @@ function Record() {
     const day = parts.find((p) => p.type === "day").value;
     return `${year}-${month}-${day}`;
   }
-
   let Localdate = new Date().toISOString();
   let LocaldateunFormatted = convert(Localdate, timezone);
   const [curDate, setCurDate] = useState(null);
@@ -35,6 +32,9 @@ function Record() {
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [workoutName, setWorkoutName] = useState(
     JSON.parse(localStorage.getItem("workoutNameATM")) || "",
+  );
+  const [workoutNamesList, setWorkoutNamesList] = useState(
+    JSON.parse(localStorage.getItem("workoutNamesList")) || [],
   );
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
@@ -54,6 +54,7 @@ function Record() {
     async function load() {
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
+        workoutNames();
         WorkoutListofToday();
       }
 
@@ -80,6 +81,7 @@ function Record() {
       if (Object.keys(dataToLookThrough).length === 0) {
         const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
+        workoutNames();
         WorkoutListofToday();
       }
 
@@ -179,6 +181,7 @@ function Record() {
       pReps.current = r;
       pSets.current = s;
       pWeight.current = w;
+
       setTodayWorkoutList((prev) => {
         const existingList = prev[wName] ?? [];
 
@@ -234,6 +237,11 @@ function Record() {
       oneExerciseForwardorBack(data);
     }
     if (param === "changeWorkoutNameHasBeenSet") {
+      if (workoutName && !workoutNamesList.includes(workoutName)) {
+        const extended = [...workoutNamesList, workoutName];
+        setWorkoutNamesList(extended);
+        localStorage.setItem("workoutNamesList", JSON.stringify(extended));
+      }
       setWorkoutNameSet(true);
       setworkoutStarted(false);
       const batchupdateWorked =
@@ -293,6 +301,14 @@ function Record() {
     const exercises = dataToLookThrough[LocaldateunFormatted] || {};
     setTodayWorkoutList(exercises);
   }
+  function workoutNames() {
+    const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+    const dates = Object.keys(dataToLookThrough);
+    for (const date of dates) {
+      const workouts = Object.keys(dataToLookThrough[date]);
+      setWorkoutNamesList(workouts);
+    }
+  }
   function oneExerciseForwardorBack(change) {
     const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
     const dates = Object.keys(dataToLookThrough).reverse();
@@ -304,7 +320,7 @@ function Record() {
           if (workout === workoutName) {
             if (exercisesList[index]["name"] === exercise.current.value) {
               let netChange = index + change;
-              if (netChange < 0 || netChange >= exercisesList.length) {
+              if (netChange < 0) {
                 netChange = index;
               }
               exercise.current.value = exercisesList[netChange]["name"];
@@ -317,6 +333,16 @@ function Record() {
         }
       }
     }
+  }
+  function handleExerciseNameChange() {
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    // set a new timer
+    const timeout = setTimeout(() => {
+      addExercise(); // call your function after 1s
+    }, 1000);
+
+    setTypingTimeout(timeout);
   }
   useEffect(() => {
     if (workoutNameSet) {
@@ -401,11 +427,21 @@ function Record() {
               <label htmlFor="workoutName">Workout name: </label>
               <div className="flexContainer">
                 <input
+                  list="workoutNameOptions"
                   value={workoutName}
                   id="workoutName"
                   type="text"
-                  onChange={(e) => setWorkoutName(e.target.value)}
+                  placeholder="Choose or type..."
+                  onChange={(e) => handleWorkoutNameChange(e)}
                 ></input>
+                <datalist id="workoutNameOptions">
+                  <option value="">-- Select a workout --</option>
+                  {workoutNamesList.map((opt, idx) => (
+                    <option key={idx} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </datalist>
               </div>
               <div className="flexContainer lessGap">
                 <button
@@ -428,14 +464,12 @@ function Record() {
                 <label htmlFor="addEx">Exercise: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={() => setTrackingExNameChange(true)}
+                    onChange={handleExerciseNameChange}
                     ref={exercise}
                     id="addEx"
                     type="text"
+                    placeholder="Exercise name..."
                   ></input>
-                  {trackingExNameChange && (
-                    <button onClick={addExercise}>Confirm name</button>
-                  )}
                 </div>
                 <br></br>
                 <label htmlFor="addReps">Reps: </label>
