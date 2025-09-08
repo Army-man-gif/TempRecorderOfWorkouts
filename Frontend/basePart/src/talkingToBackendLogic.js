@@ -1,10 +1,10 @@
-import { ensureCSRFToken } from "./auth.js";
+import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 export async function SendData(url, data) {
   let response;
   const dataToUse = data;
   console.log(dataToUse);
-  let CSRFToken = await ensureCSRFToken();
+  let CSRFToken = await getCookieFromBrowser();
   try {
     const sendData = await fetch(url, {
       method: "POST",
