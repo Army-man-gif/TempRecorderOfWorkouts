@@ -51,6 +51,7 @@ function Record() {
         );
         setPrivateBrowsing(true);
         privateBrowsingLocalFlag = true;
+        localStorage.clear();
       }
 
       if (privateBrowsingLocalFlag) {
@@ -78,6 +79,7 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
+        localStorage.clear();
         await User();
       } else {
         await justLogin(name, passkeyPulled);
