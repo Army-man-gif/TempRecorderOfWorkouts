@@ -85,7 +85,11 @@ function Record() {
 
       if (Object.keys(dataToLookThrough).length === 0) {
         const info = await getAll();
-        localStorage.setItem("data", JSON.stringify(info));
+        if (!privateBrowsingLocalFlag) {
+          localStorage.setItem("data", JSON.stringify(info));
+        } else {
+          sessionStorage.setItem("data", JSON.stringify(info));
+        }
         workoutNames();
         WorkoutListofToday();
       }
@@ -144,7 +148,6 @@ function Record() {
       areBothDatesSame = true;
     }
     const wName = workoutName;
-    localStorage.setItem("workoutNameATM", JSON.stringify(wName));
     setWorkoutName(wName);
     const ex = exercise.current?.value.trim();
     const r = reps.current?.value.trim();
@@ -166,7 +169,12 @@ function Record() {
         weight: w,
       };
 
-      const dataPool = JSON.parse(localStorage.getItem("data")) || {};
+      let dataPool = {};
+      if (!privateBrowsing) {
+        dataPool = JSON.parse(localStorage.getItem("data")) || {};
+      } else {
+        dataPool = JSON.parse(sessionStorage.getItem("data")) || {};
+      }
 
       if (!(LocaldateunFormatted in dataPool)) {
         dataPool[LocaldateunFormatted] = {};
@@ -187,10 +195,18 @@ function Record() {
         );
       }
 
-      localStorage.setItem("data", JSON.stringify(dataPool));
+      if (!privateBrowsing) {
+        localStorage.setItem("data", JSON.stringify(dataPool));
+      } else {
+        sessionStorage.setItem("data", JSON.stringify(dataPool));
+      }
 
-      const stored = JSON.parse(localStorage.getItem("workouts")) || {};
-
+      let stored = {};
+      if (!privateBrowsing) {
+        stored = JSON.parse(localStorage.getItem("workouts")) || {};
+      } else {
+        stored = JSON.parse(sessionStorage.getItem("workouts")) || {};
+      }
       if (!(wName in stored)) {
         stored[wName] = [];
       }
@@ -204,8 +220,13 @@ function Record() {
         stored[wName].push(data);
       }
 
-      localStorage.setItem("workouts", JSON.stringify(stored));
-      localStorage.setItem("timezone", JSON.stringify(timezone));
+      if (!privateBrowsing) {
+        localStorage.setItem("workouts", JSON.stringify(stored));
+        localStorage.setItem("timezone", JSON.stringify(timezone));
+      } else {
+        sessionStorage.setItem("workouts", JSON.stringify(stored));
+        sessionStorage.setItem("timezone", JSON.stringify(timezone));
+      }
       setAdding(false);
       pExercise.current = ex;
       pReps.current = r;
@@ -269,17 +290,27 @@ function Record() {
       if (workoutName && !workoutNamesList.includes(workoutName)) {
         const extended = [...workoutNamesList, workoutName];
         setWorkoutNamesList(extended);
-        localStorage.setItem("workoutNamesList", JSON.stringify(extended));
+        if (privateBrowsing) {
+          sessionStorage.setItem("workoutNamesList", JSON.stringify(extended));
+        } else {
+          localStorage.setItem("workoutNamesList", JSON.stringify(extended));
+        }
       }
       setWorkoutNameSet(true);
       setworkoutStarted(false);
-      const batchupdateWorked =
-        JSON.parse(localStorage.getItem("batchUpdateSuccess")) || false;
-      if (!batchupdateWorked) {
+      if (!privateBrowsing) {
+        const batchupdateWorked =
+          JSON.parse(localStorage.getItem("batchUpdateSuccess")) || false;
+        if (!batchupdateWorked) {
+          if (loggedIn) {
+            await batchupdateExercise();
+          } else {
+            localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
+          }
+        }
+      } else {
         if (loggedIn) {
           await batchupdateExercise();
-        } else {
-          localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
         }
       }
     }
@@ -298,10 +329,16 @@ function Record() {
     if (param === "finished") {
       setWorkoutNameSet(false);
       setWorkoutName("");
-      if (loggedIn) {
-        await batchupdateExercise();
+      if (!privateBrowsing) {
+        if (loggedIn) {
+          await batchupdateExercise();
+        } else {
+          localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
+        }
       } else {
-        localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
+        if (loggedIn) {
+          await batchupdateExercise();
+        }
       }
     }
     if (param === "view") {
@@ -317,7 +354,12 @@ function Record() {
   function changeSpecificWorkoutList(date) {
     const chosenDate = new Date(date).toISOString();
     const chosenDateunFormatted = convert(chosenDate, timezone);
-    const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    let dataToLookThrough = {};
+    if (!privateBrowsing) {
+      dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    } else {
+      dataToLookThrough = JSON.parse(sessionStorage.getItem("data"));
+    }
     const exercises = dataToLookThrough[chosenDateunFormatted] || {};
     setCurDate(date);
     setCurunformattedDate(chosenDateunFormatted);
@@ -326,14 +368,29 @@ function Record() {
   function WorkoutListofToday() {
     Localdate = new Date().toISOString();
     LocaldateunFormatted = convert(Localdate, timezone);
-    const dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    let dataToLookThrough = {};
+    if (!privateBrowsing) {
+      dataToLookThrough = JSON.parse(localStorage.getItem("data"));
+    } else {
+      dataToLookThrough = JSON.parse(sessionStorage.getItem("data"));
+    }
     const exercises = dataToLookThrough[LocaldateunFormatted] || {};
     setTodayWorkoutList(exercises);
   }
   function workoutNames() {
-    let names = JSON.parse(localStorage.getItem("workoutNamesList")) || [];
+    let names = [];
+    if (!privateBrowsing) {
+      names = JSON.parse(localStorage.getItem("workoutNamesList")) || [];
+    } else {
+      names = JSON.parse(sessionStorage.getItem("workoutNamesList")) || [];
+    }
     if (names.length === 0) {
-      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      let dataToLookThrough = {};
+      if (!privateBrowsing) {
+        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      } else {
+        dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
+      }
       const dates = Object.keys(dataToLookThrough);
       for (const date of dates) {
         const workouts = Object.keys(dataToLookThrough[date]);
@@ -345,10 +402,19 @@ function Record() {
       }
     }
     setWorkoutNamesList(names);
-    localStorage.setItem("workoutNamesList", JSON.stringify(names));
+    if (!privateBrowsing) {
+      localStorage.setItem("workoutNamesList", JSON.stringify(names));
+    } else {
+      sessionStorage.setItem("workoutNamesList", JSON.stringify(names));
+    }
   }
   function oneExerciseForwardorBack(change) {
-    const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+    let dataToLookThrough = {};
+    if (!privateBrowsing) {
+      dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+    } else {
+      dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
+    }
     const dates = Object.keys(dataToLookThrough).reverse();
     outerLoop: for (const date of dates) {
       const workouts = Object.keys(dataToLookThrough[date]).reverse();
@@ -384,7 +450,12 @@ function Record() {
   }
   useEffect(() => {
     if (workoutNameSet) {
-      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      let dataToLookThrough = {};
+      if (!privateBrowsing) {
+        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      } else {
+        dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
+      }
       const dates = Object.keys(dataToLookThrough).reverse();
       outerLoop: for (const date of dates) {
         const workouts = Object.keys(dataToLookThrough[date]).reverse();
@@ -402,7 +473,7 @@ function Record() {
         }
       }
     }
-  }, [workoutNameSet, workoutName]);
+  }, [workoutNameSet, workoutName, privateBrowsing]);
   return (
     <>
       <div className="flexContainer moreGap">
