@@ -33,6 +33,15 @@ function Record() {
 
   useEffect(() => {
     async function load() {
+      if (isPrivateBrowsing()) {
+        alert(
+          ` You're in private browsing. If you close your tab without clicking
+           'Finish Workout' your new exercises will not be saved. 
+            Also everything will be slightly slower. 
+            For more reliable saving and speed, switch off private browsing.
+          `,
+        );
+      }
       let dataToLookThrough = {};
       let name = "";
       let emptyName = false;
@@ -91,11 +100,7 @@ function Record() {
     }
   }
   /*
-  if (isPrivateBrowsing()) {
-    alert(
-      "You're in private browsing. If you close your tab without clicking 'Finish Workout' your new exercises will not be saved. Also everything may be slightly slower. For more reliable saving and speed, switch off private browsing."
-    );
-  }
+
   */
   function convert(dateString, timezone) {
     const generalDate = new Date(dateString);
