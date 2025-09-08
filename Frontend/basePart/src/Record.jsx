@@ -47,8 +47,6 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      const CSRFToken = await getCookieFromBrowser();
-      sessionStorage.setItem("CSRFToken", JSON.stringify(CSRFToken));
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
         workoutNames();
