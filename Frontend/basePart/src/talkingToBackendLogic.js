@@ -1,10 +1,9 @@
 import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
-export async function SendData(url, data) {
+export async function SendData(url, data, CSRFToken) {
   let response;
   const dataToUse = data;
   console.log(dataToUse);
-  let CSRFToken = await getCookieFromBrowser();
   try {
     const sendData = await fetch(url, {
       method: "POST",
@@ -34,11 +33,15 @@ export async function SendData(url, data) {
 }
 //   if (user["status"] === "User created" || user["status"] === "User fetched") {
 
-export async function User() {
+export async function User(token) {
   const Username = prompt("Enter username: ");
   const passkey = prompt("Enter passkey: ");
   const data = { username: Username, passkey: passkey };
-  const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
+  const user = await SendData(
+    `${intialBackendString}/GetorMakeUser/`,
+    data,
+    token,
+  );
   if (user["status"]) {
     console.log("Logged in");
     localStorage.setItem("username", JSON.stringify(user["username"]));
@@ -47,9 +50,9 @@ export async function User() {
     console.log("Login failed");
   }
 }
-export async function justLogin(name, passkey) {
+export async function justLogin(name, passkey, token) {
   const data = { username: name, passkey: passkey };
-  const user = await SendData(`${intialBackendString}/login/`, data);
+  const user = await SendData(`${intialBackendString}/login/`, data, token);
   if (user.message) {
     console.log("Login worked");
   } else {
@@ -57,12 +60,13 @@ export async function justLogin(name, passkey) {
   }
 }
 
-export async function batchupdateExercise() {
+export async function batchupdateExercise(token) {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
   const data = { batchUpdate: stored };
   const updateInBulk = await SendData(
     `${intialBackendString}/batchupdateExercise/`,
     data,
+    token,
   );
   if (updateInBulk.message) {
     console.log(updateInBulk.message);
@@ -97,8 +101,8 @@ export async function getExercisesofThatDate(date) {
   }
 }
 
-export async function getAll() {
-  const getItAll = await SendData(`${intialBackendString}/getAll/`, {});
+export async function getAll(token) {
+  const getItAll = await SendData(`${intialBackendString}/getAll/`, {}, token);
   console.log("Raw getAll response:", getItAll);
   if (getItAll) {
     if (getItAll["message"]) {

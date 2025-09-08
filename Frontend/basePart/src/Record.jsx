@@ -5,6 +5,7 @@ import {
   justLogin,
   getAll,
 } from "./talkingToBackendLogic.js";
+import { getCookieFromBrowser } from "./auth.js";
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -33,6 +34,7 @@ function Record() {
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
+  const [token, setToken] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
   const exercise = useRef(null);
@@ -46,6 +48,8 @@ function Record() {
 
   useEffect(() => {
     async function load() {
+      const CSRFToken = await getCookieFromBrowser();
+      setToken(CSRFToken);
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
         workoutNames();
@@ -67,13 +71,13 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
-        await User();
+        await User(CSRFToken);
       } else {
-        await justLogin(name, passkeyPulled);
+        await justLogin(name, passkeyPulled, CSRFToken);
       }
 
       if (Object.keys(dataToLookThrough).length === 0) {
-        const info = await getAll();
+        const info = await getAll(CSRFToken);
         localStorage.setItem("data", JSON.stringify(info));
         workoutNames();
         WorkoutListofToday();
@@ -241,7 +245,7 @@ function Record() {
         JSON.parse(localStorage.getItem("batchUpdateSuccess")) || false;
       if (!batchupdateWorked) {
         if (loggedIn) {
-          await batchupdateExercise();
+          await batchupdateExercise(token);
         } else {
           localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
         }
@@ -263,7 +267,7 @@ function Record() {
       setWorkoutNameSet(false);
       setWorkoutName("");
       if (loggedIn) {
-        await batchupdateExercise();
+        await batchupdateExercise(token);
       } else {
         localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
       }
