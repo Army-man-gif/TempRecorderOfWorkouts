@@ -99,6 +99,7 @@ export async function getExercisesofThatDate(date) {
 
 export async function getAll() {
   const getItAll = await SendData(`${intialBackendString}/getAll/`, {});
+  console.log("Raw getAll response:", getItAll);
   if (getItAll) {
     if (getItAll["message"]) {
       console.log("Exercises collected", getItAll["data"]);
