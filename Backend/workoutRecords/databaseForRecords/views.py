@@ -17,7 +17,11 @@ def records_home(request):
 # Create your views here.
 def get_csrf_token(request):
     token = get_token(request)
-    return JsonResponse({"csrftoken": token})
+    response = JsonResponse({'csrftoken': token})
+    response.set_cookie(
+        'csrftoken', token, samesite='None', secure=True, httponly=False
+    )
+    return response
 
 @ensure_csrf_cookie
 @require_GET

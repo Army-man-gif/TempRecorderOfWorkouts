@@ -5,7 +5,6 @@ import {
   justLogin,
   getAll,
 } from "./talkingToBackendLogic.js";
-import { getCookieFromBrowser } from "./auth.js";
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
