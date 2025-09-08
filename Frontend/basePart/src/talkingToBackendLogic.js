@@ -2,12 +2,14 @@ import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 export async function SendData(url, data) {
   let response;
+  const token = await getCookieFromBrowser();
+  console.log("token", token);
   try {
     const sendData = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": getCookieFromBrowser(),
+        "X-CSRFToken": token,
       },
       credentials: "include",
       body: JSON.stringify(data),
