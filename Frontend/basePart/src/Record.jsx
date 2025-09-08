@@ -5,7 +5,7 @@ import {
   justLogin,
   getAll,
 } from "./talkingToBackendLogic.js";
-import { ensureCSRFToken } from "./auth.js";
+import { setCookie } from "./auth.js";
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -47,7 +47,7 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      await ensureCSRFToken();
+      await setCookie();
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
         workoutNames();
