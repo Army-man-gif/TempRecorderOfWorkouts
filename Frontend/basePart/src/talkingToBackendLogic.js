@@ -57,7 +57,6 @@ export async function justLogin(name, passkey) {
   }
 }
 
-export async function loginLogic() {}
 export async function batchupdateExercise() {
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
   const data = { batchUpdate: stored };
