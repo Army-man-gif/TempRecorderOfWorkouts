@@ -241,7 +241,7 @@ function Record() {
         JSON.parse(localStorage.getItem("batchUpdateSuccess")) || false;
       if (!batchupdateWorked) {
         if (loggedIn) {
-          await batchupdateExercise(token);
+          await batchupdateExercise();
         } else {
           localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
         }
@@ -263,7 +263,7 @@ function Record() {
       setWorkoutNameSet(false);
       setWorkoutName("");
       if (loggedIn) {
-        await batchupdateExercise(token);
+        await batchupdateExercise();
       } else {
         localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
       }
