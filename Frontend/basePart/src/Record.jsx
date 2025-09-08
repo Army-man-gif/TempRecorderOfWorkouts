@@ -62,7 +62,7 @@ function Record() {
         }
       }
 
-      if (privateBrowsingLocalFlag) {
+      if (!privateBrowsingLocalFlag) {
         name = JSON.parse(localStorage.getItem("username")) || "";
       }
       if (name == "") {
@@ -70,7 +70,7 @@ function Record() {
       } else {
         emptyName = false;
       }
-      if (privateBrowsingLocalFlag) {
+      if (!privateBrowsingLocalFlag) {
         passkeyPulled = JSON.parse(localStorage.getItem("passkey")) || "";
       }
       if (passkeyPulled == "") {
