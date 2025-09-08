@@ -10,19 +10,6 @@ function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [typingTimeout, setTypingTimeout] = useState(null);
 
-  function convert(dateString, timezone) {
-    const generalDate = new Date(dateString);
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).formatToParts(generalDate);
-    const year = parts.find((p) => p.type === "year").value;
-    const month = parts.find((p) => p.type === "month").value;
-    const day = parts.find((p) => p.type === "day").value;
-    return `${year}-${month}-${day}`;
-  }
   let Localdate = new Date().toISOString();
   let LocaldateunFormatted = convert(Localdate, timezone);
   const [curDate, setCurDate] = useState(null);
@@ -46,21 +33,31 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-      if (Object.keys(dataToLookThrough).length > 0) {
-        workoutNames();
-        WorkoutListofToday();
+      let dataToLookThrough = {};
+      let name = "";
+      let emptyName = false;
+      let passkeyPulled = "";
+      let emptyPasskey = false;
+
+      if (!isPrivateBrowsing()) {
+        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+        if (Object.keys(dataToLookThrough).length > 0) {
+          workoutNames();
+          WorkoutListofToday();
+        }
       }
 
-      const name = JSON.parse(localStorage.getItem("username")) || "";
-      let emptyName = false;
+      if (!isPrivateBrowsing()) {
+        name = JSON.parse(localStorage.getItem("username")) || "";
+      }
       if (name == "") {
         emptyName = true;
       } else {
         emptyName = false;
       }
-      const passkeyPulled = JSON.parse(localStorage.getItem("passkey")) || "";
-      let emptyPasskey = false;
+      if (!isPrivateBrowsing()) {
+        passkeyPulled = JSON.parse(localStorage.getItem("passkey")) || "";
+      }
       if (passkeyPulled == "") {
         emptyPasskey = true;
       } else {
@@ -84,6 +81,35 @@ function Record() {
     load();
   }, []);
 
+  function isPrivateBrowsing() {
+    try {
+      localStorage.setItem("__test__", "1");
+      localStorage.removeItem("__test__");
+      return false;
+    } catch {
+      return true;
+    }
+  }
+  /*
+  if (isPrivateBrowsing()) {
+    alert(
+      "You're in private browsing. If you close your tab without clicking 'Finish Workout' your new exercises will not be saved. Also everything may be slightly slower. For more reliable saving and speed, switch off private browsing."
+    );
+  }
+  */
+  function convert(dateString, timezone) {
+    const generalDate = new Date(dateString);
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(generalDate);
+    const year = parts.find((p) => p.type === "year").value;
+    const month = parts.find((p) => p.type === "month").value;
+    const day = parts.find((p) => p.type === "day").value;
+    return `${year}-${month}-${day}`;
+  }
   function restore(field) {
     if (field == "exercise") {
       exercise.current.value = pExercise.current;
