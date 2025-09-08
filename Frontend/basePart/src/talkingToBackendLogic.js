@@ -1,4 +1,4 @@
-import { setCookie, getCookieFromBrowser } from "./auth.js";
+import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 export async function SendData(url, data) {
   let response;
@@ -37,7 +37,6 @@ export async function SendData(url, data) {
 export async function User() {
   const Username = prompt("Enter username: ");
   const passkey = prompt("Enter passkey: ");
-  await setCookie();
   const data = { username: Username, passkey: passkey };
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
@@ -49,7 +48,6 @@ export async function User() {
   }
 }
 export async function justLogin(name, passkey) {
-  await setCookie();
   const data = { username: name, passkey: passkey };
   const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
