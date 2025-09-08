@@ -1,6 +1,6 @@
 import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
-export async function SendData(url, data) {
+export async function SendData(url, data = {}) {
   let response;
   const token = await getCookieFromBrowser();
   console.log("token", token);
@@ -72,7 +72,7 @@ export async function batchupdateExercise() {
   }
 }
 export async function logout() {
-  const loggingout = await SendData(`${intialBackendString}/logout/`, {});
+  const loggingout = await SendData(`${intialBackendString}/logout/`);
   if (loggingout.message) {
     console.log("Logged out");
   }
@@ -97,7 +97,7 @@ export async function getExercisesofThatDate(date) {
 }
 
 export async function getAll() {
-  const getItAll = await SendData(`${intialBackendString}/getAll/`, {});
+  const getItAll = await SendData(`${intialBackendString}/getAll/`);
   console.log("Raw getAll response:", getItAll);
   if (getItAll) {
     if (getItAll["message"]) {
