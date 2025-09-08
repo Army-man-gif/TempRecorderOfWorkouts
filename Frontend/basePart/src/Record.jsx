@@ -54,7 +54,7 @@ function Record() {
         localStorage.clear();
       }
 
-      if (privateBrowsingLocalFlag) {
+      if (!privateBrowsingLocalFlag) {
         dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
         if (Object.keys(dataToLookThrough).length > 0) {
           workoutNames();
