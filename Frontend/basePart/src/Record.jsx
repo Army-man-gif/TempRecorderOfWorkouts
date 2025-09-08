@@ -5,7 +5,6 @@ import {
   justLogin,
   getAll,
 } from "./talkingToBackendLogic.js";
-import { setCookie } from "./auth.js";
 import React, { useRef, useEffect, useState } from "react";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -68,7 +67,6 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
-        await setCookie();
         await User();
       } else {
         await justLogin(name, passkeyPulled);
