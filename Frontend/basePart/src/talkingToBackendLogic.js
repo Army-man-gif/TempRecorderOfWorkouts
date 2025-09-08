@@ -32,7 +32,8 @@ export async function SendData(url, data, CSRFToken) {
 }
 //   if (user["status"] === "User created" || user["status"] === "User fetched") {
 
-export async function User(token) {
+export async function User() {
+  const token = JSON.parse(sessionStorage.getItem("CSRFToken"));
   const Username = prompt("Enter username: ");
   const passkey = prompt("Enter passkey: ");
   const data = { username: Username, passkey: passkey };
@@ -49,7 +50,8 @@ export async function User(token) {
     console.log("Login failed");
   }
 }
-export async function justLogin(name, passkey, token) {
+export async function justLogin(name, passkey) {
+  const token = JSON.parse(sessionStorage.getItem("CSRFToken"));
   const data = { username: name, passkey: passkey };
   const user = await SendData(`${intialBackendString}/login/`, data, token);
   if (user.message) {
@@ -59,7 +61,8 @@ export async function justLogin(name, passkey, token) {
   }
 }
 
-export async function batchupdateExercise(token) {
+export async function batchupdateExercise() {
+  const token = JSON.parse(sessionStorage.getItem("CSRFToken"));
   const stored = JSON.parse(localStorage.getItem("workouts")) || {};
   const data = { batchUpdate: stored };
   const updateInBulk = await SendData(
@@ -100,7 +103,8 @@ export async function getExercisesofThatDate(date) {
   }
 }
 
-export async function getAll(token) {
+export async function getAll() {
+  const token = JSON.parse(sessionStorage.getItem("CSRFToken"));
   const getItAll = await SendData(`${intialBackendString}/getAll/`, {}, token);
   console.log("Raw getAll response:", getItAll);
   if (getItAll) {

@@ -34,7 +34,6 @@ function Record() {
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
-  const [token, setToken] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
   const exercise = useRef(null);
@@ -49,7 +48,7 @@ function Record() {
   useEffect(() => {
     async function load() {
       const CSRFToken = await getCookieFromBrowser();
-      setToken(CSRFToken);
+      sessionStorage.setItem("CSRFToken", JSON.stringify(CSRFToken));
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
         workoutNames();
@@ -71,13 +70,13 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
-        await User(CSRFToken);
+        await User();
       } else {
-        await justLogin(name, passkeyPulled, CSRFToken);
+        await justLogin(name, passkeyPulled);
       }
 
       if (Object.keys(dataToLookThrough).length === 0) {
-        const info = await getAll(CSRFToken);
+        const info = await getAll();
         localStorage.setItem("data", JSON.stringify(info));
         workoutNames();
         WorkoutListofToday();
