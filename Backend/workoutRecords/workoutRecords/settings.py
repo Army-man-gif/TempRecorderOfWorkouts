@@ -48,7 +48,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     'django.middleware.common.CommonMiddleware',
     #"django.middleware.csrf.CsrfViewMiddleware",
-    'workoutRecords.middleware.custom_crsf_tokenLogic.CustomCsrfMiddleware'
+    'databaseForRecords.middleware.custom_crsf_tokenLogic.CustomCsrfMiddleware'
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
