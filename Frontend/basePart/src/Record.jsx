@@ -47,7 +47,6 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      await setCookie();
       const dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
       if (Object.keys(dataToLookThrough).length > 0) {
         workoutNames();
@@ -69,6 +68,7 @@ function Record() {
         emptyPasskey = false;
       }
       if (emptyPasskey || emptyName) {
+        await setCookie();
         await User();
       } else {
         await justLogin(name, passkeyPulled);
