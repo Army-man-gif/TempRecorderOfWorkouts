@@ -6,5 +6,6 @@ export async function getCookieFromBrowser() {
     credentials: "include",
   });
   const cookiesData = await fetchTheData.json();
+  console.log("Fetched CSRF token:", cookiesData.csrftoken);
   return cookiesData.csrftoken;
 }
