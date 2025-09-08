@@ -20,6 +20,7 @@ function Record() {
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
+  const [privateBrowsing, setPrivateBrowsing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
   const exercise = useRef(null);
@@ -33,6 +34,13 @@ function Record() {
 
   useEffect(() => {
     async function load() {
+      let privateBrowsingLocalFlag = false;
+      let dataToLookThrough = {};
+      let name = "";
+      let emptyName = false;
+      let passkeyPulled = "";
+      let emptyPasskey = false;
+
       if (isPrivateBrowsing()) {
         alert(
           ` You're in private browsing. If you close your tab without clicking
@@ -41,14 +49,11 @@ function Record() {
             For more reliable saving and speed, switch off private browsing.
           `,
         );
+        setPrivateBrowsing(true);
+        privateBrowsingLocalFlag = true;
       }
-      let dataToLookThrough = {};
-      let name = "";
-      let emptyName = false;
-      let passkeyPulled = "";
-      let emptyPasskey = false;
 
-      if (!isPrivateBrowsing()) {
+      if (privateBrowsingLocalFlag) {
         dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
         if (Object.keys(dataToLookThrough).length > 0) {
           workoutNames();
@@ -56,7 +61,7 @@ function Record() {
         }
       }
 
-      if (!isPrivateBrowsing()) {
+      if (privateBrowsingLocalFlag) {
         name = JSON.parse(localStorage.getItem("username")) || "";
       }
       if (name == "") {
@@ -64,7 +69,7 @@ function Record() {
       } else {
         emptyName = false;
       }
-      if (!isPrivateBrowsing()) {
+      if (privateBrowsingLocalFlag) {
         passkeyPulled = JSON.parse(localStorage.getItem("passkey")) || "";
       }
       if (passkeyPulled == "") {

@@ -31,7 +31,6 @@ export async function SendData(url, data = {}) {
   }
   return response;
 }
-//   if (user["status"] === "User created" || user["status"] === "User fetched") {
 
 export async function User() {
   const Username = prompt("Enter username: ");
