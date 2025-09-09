@@ -50,7 +50,7 @@ export async function User() {
   const Username = prompt("Enter username: ");
   const passkey = prompt("Enter passkey: ");
   const data = { username: Username, passkey: passkey };
-  const csrftoken = getCookieFromBrowser();
+  const csrftoken = await getCookieFromBrowser();
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
@@ -70,7 +70,7 @@ export async function User() {
 }
 export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
-  const csrftoken = getCookieFromBrowser();
+  const csrftoken = await getCookieFromBrowser();
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
