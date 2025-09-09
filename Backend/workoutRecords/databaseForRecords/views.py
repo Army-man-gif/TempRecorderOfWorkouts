@@ -11,7 +11,7 @@ import traceback
 import json
 from datetime import datetime
 from .models import Workout,Exercise
-
+import re
 def records_home(request):
     return HttpResponse("Records root works!")
 # Create your views here.
@@ -125,6 +125,12 @@ def logoutView(request):
         return JsonResponse({"message": "User logged out"})
     return JsonResponse({"error":"User not logged in yet"})
 
+def cleanInput(val):
+    cleaned = val.strip()
+    cleaned = cleaned.lower()
+    cleaned = re.sub(r'[^a-z0-9]+', ' ', cleaned)
+    cleaned = re.sub(r'\s+', ' ', cleaned)
+    return cleaned
 
 # ----------------------------------------------------------------------------------------
 def batchupdateExercise(request):
@@ -147,10 +153,10 @@ def batchupdateExercise(request):
                             date_workoutName_pairs.append((j["workoutName"],date_obj))
                             exerciseNames.append(j["exerciseName"])
                             exerciseData.append({
-                                "workoutName": j["workoutName"],                    
-                                "exerciseReps":j["exerciseReps"], 
-                                "exerciseSets":j["exerciseSets"],
-                                "exerciseWeight":j["exerciseWeight"]
+                                "workoutName": cleanInput(j["workoutName"]),                    
+                                "exerciseReps":cleanInput(j["exerciseReps"]), 
+                                "exerciseSets":cleanInput(j["exerciseSets"]),
+                                "exerciseWeight":cleanInput(j["exerciseWeight"])
                             })
                             
                     workouts = Workout.objects.filter(name__in = batchupdateDataworkoutNames, date__in = dates)

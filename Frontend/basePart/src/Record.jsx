@@ -16,7 +16,7 @@ function Record() {
   const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
   const [workoutName, setWorkoutName] = useState("");
-  const [workoutNamesList, setWorkoutNamesList] = useState(null);
+  const [workoutNamesList, setWorkoutNamesList] = useState([]);
   const [workoutNameSet, setWorkoutNameSet] = useState(false);
   const [todayWorkoutList, setTodayWorkoutList] = useState({});
   const [SpecificworkoutList, setSpecificWorkoutList] = useState({});
@@ -140,7 +140,14 @@ function Record() {
       weight.current.value = pWeight.current;
     }
   }
-
+  function cleanInput(input) {
+    const cleaned = input
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/gi, " ")
+      .replace(/\s+/g, " ");
+    return cleaned;
+  }
   async function addExercise() {
     setAdding(true);
     Localdate = new Date().toISOString();
@@ -151,10 +158,10 @@ function Record() {
     }
     const wName = workoutName;
     setWorkoutName(wName);
-    const ex = exercise.current?.value.trim();
-    const r = reps.current?.value.trim();
-    const s = sets.current?.value.trim();
-    const w = weight.current?.value.trim();
+    const ex = cleanInput(exercise.current?.value);
+    const r = cleanInput(reps.current?.value);
+    const s = cleanInput(sets.current?.value);
+    const w = cleanInput(weight.current?.value);
     if (ex && r && s && w && wName) {
       const data = {
         date: LocaldateunFormatted,
