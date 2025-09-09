@@ -11,7 +11,7 @@ function Record() {
   const [typingTimeout, setTypingTimeout] = useState(null);
 
   let Localdate = new Date().toISOString();
-  let LocaldateunFormatted = convert(Localdate, timezone);
+  let LocaldateunFormatted = formatDate(Localdate, timezone);
   const [curDate, setCurDate] = useState(null);
   const [curunformattedDate, setCurunformattedDate] = useState(null);
   const [workoutStarted, setworkoutStarted] = useState(false);
@@ -41,7 +41,7 @@ function Record() {
       let passkeyPulled = "";
       let emptyPasskey = false;
 
-      if (isPrivateBrowsing()) {
+      if (checkPrivateBrowsing()) {
         alert(
           ` You're in private browsing. If you close your tab without clicking
            'Finish Workout' your new exercises will not be saved. 
@@ -57,8 +57,8 @@ function Record() {
       if (!privateBrowsingLocalFlag) {
         dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
         if (Object.keys(dataToLookThrough).length > 0) {
-          workoutNames();
-          WorkoutListofToday();
+          loadWorkoutNames();
+          loadTodayList();
         }
       }
 
@@ -92,8 +92,8 @@ function Record() {
         } else {
           sessionStorage.setItem("data", JSON.stringify(info));
         }
-        workoutNames();
-        WorkoutListofToday();
+        loadWorkoutNames();
+        loadTodayList();
       }
 
       setLoggedIn(true);
@@ -101,7 +101,7 @@ function Record() {
     load();
   }, []);
 
-  function isPrivateBrowsing() {
+  function checkPrivateBrowsing() {
     try {
       localStorage.setItem("__test__", "1");
       localStorage.removeItem("__test__");
@@ -110,7 +110,7 @@ function Record() {
       return true;
     }
   }
-  function convert(dateString, timezone) {
+  function formatDate(dateString, timezone) {
     const generalDate = new Date(dateString);
     const parts = new Intl.DateTimeFormat("en-GB", {
       timeZone: timezone,
@@ -123,7 +123,7 @@ function Record() {
     const day = parts.find((p) => p.type === "day").value;
     return `${year}-${month}-${day}`;
   }
-  function restore(field) {
+  function restoreField(field) {
     if (field == "exercise") {
       exercise.current.value = pExercise.current;
     }
@@ -138,19 +138,15 @@ function Record() {
     }
   }
   // Add exercise helper functions
-  function cleanInput(input) {
+  function normalizeInput(input) {
     const cleaned = input
       .trim()
-      .toUpperCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase())
       .replace(/[^a-z0-9]+/gi, " ")
       .replace(/\s+/g, " ");
     return cleaned;
   }
-  function updatedataToIterateThroughByWorkoutName(
-    wName,
-    dateToChangeWorkoutStateListsWith,
-    ex,
-  ) {
+  function saveIterData(wName, dateToChangeWorkoutStateListsWith, ex) {
     const purelyForDisplay =
       JSON.parse(
         sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
@@ -164,6 +160,9 @@ function Record() {
     }
     if (date === "") {
       date = LocaldateunFormatted;
+    }
+    if (!(date in purelyForDisplay)) {
+      purelyForDisplay[date] = {};
     }
     if (!(wName in purelyForDisplay[date])) {
       purelyForDisplay[date][wName] = [];
@@ -182,7 +181,7 @@ function Record() {
       JSON.stringify(purelyForDisplay),
     );
   }
-  function updateDataPool(wName, dateToChangeWorkoutStateListsWith, ex) {
+  function saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex) {
     let dataPool = {};
     if (!privateBrowsing) {
       dataPool = JSON.parse(localStorage.getItem("data")) || {};
@@ -215,7 +214,7 @@ function Record() {
       sessionStorage.setItem("data", JSON.stringify(dataPool));
     }
   }
-  function updateWorkoutStorage(wName, data, ex) {
+  function saveWorkoutData(wName, data, ex) {
     let stored = {};
     if (!privateBrowsing) {
       stored = JSON.parse(localStorage.getItem("workouts")) || {};
@@ -243,11 +242,7 @@ function Record() {
       sessionStorage.setItem("timezone", JSON.stringify(timezone));
     }
   }
-  function updateTodayWorkoutList(
-    wName,
-    dateToChangeWorkoutStateListsWith,
-    ex,
-  ) {
+  function saveTodayList(wName, dateToChangeWorkoutStateListsWith, ex) {
     setTodayWorkoutList((prev) => {
       const existingList = prev[wName] ?? [];
 
@@ -272,11 +267,7 @@ function Record() {
       };
     });
   }
-  function updateSpecificWorkoutList(
-    wName,
-    dateToChangeWorkoutStateListsWith,
-    ex,
-  ) {
+  function saveSpecificList(wName, dateToChangeWorkoutStateListsWith, ex) {
     setSpecificWorkoutList((prev2) => {
       const existingList = prev2[wName] ?? [];
 
@@ -300,7 +291,7 @@ function Record() {
       };
     });
   }
-  function addExerciseInitialSetupVariablesAndStates() {
+  function setupExercise() {
     setAdding(true);
     let areBothDatesSame = false;
     if (curunformattedDate == LocaldateunFormatted) {
@@ -308,13 +299,13 @@ function Record() {
     }
     const wName = workoutName;
     setWorkoutName(wName);
-    const ex = cleanInput(exercise.current?.value);
-    const r = cleanInput(reps.current?.value);
-    const s = cleanInput(sets.current?.value);
-    const w = cleanInput(weight.current?.value);
+    const ex = normalizeInput(exercise.current?.value);
+    const r = normalizeInput(reps.current?.value);
+    const s = normalizeInput(sets.current?.value);
+    const w = normalizeInput(weight.current?.value);
     return { areBothDatesSame, wName, ex, r, s, w };
   }
-  function dataDictionaries(wName, ex, r, s, w) {
+  function buildExerciseData(wName, ex, r, s, w) {
     const data = {
       date: LocaldateunFormatted,
       workoutName: wName,
@@ -340,39 +331,34 @@ function Record() {
   }
   // Add exercise function
   async function addExercise() {
-    const { areBothDatesSame, wName, ex, r, s, w } =
-      addExerciseInitialSetupVariablesAndStates();
+    const { areBothDatesSame, wName, ex, r, s, w } = setupExercise();
     if (ex && r && s && w && wName) {
-      const { data, dateToChangeWorkoutStateListsWith } = dataDictionaries(
+      const { data, dateToChangeWorkoutStateListsWith } = buildExerciseData(
         wName,
         ex,
         r,
         s,
         w,
       );
-      updatedataToIterateThroughByWorkoutName(
-        wName,
-        dateToChangeWorkoutStateListsWith,
-        ex,
-      );
-      updateDataPool(wName, dateToChangeWorkoutStateListsWith, ex);
-      updateWorkoutStorage(wName, data, ex);
+      saveIterData(wName, dateToChangeWorkoutStateListsWith, ex);
+      saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex);
+      saveWorkoutData(wName, data, ex);
 
       finaliseExercise(ex, r, s, w);
 
-      updateTodayWorkoutList(wName, dateToChangeWorkoutStateListsWith, ex);
+      saveTodayList(wName, dateToChangeWorkoutStateListsWith, ex);
       if (areBothDatesSame) {
-        updateSpecificWorkoutList(wName, dateToChangeWorkoutStateListsWith, ex);
+        saveSpecificList(wName, dateToChangeWorkoutStateListsWith, ex);
       }
     }
   }
-  async function main(param, data = null) {
+  async function handleAction(param, data = null) {
     if (param == "ExerciseFororBack") {
-      oneExerciseForwardorBack(data);
+      navigateExercise(data);
     }
     if (param === "changeWorkoutNameHasBeenSet") {
       if (workoutName) {
-        setDataToIterateState();
+        cacheIterData();
       }
       if (workoutName && !workoutNamesList.includes(workoutName)) {
         const extended = [...workoutNamesList, workoutName];
@@ -408,7 +394,7 @@ function Record() {
     if (param === "cancelExercise") {
       setWorkoutNameSet(false);
       setworkoutStarted(true);
-      restore("workoutName");
+      restoreField("workoutName");
     }
     if (param === "started") {
       setworkoutStarted(true);
@@ -431,16 +417,16 @@ function Record() {
     if (param === "view") {
       const date = data.target.value;
       if (date != curunformattedDate) {
-        changeSpecificWorkoutList(date);
+        loadSpecificList(date);
       }
     }
     if (param === "restore") {
-      restore(data);
+      restoreField(data);
     }
   }
-  function changeSpecificWorkoutList(date) {
+  function loadSpecificList(date) {
     const chosenDate = new Date(date).toISOString();
-    const chosenDateunFormatted = convert(chosenDate, timezone);
+    const chosenDateunFormatted = formatDate(chosenDate, timezone);
     let dataToLookThrough = {};
     if (!privateBrowsing) {
       dataToLookThrough = JSON.parse(localStorage.getItem("data"));
@@ -452,9 +438,9 @@ function Record() {
     setCurunformattedDate(chosenDateunFormatted);
     setSpecificWorkoutList(exercises);
   }
-  function WorkoutListofToday() {
+  function loadTodayList() {
     Localdate = new Date().toISOString();
-    LocaldateunFormatted = convert(Localdate, timezone);
+    LocaldateunFormatted = formatDate(Localdate, timezone);
     let dataToLookThrough = {};
     if (!privateBrowsing) {
       dataToLookThrough = JSON.parse(localStorage.getItem("data"));
@@ -464,7 +450,7 @@ function Record() {
     const exercises = dataToLookThrough[LocaldateunFormatted] || {};
     setTodayWorkoutList(exercises);
   }
-  function workoutNames() {
+  function loadWorkoutNames() {
     let names = [];
     if (!privateBrowsing) {
       names = JSON.parse(localStorage.getItem("workoutNamesList")) || [];
@@ -495,7 +481,7 @@ function Record() {
       sessionStorage.setItem("workoutNamesList", JSON.stringify(names));
     }
   }
-  function setDataToIterateState() {
+  function cacheIterData() {
     let dataToSave = {};
     let dataToLookThrough = {};
     if (!privateBrowsing) {
@@ -519,7 +505,7 @@ function Record() {
       JSON.stringify(dataToSave),
     );
   }
-  function oneExerciseForwardorBack(change) {
+  function navigateExercise(change) {
     let dataToLookThrough = {};
     dataToLookThrough =
       JSON.parse(
@@ -548,7 +534,7 @@ function Record() {
       }
     }
   }
-  function handleExerciseNameChange() {
+  function debouncedExerciseChange() {
     if (typingTimeout) clearTimeout(typingTimeout);
 
     // set a new timer
@@ -570,7 +556,7 @@ function Record() {
 
       for (const date of dates) {
         const workouts = Object.keys(dataToLookThrough[date]);
-        if (workoutName in workouts) {
+        if (workouts.includes(workoutName)) {
           const workout = dataToLookThrough[date][workoutName][0];
           exercise.current.value = workout["name"];
           reps.current.value = workout["reps"];
@@ -631,7 +617,7 @@ function Record() {
           <button
             className="SquishSize"
             type="button"
-            onClick={() => main("started")}
+            onClick={() => handleAction("started")}
             disabled={workoutStarted}
           >
             Click to add a new workout
@@ -662,11 +648,14 @@ function Record() {
               <div className="flexContainer lessGap">
                 <button
                   type="button"
-                  onClick={() => main("changeWorkoutNameHasBeenSet")}
+                  onClick={() => handleAction("changeWorkoutNameHasBeenSet")}
                 >
                   Confirm name
                 </button>
-                <button type="button" onClick={() => main("cancelWorkout")}>
+                <button
+                  type="button"
+                  onClick={() => handleAction("cancelWorkout")}
+                >
                   Cancel workout
                 </button>
               </div>
@@ -680,7 +669,7 @@ function Record() {
                 <label htmlFor="addEx">Exercise: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={handleExerciseNameChange}
+                    onChange={debouncedExerciseChange}
                     ref={exercise}
                     id="addEx"
                     type="text"
@@ -726,7 +715,7 @@ function Record() {
               <button
                 className="SquishSize"
                 type="button"
-                onClick={() => main("finished")}
+                onClick={() => handleAction("finished")}
                 disabled={adding && !loggedIn}
               >
                 Click to finish workout
@@ -734,15 +723,15 @@ function Record() {
               <button
                 className="SquishSize"
                 type="button"
-                onClick={() => main("cancelExercise")}
+                onClick={() => handleAction("cancelExercise")}
               >
                 Click to cancel exercise
               </button>
               <div className="flexContainer spaceNicely">
-                <button onClick={() => main("ExerciseFororBack", -1)}>
+                <button onClick={() => handleAction("ExerciseFororBack", -1)}>
                   ◄ Go back an exercise
                 </button>
-                <button onClick={() => main("ExerciseFororBack", 1)}>
+                <button onClick={() => handleAction("ExerciseFororBack", 1)}>
                   Go to next exercise ►
                 </button>
               </div>
@@ -758,7 +747,7 @@ function Record() {
               type="date"
               id="workoutPick"
               name="workoutPick"
-              onChange={(e) => main("view", e)}
+              onChange={(e) => handleAction("view", e)}
             ></input>
           </form>
           {Object.keys(SpecificworkoutList).length > 0 && (
