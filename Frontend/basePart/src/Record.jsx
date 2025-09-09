@@ -34,6 +34,7 @@ function Record() {
 
   useEffect(() => {
     async function load() {
+      localStorage.clear();
       let privateBrowsingLocalFlag = false;
       let dataToLookThrough = {};
       let name = "";
