@@ -316,7 +316,7 @@ function Record() {
     const r = cleanInput(reps.current?.value);
     const s = cleanInput(sets.current?.value);
     const w = cleanInput(weight.current?.value);
-    return [areBothDatesSame, wName, ex, r, s, w];
+    return { areBothDatesSame, wName, ex, r, s, w };
   }
   function dataDictionaries(wName, ex, r, s, w) {
     const data = {
@@ -333,9 +333,9 @@ function Record() {
       sets: s,
       weight: w,
     };
-    return [data, dateToChangeWorkoutStateListsWith];
+    return { data, dateToChangeWorkoutStateListsWith };
   }
-  function ExercisefinishUp(ex, r, s, w) {
+  function finaliseExercise(ex, r, s, w) {
     setAdding(false);
     pExercise.current = ex;
     pReps.current = r;
@@ -344,10 +344,10 @@ function Record() {
   }
   // Add exercise function
   async function addExercise() {
-    const [areBothDatesSame, wName, ex, r, s, w] =
+    const { areBothDatesSame, wName, ex, r, s, w } =
       addExerciseInitialSetupVariablesAndStates();
     if (ex && r && s && w && wName) {
-      const [data, dateToChangeWorkoutStateListsWith] = dataDictionaries(
+      const { data, dateToChangeWorkoutStateListsWith } = dataDictionaries(
         wName,
         ex,
         r,
@@ -362,7 +362,7 @@ function Record() {
       updateDataPool(wName, dateToChangeWorkoutStateListsWith, ex);
       updateWorkoutStorage(wName, data, ex);
 
-      ExercisefinishUp(ex, r, s, w);
+      finaliseExercise(ex, r, s, w);
 
       updateTodayWorkoutList(wName, dateToChangeWorkoutStateListsWith, ex);
       if (areBothDatesSame) {
