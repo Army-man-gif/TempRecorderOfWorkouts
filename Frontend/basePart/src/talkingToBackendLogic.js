@@ -52,8 +52,12 @@ export async function User() {
 
   do {
     Username = prompt("Enter username: ");
-    if (Username == null || Username == "") {
+    if (Username == "") {
       alert("You must enter something");
+      loop = true;
+    }
+    if (Username == null) {
+      alert("You can't cancel");
       loop = true;
     } else {
       loop = false;
@@ -63,8 +67,12 @@ export async function User() {
   let passkey = "";
   do {
     passkey = prompt("Enter username: ");
-    if (passkey == null || passkey == "") {
+    if (passkey == "") {
       alert("You must enter something");
+      loop = true;
+    }
+    if (passkey == null) {
+      alert("You can't cancel");
       loop = true;
     } else {
       loop = false;
