@@ -1,5 +1,14 @@
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
-import { getCookieFromBrowser } from "./auth.js";
+
+async function getCookieFromBrowser() {
+  const fetchTheData = await fetch(`${intialBackendString}/getToken/`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const cookiesData = await fetchTheData.json();
+  console.log("Fetched CSRF token:", cookiesData.csrftoken);
+  return cookiesData.csrftoken;
+}
 function isPrivateBrowsing() {
   try {
     localStorage.setItem("__test__", "1");
