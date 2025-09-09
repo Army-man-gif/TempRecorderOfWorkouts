@@ -136,6 +136,8 @@ export async function getExercisesofThatDate(date) {
 }
 
 export async function getAll() {
+  const sessionid = JSON.parse(sessionStorage.getItem("sessionid"));
+  console.log(sessionid);
   const getItAll = await SendData(`${intialBackendString}/getAll/`);
   console.log("Raw getAll response:", getItAll);
   if (getItAll) {
