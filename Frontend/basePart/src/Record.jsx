@@ -110,9 +110,6 @@ function Record() {
       return true;
     }
   }
-  /*
-
-  */
   function convert(dateString, timezone) {
     const generalDate = new Date(dateString);
     const parts = new Intl.DateTimeFormat("en-GB", {
@@ -140,12 +137,11 @@ function Record() {
       weight.current.value = pWeight.current;
     }
   }
-
   // Add exercise helper functions
   function cleanInput(input) {
     const cleaned = input
       .trim()
-      .toLowerCase()
+      .toUpperCase()
       .replace(/[^a-z0-9]+/gi, " ")
       .replace(/\s+/g, " ");
     return cleaned;

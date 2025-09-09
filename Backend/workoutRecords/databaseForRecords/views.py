@@ -129,7 +129,7 @@ def logoutView(request):
 
 def cleanInput(val):
     cleaned = val.strip()
-    cleaned = cleaned.lower()
+    cleaned = cleaned.upper()
     cleaned = re.sub(r'[^a-z0-9]+', ' ', cleaned)
     cleaned = re.sub(r'\s+', ' ', cleaned)
     return cleaned
