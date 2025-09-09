@@ -61,6 +61,11 @@ SESSION_COOKIE_SAMESITE = "None"
 
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS","").split(",")
 
+from corsheaders.defaults import default_headers  
+CORS_ALLOW_HEADERS = list(default_headers) + [  
+    "x-sessionid",  
+    "x-csrftoken",  
+]
 CORS_ALLOW_CREDENTIALS = True
 SECURE_SSL_REDIRECT = True
 
