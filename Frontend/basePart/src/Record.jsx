@@ -177,7 +177,36 @@ function Record() {
         sets: s,
         weight: w,
       };
-
+      const purelyForDisplay =
+        JSON.parse(
+          sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
+        ) || {};
+      const dates = Object.keys(purelyForDisplay);
+      let date = "";
+      for (const curDate of dates) {
+        if (wName in purelyForDisplay[curDate]) {
+          date = curDate;
+        }
+      }
+      if (date === "") {
+        date = LocaldateunFormatted;
+      }
+      if (!(wName in purelyForDisplay[date])) {
+        purelyForDisplay[date][wName] = [];
+      }
+      const changeExerciseIndexinpurelyForDisplay = purelyForDisplay[date][
+        wName
+      ].findIndex((exercise) => exercise.name === ex);
+      if (changeExerciseIndexinpurelyForDisplay >= 0) {
+        purelyForDisplay[date][wName][changeExerciseIndexinpurelyForDisplay] =
+          dateToChangeWorkoutStateListsWith;
+      } else {
+        purelyForDisplay[date][wName].push(dateToChangeWorkoutStateListsWith);
+      }
+      sessionStorage.setItem(
+        "dataToIterateThroughBasedonWorkoutName",
+        JSON.stringify(purelyForDisplay),
+      );
       let dataPool = {};
       if (!privateBrowsing) {
         dataPool = JSON.parse(localStorage.getItem("data")) || {};
@@ -296,6 +325,9 @@ function Record() {
       oneExerciseForwardorBack(data);
     }
     if (param === "changeWorkoutNameHasBeenSet") {
+      if (workoutName) {
+        setDataToIterateState();
+      }
       if (workoutName && !workoutNamesList.includes(workoutName)) {
         const extended = [...workoutNamesList, workoutName];
         setWorkoutNamesList(extended);
@@ -417,7 +449,9 @@ function Record() {
       sessionStorage.setItem("workoutNamesList", JSON.stringify(names));
     }
   }
-  function oneExerciseForwardorBack(change) {
+  function setDataToIterateState() {
+    // dataToIterateThroughBasedonWorkoutName
+    let dataToSave = {};
     let dataToLookThrough = {};
     if (!privateBrowsing) {
       dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
@@ -425,12 +459,56 @@ function Record() {
       dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
     }
     const dates = Object.keys(dataToLookThrough).reverse();
+    for (const date of dates) {
+      const workouts = Object.keys(dataToLookThrough[date]).reverse();
+      for (const workout of workouts) {
+        if (!dataToSave[date]) {
+          dataToSave[date] = {};
+        }
+        const exercisesList = dataToLookThrough[date][workout] || [];
+        dataToSave[date][workout] = exercisesList;
+      }
+    }
+    sessionStorage.setItem(
+      "dataToIterateThroughBasedonWorkoutName",
+      JSON.stringify(dataToSave),
+    );
+  }
+  function oneExerciseForwardorBack(change) {
+    let dataToLookThrough = {};
+    dataToLookThrough =
+      JSON.parse(
+        sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
+      ) || {};
+
+    const dates = Object.keys(dataToLookThrough).reverse();
+
+    outerLoop: for (const date of dates) {
+      const list = dataToLookThrough[date][workoutName];
+      for (let index = 0; index < list.length; index++) {
+        if (list[index]["name"] === exercise.current.value) {
+          let netChange = index + change;
+          if (netChange < 0) {
+            netChange = index;
+          }
+          if (netChange >= list.length) {
+            netChange = 0;
+          }
+          exercise.current.value = list[netChange]["name"];
+          reps.current.value = list[netChange]["reps"];
+          sets.current.value = list[netChange]["sets"];
+          weight.current.value = list[netChange]["weight"];
+          break outerLoop;
+        }
+      }
+    }
+    /*
     outerLoop: for (const date of dates) {
       const workouts = Object.keys(dataToLookThrough[date]).reverse();
       for (const workout of workouts) {
-        const exercisesList = dataToLookThrough[date][workout];
-        for (let index = 0; index < exercisesList.length; index++) {
-          if (workout === workoutName) {
+        if (workout === workoutName) {
+          const exercisesList = dataToLookThrough[date][workout];
+          for (let index = 0; index < exercisesList.length; index++) {
             if (exercisesList[index]["name"] === exercise.current.value) {
               let netChange = index + change;
               if (netChange < 0) {
@@ -446,6 +524,7 @@ function Record() {
         }
       }
     }
+    */
   }
   function handleExerciseNameChange() {
     if (typingTimeout) clearTimeout(typingTimeout);
@@ -460,27 +539,41 @@ function Record() {
   useEffect(() => {
     if (workoutNameSet) {
       let dataToLookThrough = {};
-      if (!privateBrowsing) {
-        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-      } else {
-        dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
-      }
+      dataToLookThrough =
+        JSON.parse(
+          sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
+        ) || {};
+
       const dates = Object.keys(dataToLookThrough).reverse();
-      outerLoop: for (const date of dates) {
-        const workouts = Object.keys(dataToLookThrough[date]).reverse();
-        for (const workout of workouts) {
-          const exercisesList = dataToLookThrough[date][workout];
-          for (const exerciseCur of exercisesList) {
-            if (workout === workoutName) {
-              exercise.current.value = exerciseCur["name"];
-              reps.current.value = exerciseCur["reps"];
-              sets.current.value = exerciseCur["sets"];
-              weight.current.value = exerciseCur["weight"];
-              break outerLoop;
+
+      for (const date of dates) {
+        const workouts = Object.keys(dataToLookThrough[date]);
+        if (workoutName in workouts) {
+          const workout = dataToLookThrough[date][workoutName][0];
+          exercise.current.value = workout["name"];
+          reps.current.value = workout["reps"];
+          sets.current.value = workout["sets"];
+          weight.current.value = workout["weight"];
+          break;
+        }
+      }
+      /*
+        outerLoop: for (const date of dates) {
+          const workouts = Object.keys(dataToLookThrough[date]).reverse();
+          for (const workout of workouts) {
+            const exercisesList = dataToLookThrough[date][workout];
+            for (const exerciseCur of exercisesList) {
+              if (workout === workoutName) {
+                exercise.current.value = exerciseCur["name"];
+                reps.current.value = exerciseCur["reps"];
+                sets.current.value = exerciseCur["sets"];
+                weight.current.value = exerciseCur["weight"];
+                break outerLoop;
+              }
             }
           }
         }
-      }
+      */
     }
   }, [workoutNameSet, workoutName, privateBrowsing]);
   return (
