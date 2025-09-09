@@ -1,6 +1,6 @@
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 
-async function getCookieFromBrowser() {
+async function getCSRFToken() {
   const fetchTheData = await fetch(`${intialBackendString}/getToken/`, {
     method: "GET",
     credentials: "include",
@@ -87,7 +87,7 @@ export async function User() {
   } while (loop);
 
   const data = { username: Username, passkey: passkey };
-  const csrftoken = await getCookieFromBrowser();
+  const csrftoken = await getCSRFToken();
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
@@ -107,7 +107,7 @@ export async function User() {
 }
 export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
-  const csrftoken = await getCookieFromBrowser();
+  const csrftoken = await getCSRFToken();
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
