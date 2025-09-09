@@ -1,5 +1,5 @@
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
-
+import { getCookieFromBrowser } from "./auth.js";
 function isPrivateBrowsing() {
   try {
     localStorage.setItem("__test__", "1");
@@ -50,13 +50,13 @@ export async function User() {
   const Username = prompt("Enter username: ");
   const passkey = prompt("Enter passkey: ");
   const data = { username: Username, passkey: passkey };
+  const csrftoken = getCookieFromBrowser();
+  sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
     console.log("Logged in");
     const sessionid = user["sessionid"];
-    const csrftoken = user["csrftoken"];
     sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
-    sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
     if (!isPrivateBrowsing()) {
       localStorage.setItem("username", JSON.stringify(user["username"]));
       localStorage.setItem("passkey", JSON.stringify(user["passkey"]));
@@ -70,12 +70,12 @@ export async function User() {
 }
 export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
+  const csrftoken = getCookieFromBrowser();
+  sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
     const sessionid = user["sessionid"];
-    const csrftoken = user["csrftoken"];
     sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
-    sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
     console.log("Login worked");
   } else {
     console.log("Login failed");
