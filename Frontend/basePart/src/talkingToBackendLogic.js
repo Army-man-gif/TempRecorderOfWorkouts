@@ -1,5 +1,15 @@
 import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
+
+function isPrivateBrowsing() {
+  try {
+    localStorage.setItem("__test__", "1");
+    localStorage.removeItem("__test__");
+    return false;
+  } catch {
+    return true;
+  }
+}
 export async function SendData(url, data = {}) {
   let response;
   const token = await getCookieFromBrowser();
@@ -39,8 +49,13 @@ export async function User() {
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
     console.log("Logged in");
-    localStorage.setItem("username", JSON.stringify(user["username"]));
-    localStorage.setItem("passkey", JSON.stringify(user["passkey"]));
+    if (!isPrivateBrowsing()) {
+      localStorage.setItem("username", JSON.stringify(user["username"]));
+      localStorage.setItem("passkey", JSON.stringify(user["passkey"]));
+    } else {
+      sessionStorage.setItem("username", JSON.stringify(user["username"]));
+      sessionStorage.setItem("passkey", JSON.stringify(user["passkey"]));
+    }
   } else {
     console.log("Login failed");
   }
@@ -56,7 +71,14 @@ export async function justLogin(name, passkey) {
 }
 
 export async function batchupdateExercise() {
-  const stored = JSON.parse(localStorage.getItem("workouts")) || {};
+  let stored = {};
+  let privateBrowsing = false;
+  if (!isPrivateBrowsing()) {
+    stored = JSON.parse(localStorage.getItem("workouts")) || {};
+  } else {
+    stored = JSON.parse(sessionStorage.getItem("workouts")) || {};
+    privateBrowsing = true;
+  }
   const data = { batchUpdate: stored };
   const updateInBulk = await SendData(
     `${intialBackendString}/batchupdateExercise/`,
@@ -64,10 +86,16 @@ export async function batchupdateExercise() {
   );
   if (updateInBulk.message) {
     console.log(updateInBulk.message);
-    localStorage.setItem("batchUpdateSuccess", JSON.stringify(true));
-    localStorage.setItem("workouts", JSON.stringify({}));
+    if (!privateBrowsing) {
+      localStorage.setItem("batchUpdateSuccess", JSON.stringify(true));
+      localStorage.setItem("workouts", JSON.stringify({}));
+    } else {
+      sessionStorage.setItem("workouts", JSON.stringify({}));
+    }
   } else {
-    localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
+    if (!privateBrowsing) {
+      localStorage.setItem("batchUpdateSuccess", JSON.stringify(false));
+    }
   }
 }
 export async function logout() {
