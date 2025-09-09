@@ -74,7 +74,7 @@ export async function User() {
 
   let passkey = "";
   do {
-    passkey = prompt("Enter username: ").trim();
+    passkey = prompt("Enter password: ").trim();
     if (passkey == "") {
       alert("You must enter something");
       loop = true;
