@@ -42,8 +42,12 @@ def GetorMakeUser(request):
                 user.set_password(passkey)
             user.save()
             login(request, user)
+            if not request.session.session_key:
+                request.session.save()
+            sessionid = request.session.session_key
+            csrftoken = get_token(request)
             message = "User created and logged in" if created else "User fetched and logged in"
-            userDataToReturn = {"username":user.username,"passkey":passkey,"status":message}
+            userDataToReturn = {"username":user.username,"passkey":passkey,"sessionid":sessionid,"csrftoken":csrftoken,"status":message}
             return JsonResponse(userDataToReturn)
         except Exception as e:
             traceback.print_exc()
@@ -103,7 +107,11 @@ def loginView(request):
             user = User.objects.get(username=username)
             if(check_password(passkey,user.password)):
                 login(request, user)
-                return JsonResponse({"message":"User logged in"})
+                if not request.session.session_key:
+                    request.session.save()
+                sessionid = request.session.session_key
+                csrftoken = get_token(request)
+                return JsonResponse({"message":"User logged in","sessionid":sessionid,"csrftoken":csrftoken})
             return JsonResponse({"error":"Wrong password"})
         except User.DoesNotExist:
             return JsonResponse({"error": "User does not exist"}, status=404)

@@ -14,5 +14,11 @@ class CustomCsrfMiddleware(CsrfViewMiddleware):
         token_from_header = request.META.get('HTTP_X_CSRFTOKEN')
         if token_from_header:
             request.COOKIES['csrftoken'] = token_from_header
-            print(f"Custom CSRF Middleware hit! Token from header: {token_from_header}")
+            print(f"Custom CSRF Middleware hit!")
+            
+        session_from_header = request.META.get('HTTP_X_SESSIONID')
+        if session_from_header:
+            request.COOKIES['sessionid'] = session_from_header
+            print(f"Custom session Middleware hit!")
+
         return super().process_view(request, callback, callback_args, callback_kwargs)

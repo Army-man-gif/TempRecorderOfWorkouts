@@ -1,4 +1,3 @@
-import { getCookieFromBrowser } from "./auth.js";
 const intialBackendString = "https://workoutsBackend-qta1.onrender.com/records";
 
 function isPrivateBrowsing() {
@@ -10,17 +9,22 @@ function isPrivateBrowsing() {
     return true;
   }
 }
+function authenticationHeaders() {
+  const sessionid = JSON.parse(sessionStorage.getItem("sessionid"));
+  const csrftoken = JSON.parse(sessionStorage.getItem("csrftoken"));
+
+  return {
+    "Content-Type": "application/json",
+    "X-SESSIONID": sessionid || "",
+    "X-CSRFToken": csrftoken || "",
+  };
+}
 export async function SendData(url, data = {}) {
   let response;
-  const token = await getCookieFromBrowser();
-  console.log("token", token);
   try {
     const sendData = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": token,
-      },
+      headers: authenticationHeaders(),
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -49,6 +53,10 @@ export async function User() {
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
     console.log("Logged in");
+    const sessionid = user["sessionid"];
+    const csrftoken = user["csrftoken"];
+    sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
+    sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
     if (!isPrivateBrowsing()) {
       localStorage.setItem("username", JSON.stringify(user["username"]));
       localStorage.setItem("passkey", JSON.stringify(user["passkey"]));
@@ -64,6 +72,10 @@ export async function justLogin(name, passkey) {
   const data = { username: name, passkey: passkey };
   const user = await SendData(`${intialBackendString}/login/`, data);
   if (user.message) {
+    const sessionid = user["sessionid"];
+    const csrftoken = user["csrftoken"];
+    sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
+    sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
     console.log("Login worked");
   } else {
     console.log("Login failed");
