@@ -141,7 +141,7 @@ function Record() {
     }
   }
 
-  // Add exercise helper function
+  // Add exercise helper functions
   function cleanInput(input) {
     const cleaned = input
       .trim()
@@ -500,7 +500,6 @@ function Record() {
     }
   }
   function setDataToIterateState() {
-    // dataToIterateThroughBasedonWorkoutName
     let dataToSave = {};
     let dataToLookThrough = {};
     if (!privateBrowsing) {
@@ -552,29 +551,6 @@ function Record() {
         }
       }
     }
-    /*
-    outerLoop: for (const date of dates) {
-      const workouts = Object.keys(dataToLookThrough[date]).reverse();
-      for (const workout of workouts) {
-        if (workout === workoutName) {
-          const exercisesList = dataToLookThrough[date][workout];
-          for (let index = 0; index < exercisesList.length; index++) {
-            if (exercisesList[index]["name"] === exercise.current.value) {
-              let netChange = index + change;
-              if (netChange < 0) {
-                netChange = index;
-              }
-              exercise.current.value = exercisesList[netChange]["name"];
-              reps.current.value = exercisesList[netChange]["reps"];
-              sets.current.value = exercisesList[netChange]["sets"];
-              weight.current.value = exercisesList[netChange]["weight"];
-              break outerLoop;
-            }
-          }
-        }
-      }
-    }
-    */
   }
   function handleExerciseNameChange() {
     if (typingTimeout) clearTimeout(typingTimeout);
@@ -607,23 +583,6 @@ function Record() {
           break;
         }
       }
-      /*
-        outerLoop: for (const date of dates) {
-          const workouts = Object.keys(dataToLookThrough[date]).reverse();
-          for (const workout of workouts) {
-            const exercisesList = dataToLookThrough[date][workout];
-            for (const exerciseCur of exercisesList) {
-              if (workout === workoutName) {
-                exercise.current.value = exerciseCur["name"];
-                reps.current.value = exerciseCur["reps"];
-                sets.current.value = exerciseCur["sets"];
-                weight.current.value = exerciseCur["weight"];
-                break outerLoop;
-              }
-            }
-          }
-        }
-      */
     }
   }, [workoutNameSet, workoutName, privateBrowsing]);
   return (
