@@ -51,7 +51,7 @@ export async function User() {
   let Username = "";
 
   do {
-    Username = prompt("Enter username: ");
+    Username = prompt("Enter username: ").trim();
     if (Username == "") {
       alert("You must enter something");
       loop = true;
@@ -66,7 +66,7 @@ export async function User() {
 
   let passkey = "";
   do {
-    passkey = prompt("Enter username: ");
+    passkey = prompt("Enter username: ").trim();
     if (passkey == "") {
       alert("You must enter something");
       loop = true;
