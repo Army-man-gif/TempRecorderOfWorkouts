@@ -47,8 +47,30 @@ export async function SendData(url, data = {}) {
 }
 
 export async function User() {
-  const Username = prompt("Enter username: ");
-  const passkey = prompt("Enter passkey: ");
+  let loop = false;
+  let Username = "";
+
+  do {
+    Username = prompt("Enter username: ");
+    if (Username == null || Username == "") {
+      alert("You must enter something");
+      loop = true;
+    } else {
+      loop = false;
+    }
+  } while (loop);
+
+  let passkey = "";
+  do {
+    passkey = prompt("Enter username: ");
+    if (passkey == null || passkey == "") {
+      alert("You must enter something");
+      loop = true;
+    } else {
+      loop = false;
+    }
+  } while (loop);
+
   const data = { username: Username, passkey: passkey };
   const csrftoken = await getCookieFromBrowser();
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
@@ -97,7 +119,6 @@ export async function batchupdateExercise() {
     data,
   );
   if (updateInBulk.message) {
-    console.log(updateInBulk.message);
     if (!privateBrowsing) {
       localStorage.setItem("batchUpdateSuccess", JSON.stringify(true));
       localStorage.setItem("workouts", JSON.stringify({}));
@@ -119,7 +140,6 @@ export async function logout() {
 
 export async function getExercisesofThatDate(date) {
   const data = { date: date };
-  console.log(date);
   const collectingExercises =
     (await SendData(
       `${intialBackendString}/getAllExercisesbasedOnDate/`,
@@ -139,7 +159,6 @@ export async function getAll() {
   const sessionid = JSON.parse(sessionStorage.getItem("sessionid"));
   console.log(sessionid);
   const getItAll = await SendData(`${intialBackendString}/getAll/`);
-  console.log("Raw getAll response:", getItAll);
   if (getItAll) {
     if (getItAll["message"]) {
       console.log("Exercises collected", getItAll["data"]);
