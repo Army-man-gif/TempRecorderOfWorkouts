@@ -148,10 +148,106 @@ function Record() {
       .replace(/\s+/g, " ");
     return cleaned;
   }
+
+  function updatedataToIterateThroughByWorkoutName(
+    wName,
+    dateToChangeWorkoutStateListsWith,
+    ex,
+  ) {
+    const purelyForDisplay =
+      JSON.parse(
+        sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
+      ) || {};
+    const dates = Object.keys(purelyForDisplay);
+    let date = "";
+    for (const curDate of dates) {
+      if (wName in purelyForDisplay[curDate]) {
+        date = curDate;
+      }
+    }
+    if (date === "") {
+      date = LocaldateunFormatted;
+    }
+    if (!(wName in purelyForDisplay[date])) {
+      purelyForDisplay[date][wName] = [];
+    }
+    const changeExerciseIndexinpurelyForDisplay = purelyForDisplay[date][
+      wName
+    ].findIndex((exercise) => exercise.name === ex);
+    if (changeExerciseIndexinpurelyForDisplay >= 0) {
+      purelyForDisplay[date][wName][changeExerciseIndexinpurelyForDisplay] =
+        dateToChangeWorkoutStateListsWith;
+    } else {
+      purelyForDisplay[date][wName].push(dateToChangeWorkoutStateListsWith);
+    }
+    sessionStorage.setItem(
+      "dataToIterateThroughBasedonWorkoutName",
+      JSON.stringify(purelyForDisplay),
+    );
+  }
+  function updateDataPool(wName, dateToChangeWorkoutStateListsWith, ex) {
+    let dataPool = {};
+    if (!privateBrowsing) {
+      dataPool = JSON.parse(localStorage.getItem("data")) || {};
+    } else {
+      dataPool = JSON.parse(sessionStorage.getItem("data")) || {};
+    }
+
+    if (!(LocaldateunFormatted in dataPool)) {
+      dataPool[LocaldateunFormatted] = {};
+    }
+    if (!(wName in dataPool[LocaldateunFormatted])) {
+      dataPool[LocaldateunFormatted][wName] = [];
+    }
+
+    const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
+      wName
+    ].findIndex((exercise) => exercise.name === ex);
+    if (changeExerciseIndexinDataPool >= 0) {
+      dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
+        dateToChangeWorkoutStateListsWith;
+    } else {
+      dataPool[LocaldateunFormatted][wName].push(
+        dateToChangeWorkoutStateListsWith,
+      );
+    }
+
+    if (!privateBrowsing) {
+      localStorage.setItem("data", JSON.stringify(dataPool));
+    } else {
+      sessionStorage.setItem("data", JSON.stringify(dataPool));
+    }
+  }
+  function updateWorkoutStorage(wName, data, ex) {
+    let stored = {};
+    if (!privateBrowsing) {
+      stored = JSON.parse(localStorage.getItem("workouts")) || {};
+    } else {
+      stored = JSON.parse(sessionStorage.getItem("workouts")) || {};
+    }
+    if (!(wName in stored)) {
+      stored[wName] = [];
+    }
+
+    const changeExerciseIndex = stored[wName].findIndex(
+      (exercise) => exercise.exerciseName === ex,
+    );
+    if (changeExerciseIndex >= 0) {
+      stored[wName][changeExerciseIndex] = data;
+    } else {
+      stored[wName].push(data);
+    }
+
+    if (!privateBrowsing) {
+      localStorage.setItem("workouts", JSON.stringify(stored));
+      localStorage.setItem("timezone", JSON.stringify(timezone));
+    } else {
+      sessionStorage.setItem("workouts", JSON.stringify(stored));
+      sessionStorage.setItem("timezone", JSON.stringify(timezone));
+    }
+  }
   async function addExercise() {
     setAdding(true);
-    Localdate = new Date().toISOString();
-    LocaldateunFormatted = convert(Localdate, timezone);
     let areBothDatesSame = false;
     if (curunformattedDate == LocaldateunFormatted) {
       areBothDatesSame = true;
@@ -177,94 +273,14 @@ function Record() {
         sets: s,
         weight: w,
       };
-      const purelyForDisplay =
-        JSON.parse(
-          sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
-        ) || {};
-      const dates = Object.keys(purelyForDisplay);
-      let date = "";
-      for (const curDate of dates) {
-        if (wName in purelyForDisplay[curDate]) {
-          date = curDate;
-        }
-      }
-      if (date === "") {
-        date = LocaldateunFormatted;
-      }
-      if (!(wName in purelyForDisplay[date])) {
-        purelyForDisplay[date][wName] = [];
-      }
-      const changeExerciseIndexinpurelyForDisplay = purelyForDisplay[date][
-        wName
-      ].findIndex((exercise) => exercise.name === ex);
-      if (changeExerciseIndexinpurelyForDisplay >= 0) {
-        purelyForDisplay[date][wName][changeExerciseIndexinpurelyForDisplay] =
-          dateToChangeWorkoutStateListsWith;
-      } else {
-        purelyForDisplay[date][wName].push(dateToChangeWorkoutStateListsWith);
-      }
-      sessionStorage.setItem(
-        "dataToIterateThroughBasedonWorkoutName",
-        JSON.stringify(purelyForDisplay),
+      updatedataToIterateThroughByWorkoutName(
+        wName,
+        dateToChangeWorkoutStateListsWith,
+        ex,
       );
-      let dataPool = {};
-      if (!privateBrowsing) {
-        dataPool = JSON.parse(localStorage.getItem("data")) || {};
-      } else {
-        dataPool = JSON.parse(sessionStorage.getItem("data")) || {};
-      }
+      updateDataPool(wName, dateToChangeWorkoutStateListsWith, ex);
+      updateWorkoutStorage(wName, data, ex);
 
-      if (!(LocaldateunFormatted in dataPool)) {
-        dataPool[LocaldateunFormatted] = {};
-      }
-      if (!(wName in dataPool[LocaldateunFormatted])) {
-        dataPool[LocaldateunFormatted][wName] = [];
-      }
-
-      const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
-        wName
-      ].findIndex((exercise) => exercise.name === ex);
-      if (changeExerciseIndexinDataPool >= 0) {
-        dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
-          dateToChangeWorkoutStateListsWith;
-      } else {
-        dataPool[LocaldateunFormatted][wName].push(
-          dateToChangeWorkoutStateListsWith,
-        );
-      }
-
-      if (!privateBrowsing) {
-        localStorage.setItem("data", JSON.stringify(dataPool));
-      } else {
-        sessionStorage.setItem("data", JSON.stringify(dataPool));
-      }
-
-      let stored = {};
-      if (!privateBrowsing) {
-        stored = JSON.parse(localStorage.getItem("workouts")) || {};
-      } else {
-        stored = JSON.parse(sessionStorage.getItem("workouts")) || {};
-      }
-      if (!(wName in stored)) {
-        stored[wName] = [];
-      }
-
-      const changeExerciseIndex = stored[wName].findIndex(
-        (exercise) => exercise.exerciseName === ex,
-      );
-      if (changeExerciseIndex >= 0) {
-        stored[wName][changeExerciseIndex] = data;
-      } else {
-        stored[wName].push(data);
-      }
-
-      if (!privateBrowsing) {
-        localStorage.setItem("workouts", JSON.stringify(stored));
-        localStorage.setItem("timezone", JSON.stringify(timezone));
-      } else {
-        sessionStorage.setItem("workouts", JSON.stringify(stored));
-        sessionStorage.setItem("timezone", JSON.stringify(timezone));
-      }
       setAdding(false);
       pExercise.current = ex;
       pReps.current = r;
