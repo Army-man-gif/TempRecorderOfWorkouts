@@ -6,7 +6,6 @@ async function getCSRFToken() {
     credentials: "include",
   });
   const cookiesData = await fetchTheData.json();
-  console.log("Fetched CSRF token:", cookiesData.csrftoken);
   return cookiesData.csrftoken;
 }
 function isPrivateBrowsing() {
@@ -91,7 +90,6 @@ export async function User() {
   sessionStorage.setItem("csrftoken", JSON.stringify(csrftoken));
   const user = await SendData(`${intialBackendString}/GetorMakeUser/`, data);
   if (user["status"]) {
-    console.log("Logged in");
     const sessionid = user["sessionid"];
     sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
     if (!isPrivateBrowsing()) {
@@ -113,7 +111,6 @@ export async function justLogin(name, passkey) {
   if (user.message) {
     const sessionid = user["sessionid"];
     sessionStorage.setItem("sessionid", JSON.stringify(sessionid));
-    console.log("Login worked");
   } else {
     console.log("Login failed");
   }
@@ -172,12 +169,9 @@ export async function getExercisesofThatDate(date) {
 
 export async function getAll() {
   const sessionid = JSON.parse(sessionStorage.getItem("sessionid"));
-  console.log(sessionid);
   const getItAll = await SendData(`${intialBackendString}/getAll/`);
   if (getItAll) {
     if (getItAll["message"]) {
-      console.log("Exercises collected", getItAll["data"]);
-
       return getItAll["data"];
     }
   } else {

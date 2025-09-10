@@ -23,6 +23,12 @@ function Record() {
   const [privateBrowsing, setPrivateBrowsing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [backExerciseText, setBackExerciseText] = useState(
+    "◄ Go back an exercise",
+  );
+  const [forwardExerciseText, setForwardExerciseText] = useState(
+    "Go to next exercise ►",
+  );
   const exercise = useRef(null);
   const reps = useRef(null);
   const sets = useRef(null);
@@ -484,7 +490,8 @@ function Record() {
       JSON.stringify(dataToSave),
     );
   }
-  function navigateExercise(change) {
+  function CustomDisplayListBasedonWorkout() {
+    let toReturn = [];
     let dataToLookThrough = {};
     if (!privateBrowsing) {
       dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
@@ -493,45 +500,41 @@ function Record() {
     }
 
     const dates = Object.keys(dataToLookThrough).reverse();
-    let indexForSecondLogic = 0;
-    let enterSecondLogic = false;
-    outerLoop: for (const date of dates) {
-      const list = dataToLookThrough[date][workoutName];
-      for (let index = 0; index < list.length; index++) {
-        if (list[index]["name"] === exercise.current.value) {
-          let netChange = index + change;
-          if (netChange < 0) {
-            netChange = index;
-          }
-          if (netChange >= list.length) {
-            indexForSecondLogic = netChange - list.length;
-            enterSecondLogic = true;
-          }
-          if (!enterSecondLogic) {
-            exercise.current.value = list[netChange]["name"];
-            reps.current.value = list[netChange]["reps"];
-            sets.current.value = list[netChange]["sets"];
-            weight.current.value = list[netChange]["weight"];
-          }
-          break outerLoop;
+    for (const date of dates) {
+      const workouts = Object.keys(dataToLookThrough[date]);
+      if (workouts.includes(workoutName)) {
+        const list = dataToLookThrough[date][workoutName];
+        for (const exercise of list) {
+          toReturn.push(exercise);
         }
       }
     }
-    if (enterSecondLogic) {
-      if (dates.includes(LocaldateunFormatted)) {
-        if (
-          Object.keys(dataToLookThrough[LocaldateunFormatted]).includes(
-            workoutName,
-          )
-        ) {
-          const listSecond =
-            dataToLookThrough[LocaldateunFormatted][workoutName];
-          if (listSecond && listSecond[indexForSecondLogic]) {
-            exercise.current.value = listSecond[indexForSecondLogic]["name"];
-            reps.current.value = listSecond[indexForSecondLogic]["reps"];
-            sets.current.value = listSecond[indexForSecondLogic]["sets"];
-            weight.current.value = listSecond[indexForSecondLogic]["weight"];
+    return toReturn;
+  }
+  function navigateExercise(change) {
+    const exerciseList = CustomDisplayListBasedonWorkout();
+    if (exerciseList.length > 0) {
+      for (let count = 0; count < exerciseList.length; count++) {
+        let netChange = count + change;
+        if (netChange >= exerciseList.length || netChange < 0) {
+          netChange = 0;
+          if (netChange < 0) {
+            setBackExerciseText("Click to go to last exercise");
           }
+          if (netChange >= exerciseList.length) {
+            setForwardExerciseText("Click to go to first exercise");
+          }
+        }
+        setBackExerciseText("◄ Go back an exercise");
+        setForwardExerciseText("Go to next exercise ►");
+
+        if (exerciseList[count]["name"] === exercise.current.value) {
+          exercise.current.value = exerciseList[netChange]["name"] || "";
+          reps.current.value = exerciseList[netChange]["reps"] || "";
+          sets.current.value = exerciseList[netChange]["sets"] || "";
+          reps.current.value = exerciseList[netChange]["reps"] || "";
+          weight.current.value = exerciseList[netChange]["weight"] || "";
+          break;
         }
       }
     }
@@ -548,27 +551,16 @@ function Record() {
   }
   useEffect(() => {
     if (workoutNameSet) {
-      let dataToLookThrough = {};
-      if (!privateBrowsing) {
-        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-      } else {
-        dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
-      }
-      const dates = Object.keys(dataToLookThrough).reverse();
-      for (const date of dates) {
-        const workouts = Object.keys(dataToLookThrough[date]);
-        console.log(workouts);
-        if (workouts.includes(workoutName)) {
-          const workout = dataToLookThrough[date][workoutName][0];
-          exercise.current.value = workout["name"];
-          reps.current.value = workout["reps"];
-          sets.current.value = workout["sets"];
-          weight.current.value = workout["weight"];
-          break;
-        }
+      const exerciseList = CustomDisplayListBasedonWorkout();
+      if (exerciseList.length > 0) {
+        exercise.current.value = exerciseList[0]["name"] || "";
+        reps.current.value = exerciseList[0]["reps"] || "";
+        sets.current.value = exerciseList[0]["sets"] || "";
+        reps.current.value = exerciseList[0]["reps"] || "";
+        weight.current.value = exerciseList[0]["weight"] || "";
       }
     }
-  }, [workoutNameSet, workoutName, privateBrowsing]);
+  }, [workoutNameSet]);
   return (
     <>
       <div className="flexContainer moreGap">
@@ -734,10 +726,10 @@ function Record() {
               </button>
               <div className="flexContainer spaceNicely">
                 <button onClick={() => handleAction("ExerciseFororBack", -1)}>
-                  ◄ Go back an exercise
+                  {backExerciseText}
                 </button>
                 <button onClick={() => handleAction("ExerciseFororBack", 1)}>
-                  Go to next exercise ►
+                  {forwardExerciseText}
                 </button>
               </div>
             </>
