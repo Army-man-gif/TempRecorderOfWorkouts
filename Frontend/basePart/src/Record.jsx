@@ -262,6 +262,28 @@ function Record() {
       };
     });
   }
+  function isInteger(str) {
+    const num = Number(str);
+    return Number.isInteger(num) || str.trim() == "";
+  }
+  function adjustOtherThreeFieldValues(r, s, w) {
+    const rInteger = isInteger(r);
+    const sInteger = isInteger(s);
+    const wInteger = isInteger(w);
+    if (!rInteger) {
+      r = pReps.current;
+      reps.current.value = r;
+    }
+    if (!sInteger) {
+      s = pSets.current;
+      sets.current.value = s;
+    }
+    if (!wInteger) {
+      w = pWeight.current;
+      weight.current.value = w;
+    }
+    return { r, s, w };
+  }
   function setupExercise(bool) {
     setAdding(true);
     let areBothDatesSame = false;
@@ -271,9 +293,10 @@ function Record() {
     const wName = workoutName;
     setWorkoutName(wName);
     let ex = normalizeInput(exercise.current?.value);
-    const r = normalizeInput(reps.current?.value);
-    const s = normalizeInput(sets.current?.value);
-    const w = normalizeInput(weight.current?.value);
+    let rOld = normalizeInput(reps.current?.value);
+    let sOld = normalizeInput(sets.current?.value);
+    let wOld = normalizeInput(weight.current?.value);
+    const { r, s, w } = adjustOtherThreeFieldValues(rOld, sOld, wOld);
     if (bool) {
       const { target, rating } = isInListForThatWorkoutName(ex);
       if (rating >= 0.6) {
