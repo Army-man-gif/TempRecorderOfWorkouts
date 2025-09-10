@@ -110,12 +110,9 @@ function Record() {
   }, []);
 
   function bestMatch(inputValue, list) {
-    console.log("val:", inputValue, "list", list);
     const closestMatch = stringSimilarity.findBestMatch(inputValue, list);
-    console.log("closest", closestMatch);
     const target = closestMatch.bestMatch.target;
     const rating = closestMatch.bestMatch.rating;
-    console.log("target", target, "rating", rating);
     return { target, rating };
   }
   function isInListForThatWorkoutName(ex) {
@@ -265,7 +262,7 @@ function Record() {
       };
     });
   }
-  function setupExercise() {
+  function setupExercise(bool) {
     setAdding(true);
     let areBothDatesSame = false;
     if (curunformattedDate == LocaldateunFormatted) {
@@ -277,15 +274,16 @@ function Record() {
     const r = normalizeInput(reps.current?.value);
     const s = normalizeInput(sets.current?.value);
     const w = normalizeInput(weight.current?.value);
-    const { target, rating } = isInListForThatWorkoutName(ex);
-    console.log("rating", rating);
-    if (rating >= 0.6) {
-      const ask = confirm(
-        `Did you mean ${target}, because it's quite similar. Click OK to change to ${target} or cancel to keep your name`,
-      );
-      if (ask) {
-        ex = normalizeInput(target);
-        exercise.current.value = target;
+    if (bool) {
+      const { target, rating } = isInListForThatWorkoutName(ex);
+      if (rating >= 0.6) {
+        const ask = confirm(
+          `Did you mean ${target}, because it's quite similar. Click OK to change to ${target} or cancel to keep your name`,
+        );
+        if (ask) {
+          ex = normalizeInput(target);
+          exercise.current.value = target;
+        }
       }
     }
     return { areBothDatesSame, wName, ex, r, s, w };
@@ -315,8 +313,8 @@ function Record() {
     pWeight.current = w;
   }
   // Add exercise function
-  async function addExercise() {
-    const { areBothDatesSame, wName, ex, r, s, w } = setupExercise();
+  async function addExercise(bool = false) {
+    const { areBothDatesSame, wName, ex, r, s, w } = setupExercise(bool);
     if (ex && r && s && w && wName) {
       const { data, dateToChangeWorkoutStateListsWith } = buildExerciseData(
         wName,
@@ -509,10 +507,10 @@ function Record() {
   }
   function debouncedExerciseChange() {
     if (typingTimeout) clearTimeout(typingTimeout);
-
+    const val = true;
     // set a new timer
     const timeout = setTimeout(() => {
-      addExercise();
+      addExercise(val);
     }, 1500);
 
     setTypingTimeout(timeout);
@@ -642,7 +640,7 @@ function Record() {
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false)}
                     ref={reps}
                     id="addReps"
                     type="text"
@@ -654,7 +652,7 @@ function Record() {
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false)}
                     ref={sets}
                     id="addSets"
                     type="text"
@@ -666,7 +664,7 @@ function Record() {
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false)}
                     ref={weight}
                     id="addWeight"
                     type="text"
