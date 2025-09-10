@@ -138,41 +138,6 @@ function Record() {
       .replace(/\s+/g, " ");
     return cleaned;
   }
-  function saveIterData(wName, dateToChangeWorkoutStateListsWith, ex) {
-    const purelyForDisplay =
-      JSON.parse(
-        sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
-      ) || {};
-    const dates = Object.keys(purelyForDisplay);
-    let date = "";
-    for (const curDate of dates) {
-      if (wName in purelyForDisplay[curDate]) {
-        date = curDate;
-      }
-    }
-    if (date === "") {
-      date = LocaldateunFormatted;
-    }
-    if (!(date in purelyForDisplay)) {
-      purelyForDisplay[date] = {};
-    }
-    if (!(wName in purelyForDisplay[date])) {
-      purelyForDisplay[date][wName] = [];
-    }
-    const changeExerciseIndexinpurelyForDisplay = purelyForDisplay[date][
-      wName
-    ].findIndex((exercise) => exercise.name === ex);
-    if (changeExerciseIndexinpurelyForDisplay >= 0) {
-      purelyForDisplay[date][wName][changeExerciseIndexinpurelyForDisplay] =
-        dateToChangeWorkoutStateListsWith;
-    } else {
-      purelyForDisplay[date][wName].push(dateToChangeWorkoutStateListsWith);
-    }
-    sessionStorage.setItem(
-      "dataToIterateThroughBasedonWorkoutName",
-      JSON.stringify(purelyForDisplay),
-    );
-  }
   function saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex) {
     let dataPool = {};
     if (!privateBrowsing) {
@@ -332,7 +297,6 @@ function Record() {
         s,
         w,
       );
-      //saveIterData(wName, dateToChangeWorkoutStateListsWith, ex);
       saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex);
       saveWorkoutData(wName, data, ex);
 
@@ -465,30 +429,6 @@ function Record() {
     } else {
       sessionStorage.setItem("workoutNamesList", JSON.stringify(names));
     }
-  }
-  function cacheIterData() {
-    let dataToSave = {};
-    let dataToLookThrough = {};
-    if (!privateBrowsing) {
-      dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
-    } else {
-      dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
-    }
-    const dates = Object.keys(dataToLookThrough).reverse();
-    for (const date of dates) {
-      const workouts = Object.keys(dataToLookThrough[date]).reverse();
-      for (const workout of workouts) {
-        if (!dataToSave[date]) {
-          dataToSave[date] = {};
-        }
-        const exercisesList = dataToLookThrough[date][workout] || [];
-        dataToSave[date][workout] = exercisesList;
-      }
-    }
-    sessionStorage.setItem(
-      "dataToIterateThroughBasedonWorkoutName",
-      JSON.stringify(dataToSave),
-    );
   }
   function CustomDisplayListBasedonWorkout() {
     let toReturn = [];
