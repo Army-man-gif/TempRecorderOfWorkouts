@@ -279,7 +279,7 @@ function Record() {
     const w = normalizeInput(weight.current?.value);
     const { target, rating } = isInListForThatWorkoutName(ex);
     console.log("rating", rating);
-    if (rating >= 0.65) {
+    if (rating >= 0.6) {
       const ask = confirm(
         `Did you mean ${target}, because it's quite similar. Click OK to change to ${target} or cancel to keep your name`,
       );
