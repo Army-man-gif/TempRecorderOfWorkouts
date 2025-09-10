@@ -6,6 +6,8 @@ import {
   getAll,
 } from "./talkingToBackendLogic.js";
 import React, { useRef, useEffect, useState } from "react";
+import stringSimilarity from "string-similarity";
+
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [typingTimeout, setTypingTimeout] = useState(null);
@@ -107,6 +109,21 @@ function Record() {
     load();
   }, []);
 
+  function bestMatch(inputValue, list) {
+    console.log("val:", inputValue, "list", list);
+    const closestMatch = stringSimilarity.findBestMatch(inputValue, list);
+    console.log("closest", closestMatch);
+    const target = closestMatch.bestMatch.target;
+    const rating = closestMatch.bestMatch.rating;
+    console.log("target", target, "rating", rating);
+    return { target, rating };
+  }
+  function isInListForThatWorkoutName(ex) {
+    const listOfExerciseObjects = CustomDisplayListBasedonWorkout();
+    const justTheNames = listOfExerciseObjects.map((ex) => ex.name);
+    const { target, rating } = bestMatch(ex, justTheNames);
+    return { target, rating };
+  }
   function checkPrivateBrowsing() {
     try {
       localStorage.setItem("__test__", "1");
@@ -256,10 +273,21 @@ function Record() {
     }
     const wName = workoutName;
     setWorkoutName(wName);
-    const ex = normalizeInput(exercise.current?.value);
+    let ex = normalizeInput(exercise.current?.value);
     const r = normalizeInput(reps.current?.value);
     const s = normalizeInput(sets.current?.value);
     const w = normalizeInput(weight.current?.value);
+    const { target, rating } = isInListForThatWorkoutName(ex);
+    console.log("rating", rating);
+    if (rating >= 0.65) {
+      const ask = confirm(
+        `Did you mean ${target}, because it's quite similar. Click OK to change to ${target} or cancel to keep your name`,
+      );
+      if (ask) {
+        ex = normalizeInput(target);
+        exercise.current.value = target;
+      }
+    }
     return { areBothDatesSame, wName, ex, r, s, w };
   }
   function buildExerciseData(wName, ex, r, s, w) {
