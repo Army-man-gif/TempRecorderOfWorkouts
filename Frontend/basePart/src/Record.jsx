@@ -123,20 +123,6 @@ function Record() {
     const day = parts.find((p) => p.type === "day").value;
     return `${year}-${month}-${day}`;
   }
-  function restoreField(field) {
-    if (field == "exercise") {
-      exercise.current.value = pExercise.current;
-    }
-    if (field == "sets") {
-      sets.current.value = pSets.current;
-    }
-    if (field == "reps") {
-      reps.current.value = pReps.current;
-    }
-    if (field == "weight") {
-      weight.current.value = pWeight.current;
-    }
-  }
   // Add exercise helper functions
   function normalizeInput(input) {
     const cleaned = input
@@ -340,7 +326,7 @@ function Record() {
         s,
         w,
       );
-      saveIterData(wName, dateToChangeWorkoutStateListsWith, ex);
+      //saveIterData(wName, dateToChangeWorkoutStateListsWith, ex);
       saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex);
       saveWorkoutData(wName, data, ex);
 
@@ -357,9 +343,6 @@ function Record() {
       navigateExercise(data);
     }
     if (param === "changeWorkoutNameHasBeenSet") {
-      if (workoutName) {
-        cacheIterData();
-      }
       if (workoutName && !workoutNamesList.includes(workoutName)) {
         const extended = [...workoutNamesList, workoutName];
         setWorkoutNamesList(extended);
@@ -394,7 +377,6 @@ function Record() {
     if (param === "cancelExercise") {
       setWorkoutNameSet(false);
       setworkoutStarted(true);
-      restoreField("workoutName");
     }
     if (param === "started") {
       setworkoutStarted(true);
@@ -419,9 +401,6 @@ function Record() {
       if (date != curunformattedDate) {
         loadSpecificList(date);
       }
-    }
-    if (param === "restore") {
-      restoreField(data);
     }
   }
   function loadSpecificList(date) {
@@ -507,13 +486,15 @@ function Record() {
   }
   function navigateExercise(change) {
     let dataToLookThrough = {};
-    dataToLookThrough =
-      JSON.parse(
-        sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
-      ) || {};
+    if (!privateBrowsing) {
+      dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+    } else {
+      dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
+    }
 
     const dates = Object.keys(dataToLookThrough).reverse();
-
+    let indexForSecondLogic = 0;
+    let enterSecondLogic = false;
     outerLoop: for (const date of dates) {
       const list = dataToLookThrough[date][workoutName];
       for (let index = 0; index < list.length; index++) {
@@ -523,13 +504,34 @@ function Record() {
             netChange = index;
           }
           if (netChange >= list.length) {
-            netChange = 0;
+            indexForSecondLogic = netChange - list.length;
+            enterSecondLogic = true;
           }
-          exercise.current.value = list[netChange]["name"];
-          reps.current.value = list[netChange]["reps"];
-          sets.current.value = list[netChange]["sets"];
-          weight.current.value = list[netChange]["weight"];
+          if (!enterSecondLogic) {
+            exercise.current.value = list[netChange]["name"];
+            reps.current.value = list[netChange]["reps"];
+            sets.current.value = list[netChange]["sets"];
+            weight.current.value = list[netChange]["weight"];
+          }
           break outerLoop;
+        }
+      }
+    }
+    if (enterSecondLogic) {
+      if (dates.includes(LocaldateunFormatted)) {
+        if (
+          Object.keys(dataToLookThrough[LocaldateunFormatted]).includes(
+            workoutName,
+          )
+        ) {
+          const listSecond =
+            dataToLookThrough[LocaldateunFormatted][workoutName];
+          if (listSecond && listSecond[indexForSecondLogic]) {
+            exercise.current.value = listSecond[indexForSecondLogic]["name"];
+            reps.current.value = listSecond[indexForSecondLogic]["reps"];
+            sets.current.value = listSecond[indexForSecondLogic]["sets"];
+            weight.current.value = listSecond[indexForSecondLogic]["weight"];
+          }
         }
       }
     }
@@ -547,15 +549,15 @@ function Record() {
   useEffect(() => {
     if (workoutNameSet) {
       let dataToLookThrough = {};
-      dataToLookThrough =
-        JSON.parse(
-          sessionStorage.getItem("dataToIterateThroughBasedonWorkoutName"),
-        ) || {};
-
+      if (!privateBrowsing) {
+        dataToLookThrough = JSON.parse(localStorage.getItem("data")) || {};
+      } else {
+        dataToLookThrough = JSON.parse(sessionStorage.getItem("data")) || {};
+      }
       const dates = Object.keys(dataToLookThrough).reverse();
-
       for (const date of dates) {
         const workouts = Object.keys(dataToLookThrough[date]);
+        console.log(workouts);
         if (workouts.includes(workoutName)) {
           const workout = dataToLookThrough[date][workoutName][0];
           exercise.current.value = workout["name"];
@@ -684,6 +686,7 @@ function Record() {
                     ref={reps}
                     id="addReps"
                     type="text"
+                    placeholder="Reps..."
                   ></input>
                 </div>
                 <br></br>
@@ -695,6 +698,7 @@ function Record() {
                     ref={sets}
                     id="addSets"
                     type="text"
+                    placeholder="Sets..."
                   ></input>
                 </div>
                 <br></br>
@@ -706,6 +710,7 @@ function Record() {
                     ref={weight}
                     id="addWeight"
                     type="text"
+                    placeholder="Weight..."
                     disabled={adding && !loggedIn}
                   ></input>
                 </div>
