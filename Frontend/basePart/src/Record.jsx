@@ -105,12 +105,7 @@ function Record() {
       }
 
       if (Object.keys(dataToLookThrough).length === 0) {
-        const info = (await getAll()) || {};
-        if (!privateBrowsingLocalFlag) {
-          localStorage.setItem("data", JSON.stringify(info));
-        } else {
-          sessionStorage.setItem("data", JSON.stringify(info));
-        }
+        await getAll();
         loadWorkoutNames();
         loadTodayList();
       }

@@ -168,13 +168,20 @@ export async function getExercisesofThatDate(date) {
 }
 
 export async function getAll() {
-  const sessionid = JSON.parse(sessionStorage.getItem("sessionid"));
-  const getItAll = await SendData(`${intialBackendString}/getAll/`);
+  const getItAll = (await SendData(`${intialBackendString}/getAll/`)) || {};
   if (getItAll) {
     if (getItAll["message"]) {
-      return getItAll["data"];
+      if (!isPrivateBrowsing()) {
+        localStorage.setItem("data", JSON.stringify(getItAll["data"]));
+      } else {
+        sessionStorage.setItem("data", JSON.stringify(getItAll["data"]));
+      }
+    } else {
+      if (!isPrivateBrowsing()) {
+        localStorage.setItem("data", JSON.stringify({}));
+      } else {
+        sessionStorage.setItem("data", JSON.stringify({}));
+      }
     }
-  } else {
-    return {};
   }
 }
