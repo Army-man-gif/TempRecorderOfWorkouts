@@ -31,6 +31,7 @@ function Record() {
   const [privateBrowsing, setPrivateBrowsing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [cleared, setCleared] = useState(0);
   const [exerciseNames, setExerciseNames] = useState([]);
   const [backExerciseText, setBackExerciseText] = useState(
     "◄ Go back an exercise",
@@ -561,6 +562,10 @@ function Record() {
     }
     return toReturn;
   }
+  function clearExerciseField() {
+    exercise.current.value = "";
+    setCleared((prev) => prev + 1);
+  }
   function navigateExercise(change) {
     const exerciseList = CustomDisplayListBasedonWorkout();
     if (exerciseList.length > 0) {
@@ -602,12 +607,14 @@ function Record() {
   }
   function exerciseNameChanged() {
     let ex = normalizeInput(exercise.current?.value);
-    const { target, rating } = isInListForThatWorkoutName(ex);
-    if (rating >= 0.6 && rating < 1) {
-      setTarget(target);
-      setOpen(true);
-    } else {
-      addExercise();
+    if (ex != "") {
+      const { target, rating } = isInListForThatWorkoutName(ex);
+      if (rating >= 0.6 && rating < 1) {
+        setTarget(target);
+        setOpen(true);
+      } else {
+        addExercise();
+      }
     }
   }
   function debouncedExerciseChange() {
@@ -768,6 +775,13 @@ function Record() {
                     type="text"
                     placeholder="Exercise name..."
                   ></input>
+                  <Button
+                    onClick={clearExerciseField}
+                    type="button"
+                    id="clearButton"
+                  >
+                    Clear
+                  </Button>
                   <datalist id="exerciseNameOptions">
                     <option value="">-- Select an exercise --</option>
                     {exerciseNames.map((opt, idx) => (
