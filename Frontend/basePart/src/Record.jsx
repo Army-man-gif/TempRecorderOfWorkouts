@@ -379,7 +379,7 @@ function Record() {
     pWeight.current = w;
   }
   // Add exercise function
-  async function addExercise(replace = false, target = "") {
+  async function addExercise(replace, target) {
     const { areBothDatesSame, wName, ex, r, s, w } = setupExercise();
     if (ex && r && s && w && wName) {
       const { data, dateToChangeWorkoutStateListsWith } = buildExerciseData(
@@ -781,7 +781,7 @@ function Record() {
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false, "")}
                     ref={reps}
                     id="addReps"
                     type="text"
@@ -793,7 +793,7 @@ function Record() {
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false, "")}
                     ref={sets}
                     id="addSets"
                     type="text"
@@ -805,7 +805,7 @@ function Record() {
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
                   <input
-                    onChange={addExercise}
+                    onChange={() => addExercise(false, "")}
                     ref={weight}
                     id="addWeight"
                     type="text"
