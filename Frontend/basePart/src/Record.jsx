@@ -161,7 +161,13 @@ function Record() {
       .replace(/\s+/g, " ");
     return cleaned;
   }
-  function saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex) {
+  function saveDataStore(
+    wName,
+    dateToChangeWorkoutStateListsWith,
+    ex,
+    replace,
+    target,
+  ) {
     let dataPool = {};
     if (!privateBrowsing) {
       dataPool = JSON.parse(localStorage.getItem("data")) || {};
@@ -175,10 +181,16 @@ function Record() {
     if (!(wName in dataPool[LocaldateunFormatted])) {
       dataPool[LocaldateunFormatted][wName] = [];
     }
-
-    const changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
-      wName
-    ].findIndex((exercise) => exercise.name === ex);
+    let changeExerciseIndexinDataPool = -1;
+    if (replace) {
+      changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
+        wName
+      ].findIndex((exercise) => exercise.name === target);
+    } else {
+      changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
+        wName
+      ].findIndex((exercise) => exercise.name === ex);
+    }
     if (changeExerciseIndexinDataPool >= 0) {
       dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
         dateToChangeWorkoutStateListsWith;
@@ -194,7 +206,7 @@ function Record() {
       sessionStorage.setItem("data", JSON.stringify(dataPool));
     }
   }
-  function saveWorkoutData(wName, data, ex) {
+  function saveWorkoutData(wName, data, ex, replace, target) {
     let stored = {};
     if (!privateBrowsing) {
       stored = JSON.parse(localStorage.getItem("workouts")) || {};
@@ -205,9 +217,16 @@ function Record() {
       stored[wName] = [];
     }
 
-    const changeExerciseIndex = stored[wName].findIndex(
-      (exercise) => exercise.exerciseName === ex,
-    );
+    let changeExerciseIndex = -1;
+    if (replace) {
+      changeExerciseIndex = stored[wName].findIndex(
+        (exercise) => exercise.name === target,
+      );
+    } else {
+      changeExerciseIndex = stored[wName].findIndex(
+        (exercise) => exercise.name === ex,
+      );
+    }
     if (changeExerciseIndex >= 0) {
       stored[wName][changeExerciseIndex] = data;
     } else {
@@ -222,14 +241,26 @@ function Record() {
       sessionStorage.setItem("timezone", JSON.stringify(timezone));
     }
   }
-  function saveTodayList(wName, dateToChangeWorkoutStateListsWith, ex) {
+  function saveTodayList(
+    wName,
+    dateToChangeWorkoutStateListsWith,
+    ex,
+    replace,
+    target,
+  ) {
     setTodayWorkoutList((prev) => {
       const existingList = prev[wName] ?? [];
 
-      const changeExerciseIndex = existingList.findIndex(
-        (exercise) => exercise.name === ex,
-      );
-
+      let changeExerciseIndex = -1;
+      if (replace) {
+        changeExerciseIndex = existingList.findIndex(
+          (exercise) => exercise.name === target,
+        );
+      } else {
+        changeExerciseIndex = existingList.findIndex(
+          (exercise) => exercise.name === ex,
+        );
+      }
       let newList;
 
       if (changeExerciseIndex >= 0) {
@@ -247,13 +278,26 @@ function Record() {
       };
     });
   }
-  function saveSpecificList(wName, dateToChangeWorkoutStateListsWith, ex) {
+  function saveSpecificList(
+    wName,
+    dateToChangeWorkoutStateListsWith,
+    ex,
+    replace,
+    target,
+  ) {
     setSpecificWorkoutList((prev2) => {
       const existingList = prev2[wName] ?? [];
 
-      const changeExerciseIndex = existingList.findIndex(
-        (exercise) => exercise.name === ex,
-      );
+      let changeExerciseIndex = -1;
+      if (replace) {
+        changeExerciseIndex = existingList.findIndex(
+          (exercise) => exercise.name === target,
+        );
+      } else {
+        changeExerciseIndex = existingList.findIndex(
+          (exercise) => exercise.name === ex,
+        );
+      }
 
       let newList;
       newList = [...existingList];
@@ -333,7 +377,7 @@ function Record() {
     pWeight.current = w;
   }
   // Add exercise function
-  async function addExercise() {
+  async function addExercise(replace = false, target = "") {
     const { areBothDatesSame, wName, ex, r, s, w } = setupExercise();
     if (ex && r && s && w && wName) {
       const { data, dateToChangeWorkoutStateListsWith } = buildExerciseData(
@@ -343,14 +387,32 @@ function Record() {
         s,
         w,
       );
-      saveDataStore(wName, dateToChangeWorkoutStateListsWith, ex);
-      saveWorkoutData(wName, data, ex);
+      saveDataStore(
+        wName,
+        dateToChangeWorkoutStateListsWith,
+        ex,
+        replace,
+        target,
+      );
+      saveWorkoutData(wName, data, ex, replace, target);
 
       finaliseExercise(ex, r, s, w);
 
-      saveTodayList(wName, dateToChangeWorkoutStateListsWith, ex);
+      saveTodayList(
+        wName,
+        dateToChangeWorkoutStateListsWith,
+        ex,
+        replace,
+        target,
+      );
       if (areBothDatesSame) {
-        saveSpecificList(wName, dateToChangeWorkoutStateListsWith, ex);
+        saveSpecificList(
+          wName,
+          dateToChangeWorkoutStateListsWith,
+          ex,
+          replace,
+          target,
+        );
       }
     }
   }
@@ -526,14 +588,15 @@ function Record() {
     }
   }
   function handleChoice(choiceMade) {
+    let replace = false;
     if (choiceMade == "use") {
       exercise.current.value = target;
     }
     if (choiceMade == "update") {
-      //
+      replace = true;
     }
     setOpen(false);
-    addExercise();
+    addExercise(replace, target);
   }
   function exerciseNameChanged() {
     let ex = normalizeInput(exercise.current?.value);
