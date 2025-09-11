@@ -31,6 +31,7 @@ function Record() {
   const [privateBrowsing, setPrivateBrowsing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [exerciseNames, setExerciseNames] = useState([]);
   const [backExerciseText, setBackExerciseText] = useState(
     "◄ Go back an exercise",
   );
@@ -127,6 +128,7 @@ function Record() {
   function isInListForThatWorkoutName(ex) {
     const listOfExerciseObjects = CustomDisplayListBasedonWorkout();
     const justTheNames = listOfExerciseObjects.map((ex) => ex.name);
+    setExerciseNames(justTheNames);
     const { target, rating } = bestMatch(ex, justTheNames);
     return { target, rating };
   }
