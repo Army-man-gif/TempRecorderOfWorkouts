@@ -606,7 +606,6 @@ function Record() {
       const { target, rating } = isInListForThatWorkoutName(ex);
       setTarget(target);
       if (rating >= 0.9) {
-        console.log(target);
         addExercise(true, target);
       } else if (rating >= 0.6) {
         setOpen(true);
