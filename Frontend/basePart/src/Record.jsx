@@ -617,7 +617,7 @@ function Record() {
     // set a new timer
     const timeout = setTimeout(() => {
       exerciseNameChanged();
-    }, 1500);
+    }, 1200);
 
     setTypingTimeout(timeout);
   }
