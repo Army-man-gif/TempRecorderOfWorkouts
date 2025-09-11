@@ -768,6 +768,14 @@ function Record() {
                     type="text"
                     placeholder="Exercise name..."
                   ></input>
+                  <datalist id="exerciseNameOptions">
+                    <option value="">-- Select an exercise --</option>
+                    {exerciseNames.map((opt, idx) => (
+                      <option key={idx} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </datalist>
                 </div>
                 <br></br>
                 <label htmlFor="addReps">Reps: </label>
