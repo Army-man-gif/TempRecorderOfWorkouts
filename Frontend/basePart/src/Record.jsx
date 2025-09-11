@@ -7,7 +7,13 @@ import {
 } from "./talkingToBackendLogic.js";
 import React, { useRef, useEffect, useState } from "react";
 import stringSimilarity from "string-similarity";
-
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 function Record() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [typingTimeout, setTypingTimeout] = useState(null);
@@ -39,6 +45,9 @@ function Record() {
   let pReps = useRef(null);
   let pSets = useRef(null);
   let pWeight = useRef(null);
+
+  const [open, setOpen] = useState(false);
+  const [target, setTarget] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -284,7 +293,7 @@ function Record() {
     }
     return { r, s, w };
   }
-  function setupExercise(bool) {
+  function setupExercise() {
     setAdding(true);
     let areBothDatesSame = false;
     if (curunformattedDate == LocaldateunFormatted) {
@@ -297,18 +306,6 @@ function Record() {
     let sOld = normalizeInput(sets.current?.value);
     let wOld = normalizeInput(weight.current?.value);
     const { r, s, w } = adjustOtherThreeFieldValues(rOld, sOld, wOld);
-    if (bool) {
-      const { target, rating } = isInListForThatWorkoutName(ex);
-      if (rating >= 0.6) {
-        const ask = confirm(
-          `Did you mean ${target}, because it's quite similar. Click OK to change to ${target} or cancel to keep your name`,
-        );
-        if (ask) {
-          ex = normalizeInput(target);
-          exercise.current.value = target;
-        }
-      }
-    }
     return { areBothDatesSame, wName, ex, r, s, w };
   }
   function buildExerciseData(wName, ex, r, s, w) {
@@ -336,8 +333,8 @@ function Record() {
     pWeight.current = w;
   }
   // Add exercise function
-  async function addExercise(bool = false) {
-    const { areBothDatesSame, wName, ex, r, s, w } = setupExercise(bool);
+  async function addExercise() {
+    const { areBothDatesSame, wName, ex, r, s, w } = setupExercise();
     if (ex && r && s && w && wName) {
       const { data, dateToChangeWorkoutStateListsWith } = buildExerciseData(
         wName,
@@ -528,12 +525,31 @@ function Record() {
       }
     }
   }
+  function handleChoice(choiceMade) {
+    if (choiceMade == "use") {
+      exercise.current.value = target;
+    }
+    if (choiceMade == "update") {
+      //
+    }
+    setOpen(false);
+    addExercise();
+  }
+  function exerciseNameChanged() {
+    let ex = normalizeInput(exercise.current?.value);
+    const { target, rating } = isInListForThatWorkoutName(ex);
+    if (rating >= 0.6 && rating < 1) {
+      setTarget(target);
+      setOpen(true);
+    } else {
+      addExercise();
+    }
+  }
   function debouncedExerciseChange() {
     if (typingTimeout) clearTimeout(typingTimeout);
-    const val = true;
     // set a new timer
     const timeout = setTimeout(() => {
-      addExercise(val);
+      exerciseNameChanged();
     }, 1500);
 
     setTypingTimeout(timeout);
@@ -552,6 +568,35 @@ function Record() {
   }, [workoutNameSet]);
   return (
     <>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Similar Exercise Found</DialogTitle>
+        <DialogContent>
+          Did you mean {target} because it's quite similar?
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="text"
+            color="primary"
+            onClick={() => handleChoice("use")}
+          >
+            ✅ Use Suggestion
+          </Button>
+          <Button
+            variant="text"
+            color="secondary"
+            onClick={() => handleChoice("update")}
+          >
+            ✏️ Update existing exercise name
+          </Button>
+          <Button
+            varaint="text"
+            color="error"
+            onClick={() => handleChoice("ignore")}
+          >
+            ❌ Ignore
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className="flexContainer moreGap">
         <div className="flex-container">
           {Object.keys(todayWorkoutList).length > 0 && (
@@ -663,7 +708,7 @@ function Record() {
                 <label htmlFor="addReps">Reps: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={() => addExercise(false)}
+                    onChange={addExercise}
                     ref={reps}
                     id="addReps"
                     type="text"
@@ -675,7 +720,7 @@ function Record() {
                 <label htmlFor="addSets">Sets: </label>
                 <div className="flexContainer">
                   <input
-                    onChange={() => addExercise(false)}
+                    onChange={addExercise}
                     ref={sets}
                     id="addSets"
                     type="text"
@@ -687,7 +732,7 @@ function Record() {
                 <label htmlFor="addWeight">Weight (in kg): </label>
                 <div className="flexContainer">
                   <input
-                    onChange={() => addExercise(false)}
+                    onChange={addExercise}
                     ref={weight}
                     id="addWeight"
                     type="text"
