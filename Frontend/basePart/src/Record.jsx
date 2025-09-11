@@ -592,7 +592,7 @@ function Record() {
   function handleChoice(choiceMade) {
     let replace = false;
     if (choiceMade == "use") {
-      exercise.current.value = target;
+      exercise.current.value = normalizeInput(target);
     }
     if (choiceMade == "update") {
       replace = true;
@@ -604,11 +604,12 @@ function Record() {
     let ex = normalizeInput(exercise.current?.value);
     if (ex != "") {
       const { target, rating } = isInListForThatWorkoutName(ex);
-      if (rating >= 0.6 && rating < 1) {
-        setTarget(target);
+      setTarget(target);
+      if (rating >= 0.9) {
+        console.log(target);
+        addExercise(true, target);
+      } else if (rating >= 0.6) {
         setOpen(true);
-      } else {
-        addExercise();
       }
     }
   }
