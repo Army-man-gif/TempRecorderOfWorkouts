@@ -1,3 +1,6 @@
+body {
+  background-color: lightpink;
+}
 .flex-container {
   display: flex;
   flex-direction: column;
@@ -36,8 +39,11 @@
   margin-top: 10px;
   gap: 1px;
 }
-.table {
+table,
+th,
+td {
   border: 1px solid black;
+  border-collapse: collapse;
 }
 
 #workout_block_line,

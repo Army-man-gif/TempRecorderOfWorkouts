@@ -53,7 +53,6 @@ function Record() {
 
   useEffect(() => {
     async function load() {
-      localStorage.clear();
       let privateBrowsingLocalFlag = false;
       let dataToLookThrough = {};
       let name = "";
@@ -675,7 +674,7 @@ function Record() {
                     Date: {LocaldateunFormatted}
                   </th>
                 </tr>
-                <tr>
+                <tr className="Headings">
                   <th>Exercise number</th>
                   <th>Exercise Name</th>
                   <th>Reps</th>
@@ -872,7 +871,7 @@ function Record() {
                     Date: {curunformattedDate}
                   </th>
                 </tr>
-                <tr>
+                <tr className="Headings">
                   <th>Exercise number</th>
                   <th>Exercise Name</th>
                   <th>Reps</th>
@@ -885,10 +884,9 @@ function Record() {
                   ([workoutName, workoutData], counter) => (
                     <React.Fragment key={`${workoutName}-${counter}`}>
                       <tr>
-                        <td></td>
-                        <td id="workout_block_line" colSpan="4">
+                        <th id="workout_block_line" colSpan="5">
                           {workoutName}
-                        </td>
+                        </th>
                       </tr>
                       {workoutData.map((exercise, exerciseIndex) => (
                         <tr
