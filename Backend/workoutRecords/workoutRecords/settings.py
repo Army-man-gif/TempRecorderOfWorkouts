@@ -19,13 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 print(BASE_DIR)
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 import dj_database_url
-# SECURITY WARNING: keep the secret key used in production secret!
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
