@@ -208,7 +208,7 @@ def getAll(request):
 
 
 
-
+"""
 def validateUser(request,username="",passkey=""):
     if(request.method == "POST"):
         try:
@@ -359,4 +359,4 @@ def deleteExercise(request):
         exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
         exercise.delete()
         return JsonResponse({"message": "Exercise deleted"})
-
+"""
