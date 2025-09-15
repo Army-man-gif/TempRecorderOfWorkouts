@@ -22,11 +22,11 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 DEBUG = False
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY","")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","").split(",")
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS","").split(",")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS","").split(",")
-
+DATABASE_URL = os.environ.get("DATABASE_URL","")
 
 CSRF_COOKIE_SECURE = True      
 CSRF_COOKIE_SAMESITE = "None"
@@ -45,6 +45,7 @@ SECURE_SSL_REDIRECT = True
 
 ROOT_URLCONF = "workoutRecords.urls"
 
+WSGI_APPLICATION = "workoutRecords.wsgi.application"
 
 INSTALLED_APPS = [
     "databaseForRecords",
@@ -86,7 +87,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "workoutRecords.wsgi.application"
 
 
 
@@ -96,7 +96,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     },
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL","")
+        default=DATABASE_URL
     )
 }
 
