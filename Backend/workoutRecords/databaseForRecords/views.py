@@ -22,15 +22,11 @@ def get_csrf_token(request):
         'csrftoken', token, samesite='None', secure=True, httponly=False
     )
     return response
-
 @ensure_csrf_cookie
 @require_GET
 def setToken(request):
     # Sets the cookie on the frontend device
     return JsonResponse({"detail":"CSRF token set"})
-
-
-
 def GetorMakeUser(request):
     if(request.method != "POST"):
         return JsonResponse({"error": "Only POST allowed"}, status=405)
@@ -54,50 +50,7 @@ def GetorMakeUser(request):
         except Exception as e:
             traceback.print_exc()
             return JsonResponse({"error":str(e)},status=400)
-
-
-def validateUser(request,username="",passkey=""):
-    if(request.method == "POST"):
-        try:
-            data = json.loads(request.body)
-            username = data.get("username","")
-            passkey = data.get("passkey","")
-            print("After entering logic",username,passkey)
-            user = authenticate(request,username=username,password=passkey)
-            if(user is not None):
-                return JsonResponse({"message":"User validated"})
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User does not exist"}, status=405)
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
-    else:
-        try:
-            user = authenticate(request,username=username,password=passkey)
-            if(user is not None):
-                return True
-        except Exception:
-            return False
-
-def deleteUser(request):
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        try:
-            data = json.loads(request.body)
-            username = data.get("username","")
-            passkey = data.get("passkey","")
-            if(validateUser(request,username,passkey)):
-                user = User.objects.get(username=username)
-                if(check_password(passkey,user.password)):
-                    user.delete()
-                    return JsonResponse({"message":"Deleted user"})
-                return JsonResponse({"error":"Wrong password"})
-            return JsonResponse({"error": "User does not exist"}, status=405)
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
-
 # ----------------------------------------------------------------------------------------
-
 def loginView(request):
     if(request.method != "POST"):
         return JsonResponse({"error": "Only POST allowed"}, status=405)
@@ -119,21 +72,18 @@ def loginView(request):
             return JsonResponse({"error": "User does not exist"}, status=404)
         except Exception as e:
             return JsonResponse({"error":str(e)},status=400)
-
 def logoutView(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error":"User not logged in yet"})
     else:
         logout(request)
         return JsonResponse({"message": "User logged out"})
-
 def cleanInput(val):
     cleaned = val.strip()
     cleaned = cleaned.capitalize()
     cleaned = re.sub(r'[^a-z0-9]+', ' ', cleaned)
     cleaned = re.sub(r'\s+', ' ', cleaned)
     return cleaned
-
 # ----------------------------------------------------------------------------------------
 # batchupdateExercise helper functions
 def parseData(batchupdateData):
@@ -228,8 +178,6 @@ def batchupdateExercise(request):
                 return JsonResponse({"message":"Empty batchUpdate"})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
-
-
 def updateExercise(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error":"User not logged in yet"})
@@ -263,9 +211,6 @@ def updateExercise(request):
             return JsonResponse({"message": message})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
-
-
-
 def deleteExercise(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error":"User not logged in yet"})
@@ -283,80 +228,6 @@ def deleteExercise(request):
 # ----------------------------------------------------------------------------------------
 
 
-def addWorkout(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        data = json.loads(request.body)
-        newName = data.get("newName")
-        workout = Workout(user=request.user, name=newName)
-        workout.save()
-        return JsonResponse({"message": "Workout created"})
-
-def updateWorkout(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        try:
-            data = json.loads(request.body)
-            originalName = data.get("originalName")
-            newName = data.get("newName")
-            workout = Workout.objects.get(user=request.user,name=originalName)
-            workout.name = newName
-            workout.save()
-            return JsonResponse({"message": "Workout updated"})
-        except Workout.DoesNotExist:
-            return addWorkout(request)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
-
-
-def deleteWorkout(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        data = json.loads(request.body)
-        workoutName = data.get("workoutName")
-        workout = Workout(user=request.user,name=workoutName)
-        workout.delete()
-        return JsonResponse({"message": "Workout deleted"})
-
-
-
-def getAllExercisesbasedOnDate(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        try:
-            data = json.loads(request.body)
-            date = data.get("date")
-            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-            exercises = list(Exercise.objects.filter(workout__user=request.user,workout__date=date_obj))
-
-            toReturn = {}
-            for exercise in exercises:
-                workoutName = exercise.workout.name
-                exerciseName = exercise.exerciseName
-                if workoutName not in toReturn:
-                    toReturn[workoutName] = []
-                toReturn[workoutName].append({
-                    "name" : exerciseName,
-                    "reps" : exercise.exerciseReps,
-                    "sets" : exercise.exerciseSets,
-                    "weight" : exercise.exerciseWeight 
-                })
-            return JsonResponse({"message":"success","data":toReturn})
-        except Exception as e:
-            return JsonResponse({"error":str(e)},status=400)
 
 
 def getAll(request):
@@ -386,3 +257,112 @@ def getAll(request):
             return JsonResponse({"error":str(e)},status=400)
 
 
+
+
+
+
+def validateUser(request,username="",passkey=""):
+    if(request.method == "POST"):
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            print("After entering logic",username,passkey)
+            user = authenticate(request,username=username,password=passkey)
+            if(user is not None):
+                return JsonResponse({"message":"User validated"})
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    else:
+        try:
+            user = authenticate(request,username=username,password=passkey)
+            if(user is not None):
+                return True
+        except Exception:
+            return False
+def deleteUser(request):
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        try:
+            data = json.loads(request.body)
+            username = data.get("username","")
+            passkey = data.get("passkey","")
+            if(validateUser(request,username,passkey)):
+                user = User.objects.get(username=username)
+                if(check_password(passkey,user.password)):
+                    user.delete()
+                    return JsonResponse({"message":"Deleted user"})
+                return JsonResponse({"error":"Wrong password"})
+            return JsonResponse({"error": "User does not exist"}, status=405)
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+def addWorkout(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        data = json.loads(request.body)
+        newName = data.get("newName")
+        workout = Workout(user=request.user, name=newName)
+        workout.save()
+        return JsonResponse({"message": "Workout created"})
+def updateWorkout(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        try:
+            data = json.loads(request.body)
+            originalName = data.get("originalName")
+            newName = data.get("newName")
+            workout = Workout.objects.get(user=request.user,name=originalName)
+            workout.name = newName
+            workout.save()
+            return JsonResponse({"message": "Workout updated"})
+        except Workout.DoesNotExist:
+            return addWorkout(request)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+def deleteWorkout(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        data = json.loads(request.body)
+        workoutName = data.get("workoutName")
+        workout = Workout(user=request.user,name=workoutName)
+        workout.delete()
+        return JsonResponse({"message": "Workout deleted"})
+def getAllExercisesbasedOnDate(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        try:
+            data = json.loads(request.body)
+            date = data.get("date")
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            exercises = list(Exercise.objects.filter(workout__user=request.user,workout__date=date_obj))
+
+            toReturn = {}
+            for exercise in exercises:
+                workoutName = exercise.workout.name
+                exerciseName = exercise.exerciseName
+                if workoutName not in toReturn:
+                    toReturn[workoutName] = []
+                toReturn[workoutName].append({
+                    "name" : exerciseName,
+                    "reps" : exercise.exerciseReps,
+                    "sets" : exercise.exerciseSets,
+                    "weight" : exercise.exerciseWeight 
+                })
+            return JsonResponse({"message":"success","data":toReturn})
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
