@@ -178,58 +178,6 @@ def batchupdateExercise(request):
                 return JsonResponse({"message":"Empty batchUpdate"})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
-def updateExercise(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        try:
-            data = json.loads(request.body)
-            workoutName = data.get("workoutName")
-            exerciseName = data.get("exerciseName", "")
-            exerciseReps = data.get("exerciseReps",None)
-            exerciseSets = data.get("exerciseSets",None)
-            exerciseWeight = data.get("exerciseWeight",None)
-            date = data.get("date")
-            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-            workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date_obj,)
-            # defaults are only used when the creation aspect of "get_or_create" is triggered
-            exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
-            defaults={
-                "exerciseReps":exerciseReps, 
-                "exerciseSets":exerciseSets,
-                "exerciseWeight":exerciseWeight
-            }
-            )
-            if not created:
-                for field in ["exerciseReps","exerciseSets","exerciseWeight"]:
-                    value = data.get(field)
-                    if value is not None:
-                        setattr(exercise, field, value)
-            message = "Exercise created" if created else "Exercise updated"
-            return JsonResponse({"message": message})
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-def deleteExercise(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error":"User not logged in yet"})
-    if(request.method != "POST"):
-        return JsonResponse({"error": "Only POST allowed"}, status=405)
-    else:
-        data = json.loads(request.body)
-        workout = data.get("workout")
-        exerciseName = data.get("exerciseName")
-        exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
-        exercise.delete()
-        return JsonResponse({"message": "Exercise deleted"})
-
-
-# ----------------------------------------------------------------------------------------
-
-
-
-
 def getAll(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error":"User not logged in yet"})
@@ -366,3 +314,49 @@ def getAllExercisesbasedOnDate(request):
             return JsonResponse({"message":"success","data":toReturn})
         except Exception as e:
             return JsonResponse({"error":str(e)},status=400)
+def updateExercise(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        try:
+            data = json.loads(request.body)
+            workoutName = data.get("workoutName")
+            exerciseName = data.get("exerciseName", "")
+            exerciseReps = data.get("exerciseReps",None)
+            exerciseSets = data.get("exerciseSets",None)
+            exerciseWeight = data.get("exerciseWeight",None)
+            date = data.get("date")
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            workout, _ = Workout.objects.get_or_create(user=request.user, name=workoutName,date=date_obj,)
+            # defaults are only used when the creation aspect of "get_or_create" is triggered
+            exercise,created = Exercise.objects.get_or_create(workout=workout, exerciseName=exerciseName,
+            defaults={
+                "exerciseReps":exerciseReps, 
+                "exerciseSets":exerciseSets,
+                "exerciseWeight":exerciseWeight
+            }
+            )
+            if not created:
+                for field in ["exerciseReps","exerciseSets","exerciseWeight"]:
+                    value = data.get(field)
+                    if value is not None:
+                        setattr(exercise, field, value)
+            message = "Exercise created" if created else "Exercise updated"
+            return JsonResponse({"message": message})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+def deleteExercise(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error":"User not logged in yet"})
+    if(request.method != "POST"):
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    else:
+        data = json.loads(request.body)
+        workout = data.get("workout")
+        exerciseName = data.get("exerciseName")
+        exercise = Exercise.objects.get(workout=workout, exerciseName=exerciseName)
+        exercise.delete()
+        return JsonResponse({"message": "Exercise deleted"})
+
