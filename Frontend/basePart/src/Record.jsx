@@ -159,6 +159,10 @@ function Record() {
       .replace(/\s+/g, " ");
     return cleaned;
   }
+  function getTodayKey() {
+    const now = new Date().toISOString();
+    return formatDate(now, timezone);
+  }
   function saveDataStore(
     wName,
     dateToChangeWorkoutStateListsWith,
@@ -166,6 +170,7 @@ function Record() {
     replace,
     target,
   ) {
+    const todayKey = getTodayKey();
     let dataPool = {};
     if (!privateBrowsing) {
       dataPool = JSON.parse(localStorage.getItem("data")) || {};
@@ -173,29 +178,27 @@ function Record() {
       dataPool = JSON.parse(sessionStorage.getItem("data")) || {};
     }
 
-    if (!(LocaldateunFormatted in dataPool)) {
-      dataPool[LocaldateunFormatted] = {};
+    if (!(todayKey in dataPool)) {
+      dataPool[todayKey] = {};
     }
-    if (!(wName in dataPool[LocaldateunFormatted])) {
-      dataPool[LocaldateunFormatted][wName] = [];
+    if (!(wName in dataPool[todayKey])) {
+      dataPool[todayKey][wName] = [];
     }
     let changeExerciseIndexinDataPool = -1;
     if (replace) {
-      changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
-        wName
-      ].findIndex((exercise) => exercise.name === target);
+      changeExerciseIndexinDataPool = dataPool[todayKey][wName].findIndex(
+        (exercise) => exercise.name === target,
+      );
     } else {
-      changeExerciseIndexinDataPool = dataPool[LocaldateunFormatted][
-        wName
-      ].findIndex((exercise) => exercise.name === ex);
+      changeExerciseIndexinDataPool = dataPool[todayKey][wName].findIndex(
+        (exercise) => exercise.name === ex,
+      );
     }
     if (changeExerciseIndexinDataPool >= 0) {
-      dataPool[LocaldateunFormatted][wName][changeExerciseIndexinDataPool] =
+      dataPool[todayKey][wName][changeExerciseIndexinDataPool] =
         dateToChangeWorkoutStateListsWith;
     } else {
-      dataPool[LocaldateunFormatted][wName].push(
-        dateToChangeWorkoutStateListsWith,
-      );
+      dataPool[todayKey][wName].push(dateToChangeWorkoutStateListsWith);
     }
 
     if (!privateBrowsing) {
