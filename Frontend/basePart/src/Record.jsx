@@ -11,8 +11,8 @@ import {
   formatDate,
   normalizeInput,
   getTodayKey,
+  bestMatch,
 } from "./BasicCheckingAndFormatting.jsx";
-import stringSimilarity from "string-similarity";
 import {
   Dialog,
   DialogTitle,
@@ -121,12 +121,6 @@ function Record() {
     load();
   }, []);
 
-  function bestMatch(inputValue, list) {
-    const closestMatch = stringSimilarity.findBestMatch(inputValue, list);
-    const target = closestMatch.bestMatch.target;
-    const rating = closestMatch.bestMatch.rating;
-    return { target, rating };
-  }
   function isInListForThatWorkoutName(ex) {
     const listOfExerciseObjects = CustomDisplayListBasedonWorkout();
     const justTheNames = listOfExerciseObjects.map((ex) => ex.name);

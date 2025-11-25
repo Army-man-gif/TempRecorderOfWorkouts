@@ -1,3 +1,5 @@
+import stringSimilarity from "string-similarity";
+
 export function checkPrivateBrowsing() {
   try {
     localStorage.setItem("__test__", "1");
@@ -32,4 +34,11 @@ export function normalizeInput(input) {
 export function getTodayKey(timezone) {
   const now = new Date().toISOString();
   return formatDate(now, timezone);
+}
+
+export function bestMatch(inputValue, list) {
+  const closestMatch = stringSimilarity.findBestMatch(inputValue, list);
+  const target = closestMatch.bestMatch.target;
+  const rating = closestMatch.bestMatch.rating;
+  return { target, rating };
 }
