@@ -42,3 +42,8 @@ export function bestMatch(inputValue, list) {
   const rating = closestMatch.bestMatch.rating;
   return { target, rating };
 }
+
+export function isInteger(str) {
+  const num = Number(str);
+  return Number.isInteger(num) || str.trim() == "";
+}
